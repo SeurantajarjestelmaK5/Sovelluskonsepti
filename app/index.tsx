@@ -1,6 +1,8 @@
+import { Link } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
+
 
 
 
@@ -14,13 +16,12 @@ export default function Index() {
       }}
     >
       <Text>Edit app/index.tsx to edit this screen.</Text>
+      <Link href="/test">
       <Button
         children="Press me"
         mode="contained"
-        onPress={() => {
-            
-        }}
       />
+      </Link  >
     </View>
   );
 }
