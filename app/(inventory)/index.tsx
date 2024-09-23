@@ -5,7 +5,7 @@ import { Button } from "react-native-paper";
 
 
 
-export default function Index() {
+export default function InventoryHome() {
   return (
     <View
       style={{
@@ -16,18 +16,11 @@ export default function Index() {
     >
       <Text>Inventaarion indexi</Text>
     
-      <Link href="/(inventory)/diningroom">
-      <Button
-        children="Testi 3"
-        mode="contained"
-       
-      />
-      </Link>
       <Text>Inventaarion indexi</Text>
     
-      <Link href="(omavalvonta)">
+      <Link href="inventory">
       <Button
-        children="Omavalvontaan"
+        children="Inviksiin bro"
         mode="contained"
       />
       </Link>

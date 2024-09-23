@@ -5,7 +5,7 @@ import { Button } from "react-native-paper";
 
 
 
-export default function Index() {
+export default function MonitorHome() {
   return (
     <View
       style={{
@@ -14,14 +14,8 @@ export default function Index() {
         alignItems: "center",
       }}
     >
+      <Text>Omavalvonnan kotisivu</Text>
 
-      <Link href="(inventaario)">
-      <Button
-        children="Inventaarioon"
-        mode="contained"
-       
-      />
-      </Link>
     </View>
   );
 }

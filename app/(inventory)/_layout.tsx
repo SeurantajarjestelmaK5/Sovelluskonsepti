@@ -2,11 +2,9 @@ import { Stack } from "expo-router";
 
 export default function InventoryStack() {
   return (
-    <Stack
-   >
+    <Stack>
       <Stack.Screen name="index"/>
-      <Stack.Screen name="diningroom"/>
-
+      <Stack.Screen name="inventory"/>
     </Stack>
   );
 }
