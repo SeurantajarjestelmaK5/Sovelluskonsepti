@@ -14,20 +14,21 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Juuri indexi</Text>
-      <Link href="(omavalvonta)">
+      <Text>Inventaarion indexi</Text>
+    
+      <Link href="testi3">
       <Button
-        children="
-        Omavalvonta"
+        children="Testi 3"
         mode="contained"
        
       />
       </Link>
-      <Link href="(inventaario)">
+      <Text>Inventaarion indexi</Text>
+    
+      <Link href="(omavalvonta)">
       <Button
-        children="Inventaarioon"
+        children="Omavalvontaan"
         mode="contained"
-       
       />
       </Link>
     </View>
