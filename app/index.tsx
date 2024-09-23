@@ -1,5 +1,4 @@
 import { Link } from "expo-router";
-import { Link } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
@@ -17,7 +16,7 @@ export default function Index() {
       }}
     >
       <Text>Juuri indexi</Text>
-      <Link href="(omavalvonta)">
+      <Link href="(monitoring)">
       <Button
         children="
         Omavalvonta"
@@ -25,7 +24,7 @@ export default function Index() {
        
       />
       </Link>
-      <Link href="(inventaario)">
+      <Link href="(inventory)">
       <Button
         children="Inventaarioon"
         mode="contained"

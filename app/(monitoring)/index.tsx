@@ -14,14 +14,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Omavalvonnan indexi</Text>
-      <Link href="testi2">
-      <Button
-        children="Press me"
-        mode="contained"
-       
-      />
-      </Link>
+
       <Link href="(inventaario)">
       <Button
         children="Inventaarioon"

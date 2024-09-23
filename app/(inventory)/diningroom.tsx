@@ -1,11 +1,11 @@
-import { Link } from "expo-router";
+ import { Link } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
 
 
 
-export default function Index() {
+export default function Diningroom() {
   return (
     <View
       style={{
@@ -14,9 +14,9 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Inventaarion indexi</Text>
+      <Text>Takas inventaarioon</Text>
     
-      <Link href="/(inventory)/diningroom">
+      <Link href="inventory">
       <Button
         children="Testi 3"
         mode="contained"
