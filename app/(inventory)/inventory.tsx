@@ -1,9 +1,8 @@
+import { ThemedText } from "@/components/ThemedText";
 import { Link } from "expo-router";
 import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
-
-
 
 export default function InventoryHome() {
   return (
@@ -14,16 +13,8 @@ export default function InventoryHome() {
         alignItems: "center",
       }}
     >
-      <Text>Inventaarion indexi</Text>
-    
-      <Text>Inventaarion indexi</Text>
-    
-      <Link href="inventory">
-      <Button
-        children="Inviksiin bro"
-        mode="contained"
-      />
-      </Link>
+      <ThemedText>Täs vois tehä invistä sitte niiin</ThemedText>
+
     </View>
   );
 }
