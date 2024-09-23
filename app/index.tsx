@@ -9,30 +9,32 @@ export default function Index() {
     <View
       style={{
         flex: 1,
-        justifyContent: "flex-start",
+        justifyContent: "center",
         alignItems: "center",
         padding: 20,
       }}
     >
-      <ThemedText style={{ fontSize: 20 }}>K5 seuranta-app</ThemedText>
-      <Link href="/(monitoring)">
-        <Button
-          children="
+      <View style={{justifyContent: "space-evenly", alignItems: "center" , flex: 0.4}}>
+        <ThemedText style={{ fontSize: 20 }}>K5 seuranta-app</ThemedText>
+        <Link href="/(monitoring)">
+          <Button
+            children="
         Omavalvonta"
-          mode="contained"
-        />
-      </Link>
-      <Link href="(inventory)">
-        <Button children="Inventaarioon" mode="contained" />
-      </Link>
+            mode="contained"
+          />
+        </Link>
+        <Link href="(inventory)">
+          <Button children="Inventaarioon" mode="contained" />
+        </Link>
 
-      <Link href="(settings)">
-        <Button children="Asetukset" mode="contained" />
-      </Link>
+        <Link href="(settings)">
+          <Button children="Asetukset" mode="contained" />
+        </Link>
 
-      <Link href="(reports)">
-        <Button children="Raportit" mode="contained" />
-      </Link>
+        <Link href="(reports)">
+          <Button children="Raportit" mode="contained" />
+        </Link>
+      </View>
     </View>
   );
 }
