@@ -1,6 +1,5 @@
 import { ThemedText } from "@/components/ThemedText";
 import { Link } from "expo-router";
-import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
 
