@@ -5,7 +5,7 @@ import { Button } from "react-native-paper";
 
 
 
-export default function InventoryHome() {
+export default function waste() {
   return (
     <View
       style={{
@@ -14,19 +14,8 @@ export default function InventoryHome() {
         alignItems: "center",
       }}
     >
-    
-      <Link href="/kitchen">
-      <Button
-        children="Keittiö"
-        mode="contained"
-      />
-      </Link>
-      <Link href="/diningroom">
-      <Button
-        children="Sali"
-        mode="contained"
-      />
-      </Link>
+      <Text>Jätteet</Text>
+
       <Link href="../">
       <Button
         children="Back"
