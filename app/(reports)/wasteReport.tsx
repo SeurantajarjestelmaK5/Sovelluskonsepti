@@ -5,7 +5,7 @@ import { Button } from "react-native-paper";
 
 
 
-export default function MonitorHome() {
+export default function wasteReport() {
   return (
     <View
       style={{
@@ -14,7 +14,7 @@ export default function MonitorHome() {
         alignItems: "center",
       }}
     >
-      <Text>Omavalvonnan kotisivu</Text>
+      <Text>Jätteet - raportti</Text>
 
       <Link href="../">
       <Button

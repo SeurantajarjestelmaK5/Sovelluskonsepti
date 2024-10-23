@@ -27,6 +27,18 @@ export default function InventoryHome() {
         mode="contained"
       />
       </Link>
+      <Link href="/diningroom">
+      <Button
+        children="Sali"
+        mode="contained"
+      />
+      </Link>
+      <Link href="../">
+      <Button
+        children="Back"
+        mode="contained"
+      />
+      </Link>
     </View>
   );
 }
