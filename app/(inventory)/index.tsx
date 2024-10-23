@@ -14,13 +14,16 @@ export default function InventoryHome() {
         alignItems: "center",
       }}
     >
-      <Text>Inventaarion indexi</Text>
     
-      <Text>Inventaarion indexi</Text>
-    
-      <Link href="inventory">
+      <Link href="/kitchen">
       <Button
-        children="Inviksiin bro"
+        children="Keittiö"
+        mode="contained"
+      />
+      </Link>
+      <Link href="/diningroom">
+      <Button
+        children="Sali"
         mode="contained"
       />
       </Link>

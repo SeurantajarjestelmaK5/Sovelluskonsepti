@@ -14,8 +14,7 @@ export default function Index() {
       }}
     >
       <View style={{justifyContent: "space-evenly", alignItems: "center" , flex: 0.4}}>
-        <ThemedText style={{ fontSize: 20 }}>K5 seuranta-app</ThemedText>
-        <Link href="/(monitoring)">
+        <Link href="(monitoring)">
           <Button
             children="
         Omavalvonta"

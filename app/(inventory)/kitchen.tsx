@@ -4,7 +4,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
 
-export default function InventoryHome() {
+export default function KitchenHome() {
   return (
     <View
       style={{

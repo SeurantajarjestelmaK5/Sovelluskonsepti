@@ -16,7 +16,7 @@ export default function Diningroom() {
     >
       <Text>Takas inventaarioon</Text>
     
-      <Link href="inventory">
+      <Link href="/inventory">
       <Button
         children="Testi 3"
         mode="contained"
@@ -25,7 +25,7 @@ export default function Diningroom() {
       </Link>
       <Text>Inventaarion indexi</Text>
     
-      <Link href="(omavalvonta)">
+      <Link href="(monitoring)">
       <Button
         children="Omavalvontaan"
         mode="contained"
