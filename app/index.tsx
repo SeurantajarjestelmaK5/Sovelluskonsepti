@@ -13,23 +13,29 @@ export default function Index() {
         padding: 20,
       }}
     >
-      <View style={{justifyContent: "space-evenly", alignItems: "center" , flex: 0.4}}>
-        <Link href="(monitoring)">
+      <View
+        style={{
+          justifyContent: "space-evenly",
+          alignItems: "center",
+          flex: 0.4,
+        }}
+      >
+        <Link href="/(monitoring)">
           <Button
             children="
         Omavalvonta"
             mode="contained"
           />
         </Link>
-        <Link href="(inventory)">
-          <Button children="Inventaarioon" mode="contained" />
+        <Link href="/(inventory)">
+          <Button children="Inventaario" mode="contained" />
         </Link>
 
-        <Link href="(settings)">
+        <Link href="/(settings)">
           <Button children="Asetukset" mode="contained" />
         </Link>
 
-        <Link href="(reports)">
+        <Link href="/(reports)">
           <Button children="Raportit" mode="contained" />
         </Link>
       </View>
