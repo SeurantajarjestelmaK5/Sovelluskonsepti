@@ -16,6 +16,30 @@ export default function MonitorHome() {
     >
       <Text>Omavalvonnan kotisivu</Text>
 
+      <Link href="/cleaning">
+      <Button
+        children="Viikkosiivous"
+        mode="contained"
+      />
+      </Link>
+      <Link href="/waste">
+      <Button
+        children="Jätteet"
+        mode="contained"
+      />
+      </Link>
+      <Link href="/samples">
+      <Button
+        children="Näytteenotto"
+        mode="contained"
+      />
+      </Link>
+      <Link href="/temperatures">
+      <Button
+        children="Lämpötilat"
+        mode="contained"
+      />
+      </Link>
       <Link href="../">
       <Button
         children="Back"
