@@ -1,26 +1,17 @@
-import { Link } from "expo-router";
-import React from "react";
-import { Text, View } from "react-native";
+import { ThemedText } from "@/components/ThemedText";
+import { Text, View, useColorScheme } from "react-native";
 import { Button } from "react-native-paper";
 
-
-
-export default function SettingsHome() {
+export default function SettingsScreen() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+    <View 
+    style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
     >
-      <Text>Asetukset</Text>
-      <Link href="../">
-      <Button
-        children="Back"
-        mode="contained"
+      <ThemedText>Settings Screen</ThemedText>
+      <Button 
+        children="Dark mode"
+        onPress={() => console.log('Dark mode')}
       />
-      </Link>
     </View>
   );
 }
