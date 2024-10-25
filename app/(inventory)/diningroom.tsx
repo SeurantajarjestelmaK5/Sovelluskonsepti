@@ -6,6 +6,11 @@ import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { Button, Modal } from "react-native-paper";
 
+// FIXES TODO 25.10
+// Fixaus toho modaalii jos ei valittua kuukautta ottaa nykyisen
+// KOKO Kuu-Kalenteri bar clickableksi josta aukeaa modaali
+// Importtaa koko paska keittiö invikseen
+
 export default function Diningroom() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -53,11 +58,7 @@ export default function Diningroom() {
       <MaterialCommunityIcons name="arrow-left" style={diningroomStyle.backIcon}/>
       </Link>
       </Pressable>
-      <Pressable>
-      <Link href="../">
-      <MaterialCommunityIcons name="arrow-left" style={diningroomStyle.backIcon}/>
-      </Link>
-      </Pressable>
+      
 
       {/*TÄSTÄ ALKAA KALENTERIN MODAALI*/ }
     <YearMonthPickerModal
