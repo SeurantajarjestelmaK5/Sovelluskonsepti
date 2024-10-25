@@ -1,56 +1,52 @@
 import { Link } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Button } from "react-native-paper";
-
-
+import { reportNavStyle } from "@/styles/navigations/reportNavStyle";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export default function ReportsHome() {
   return (
     <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      style={reportNavStyle.container}
     >
-      <Text>Raportit</Text>
-      <Link href="/cleaningReport">
-      <Button
-        children="Viikkosiivous"
-        mode="contained"
-      />
-      </Link>
-      <Link href="/wasteReport">
-      <Button
-        children="Jätteet"
-        mode="contained"
-      />
-      </Link>
-      <Link href="/sampleReport">
-      <Button
-        children="Näytteenotto"
-        mode="contained"
-      />
-      </Link>
-      <Link href="/tempReport">
-      <Button
-        children="Lämpötilat"
-        mode="contained"
-      />
-      </Link>
-      <Link href="/inventoryReport">
-      <Button
-        children="Inventaario"
-        mode="contained"
-      />
-      </Link>
-      <Link href="../">
-      <Button
-        children="Back"
-        mode="contained"
-      />
-      </Link>
+      <View style={reportNavStyle.buttonContainer} >
+        <Link href="/cleaningReport" asChild>
+        <Pressable style={reportNavStyle.button}>
+          <Text style={reportNavStyle.buttonText}>Viikkosiivous - raportti</Text>
+          <MaterialCommunityIcons name="spray-bottle" style={reportNavStyle.reportIcon}/>
+        </Pressable>
+        </Link>
+        <Link href="/wasteReport" asChild>
+        <Pressable style={reportNavStyle.button}>
+          <Text style={reportNavStyle.buttonText}>Jätteet</Text>
+          <MaterialCommunityIcons name="trash-can-outline" style={reportNavStyle.reportIcon}/>
+        </Pressable>
+        </Link>
+      </View>
+      <View style={reportNavStyle.buttonContainer} >
+
+        <Link href="/sampleReport" asChild>
+        <Pressable style={reportNavStyle.button}>
+          <Text style={reportNavStyle.buttonText}>Näytteenotto</Text>
+          <MaterialCommunityIcons name="test-tube" style={reportNavStyle.reportIcon}/>
+        </Pressable>
+        </Link>
+        <Link href="/tempReport" asChild>
+        <Pressable style={reportNavStyle.button}>
+          <Text style={reportNavStyle.buttonText}>Lämpötilat</Text>
+          <MaterialCommunityIcons name="thermometer" style={reportNavStyle.reportIcon}/>
+        </Pressable>
+        </Link>
+        </View>
+      <View style={reportNavStyle.invButtonContainer} >
+        <Link href="/inventoryReport" asChild>
+        <Pressable style={reportNavStyle.invButton}>
+          <Text style={reportNavStyle.buttonText}>Inventaario</Text>
+          <MaterialCommunityIcons name="clipboard-list" style={reportNavStyle.reportIcon}/>
+        </Pressable>
+        </Link>
+      </View>
     </View>
   );
 }

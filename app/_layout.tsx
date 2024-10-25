@@ -23,8 +23,10 @@ export default function TabsLayout() {
         ),
         tabBarStyle: { height: 80 },
         tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
-        tabBarActiveTintColor: Colors.light.tabIconSelected,
-        tabBarInactiveTintColor: Colors.light.tabIconDefault,
+        tabBarActiveTintColor: Colors.dark.tabIconSelected,
+        tabBarInactiveTintColor: Colors.dark.tabIconDefault,
+        tabBarActiveBackgroundColor: Colors.nav.navSelected,
+        tabBarInactiveBackgroundColor: Colors.nav.navDefault
       }}
     >
       <Tabs.Screen

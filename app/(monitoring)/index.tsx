@@ -1,51 +1,44 @@
+import { monitoringNavStyle } from "@/styles/navigations/monitoringNavStyle";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Button } from "react-native-paper";
-
 
 
 export default function MonitorHome() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Omavalvonnan kotisivu</Text>
+    <View style={monitoringNavStyle.container} >
+      <View style={monitoringNavStyle.buttonContainer} >
 
-      <Link href="/cleaning">
-      <Button
-        children="Viikkosiivous"
-        mode="contained"
-      />
+      <Link href="/cleaning" asChild>
+      <Pressable style={monitoringNavStyle.button}>
+      <Text style={monitoringNavStyle.buttonText}>Viikkosiivous</Text>
+      <MaterialCommunityIcons name="spray-bottle" style={monitoringNavStyle.monitoringIcon}/>
+      </Pressable>
       </Link>
-      <Link href="/waste">
-      <Button
-        children="Jätteet"
-        mode="contained"
-      />
+      <Link href="/waste" asChild>
+      <Pressable style={monitoringNavStyle.button}>
+      <Text style={monitoringNavStyle.buttonText}>Jätteet</Text>
+      <MaterialCommunityIcons name="trash-can-outline" style={monitoringNavStyle.monitoringIcon}/>
+      </Pressable>
       </Link>
-      <Link href="/samples">
-      <Button
-        children="Näytteenotto"
-        mode="contained"
-      />
+      </View>
+      <View style={monitoringNavStyle.buttonContainer} >
+      <Link href="/samples" asChild>
+      <Pressable style={monitoringNavStyle.button}>
+      <Text style={monitoringNavStyle.buttonText}>Näytteenotto</Text>
+      <MaterialCommunityIcons name="test-tube" style={monitoringNavStyle.monitoringIcon}/>
+      </Pressable>
       </Link>
-      <Link href="/temperatures">
-      <Button
-        children="Lämpötilat"
-        mode="contained"
-      />
+      <Link href="/temperatures" asChild>
+      <Pressable style={monitoringNavStyle.button}>
+      <Text style={monitoringNavStyle.buttonText}>Lämpötilat</Text>
+      <MaterialCommunityIcons name="thermometer" style={monitoringNavStyle.monitoringIcon}/>
+      </Pressable>
       </Link>
-      <Link href="../">
-      <Button
-        children="Back"
-        mode="contained"
-      />
-      </Link>
+      </View>
+
     </View>
   );
 }
