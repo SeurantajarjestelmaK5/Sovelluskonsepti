@@ -1,13 +1,10 @@
 import { Tabs, useRouter } from "expo-router";
-import { useColorScheme } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Colors } from "@/constants/Colors";
-
-
+import { useThemeColors } from "@/constants/ThemeColors";
 
 export default function TabsLayout() {
   const router = useRouter();
-  const colorScheme = useColorScheme(); 
+  const ThemeColors = useThemeColors();
 
   return (
     <Tabs
@@ -17,16 +14,17 @@ export default function TabsLayout() {
             name="cog"
             size={40}
             style={{ marginRight: 20 }}
-            color={colorScheme === 'light' ? Colors.light.tint : Colors.dark.tint}
+            color={ThemeColors.tint}
             onPress={() => router.push("/(settings)")}
           />
         ),
-        tabBarStyle: { height: 80 },
-        tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
-        tabBarActiveTintColor: Colors.dark.tabIconSelected,
-        tabBarInactiveTintColor: Colors.dark.tabIconDefault,
-        tabBarActiveBackgroundColor: Colors.nav.navSelected,
-        tabBarInactiveBackgroundColor: Colors.nav.navDefault
+        tabBarStyle: { height: 80, backgroundColor: ThemeColors.navDefault },
+        tabBarLabelStyle: { fontSize: 23, fontWeight: "bold"},
+        tabBarActiveTintColor: ThemeColors.tabIconSelected,
+        tabBarInactiveTintColor: ThemeColors.tabIconDefault,
+        tabBarActiveBackgroundColor: ThemeColors.navSelected,
+        tabBarInactiveBackgroundColor: ThemeColors.navDefault,
+        tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
       }}
     >
       <Tabs.Screen
