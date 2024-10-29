@@ -8,7 +8,9 @@ export const diningroomStyle = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+    backgroundColor: '#fff'
   },
+
   headerContainer: {  
     flex: 1,
     justifyContent: "center",
@@ -29,7 +31,7 @@ export const diningroomStyle = StyleSheet.create({
     borderRadius: 10,  
     backgroundColor: '#000',
     marginHorizontal: 15
-},
+  },
   buttonText: {
     fontSize: 24,  
     color: '#fff',
@@ -40,25 +42,99 @@ export const diningroomStyle = StyleSheet.create({
     fontSize: 24,  
     color: '#000',
     fontWeight: 'bold',
-    paddingLeft: 5
-  }, 
+    paddingLeft: 5,
+    flex: 1,
+  },
   backIcon: {
-    fontSize: 50,
-    marginLeft: '80%'
+    fontSize: 25,
+  },
+  calendarIcon: {
+    fontSize: 25,
+    color: "#000",
+    paddingRight: 10,
   },
   headerText: {
     fontSize: 32,
-    fontWeight: 'condensedBold',
+    fontWeight: 'bold',
     alignSelf: 'center',
     marginTop: 15
   },
   oneBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    height: 'auto',
+    width: '95%',
+    height: 60,
     backgroundColor: '#626570',
     borderRadius: 20,
-    marginTop: 20
-  }
+    marginTop: 20,
+    paddingHorizontal: 10,
+    justifyContent: 'space-between',
+  },
+  scrollList: {
+    height: 110,
+    width: '95%',
+    justifyContent: 'space-evenly',
+    paddingVertical: 30,
+  },
+  categoryButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    backgroundColor: '#d3d3d3',
+    marginHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '30%'
+  },
+  selectedCategoryButton: {
+    backgroundColor: '#1e90ff', // Highlight color for selected
+  },
+  categoryText: {
+    fontSize: 18,
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  inventoryTable: {
+    flex: 1,
+    marginTop: 20,
+    width: '100%',
+    padding: 10,
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#d3d3d3',
+    width: '100%'
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  columnHeader: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  cellText: {
+    flex: 1,
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  editableCell: {
+    flex: 1,
+    fontSize: 16,
+    textAlign: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    paddingVertical: 5,
+  },
 });
