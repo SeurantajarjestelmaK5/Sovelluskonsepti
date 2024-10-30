@@ -136,4 +136,5 @@ export const diningroomStyle = StyleSheet.create({
     backgroundColor: '#fff',
     height: 25,
   },
+  
 });

@@ -165,7 +165,7 @@ export default function Diningroom() {
             </View>
           ))
         ) : (
-          <Text style={diningroomStyle.noDataText}>No items available in this category.</Text>
+          <Text style={diningroomStyle.cellText}>No items available in this category.</Text>
         )}
       </ScrollView>
 
