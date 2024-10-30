@@ -25,6 +25,8 @@ export default function TabsLayout() {
         tabBarActiveBackgroundColor: ThemeColors.navSelected,
         tabBarInactiveBackgroundColor: ThemeColors.navDefault,
         tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
+        headerStyle: { backgroundColor: ThemeColors.background },
+        headerTintColor: ThemeColors.tint,
       }}
     >
       <Tabs.Screen

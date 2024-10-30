@@ -2,10 +2,15 @@ import { Link } from "expo-router";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "react-native-paper";
-import { reportNavStyle } from "@/styles/navigations/reportNavStyle";
+import { getReportNavStyle } from "@/styles/navigations/reportNavStyle";
+import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useMemo } from "react";
 
 export default function ReportsHome() {
+  const ThemeColors = useThemeColors();
+  const reportNavStyle = useMemo(() => getReportNavStyle(ThemeColors), [ThemeColors]);
+
   return (
     <View
       style={reportNavStyle.container}

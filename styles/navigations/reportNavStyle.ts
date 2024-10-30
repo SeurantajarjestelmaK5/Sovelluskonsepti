@@ -1,13 +1,14 @@
 import { StyleSheet, Dimensions } from "react-native";
-
+import { ThemeColors } from "@/constants/ThemeColors";
 const windowHeight = Dimensions.get('window').height;
 
-export const reportNavStyle = StyleSheet.create({
+export const getReportNavStyle = (ThemeColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 16,
+    backgroundColor: ThemeColors.background,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -28,7 +29,7 @@ export const reportNavStyle = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,  
-    backgroundColor: '#000',
+    backgroundColor: ThemeColors.button,
     marginHorizontal: 15
 },
   invButton: {
@@ -37,17 +38,16 @@ export const reportNavStyle = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,  
-    backgroundColor: '#000',
+    backgroundColor: ThemeColors.button,
     marginHorizontal: 15
 },
   buttonText: {
     fontSize: 24,  
-    color: '#fff',
-    backgroundColor: '#000',
+    color: ThemeColors.text,
     marginBottom: 15
   },
   reportIcon: {
-    color: '#fff',
+    color: ThemeColors.tabIconSelected,
     fontSize: 50,
     marginTop: 25
   }
