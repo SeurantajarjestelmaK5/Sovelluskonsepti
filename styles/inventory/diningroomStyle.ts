@@ -107,7 +107,7 @@ export const diningroomStyle = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#ccc',
     backgroundColor: '#d3d3d3',
-    width: '100%'
+    width: '100%',
   },
   tableRow: {
     flexDirection: 'row',
@@ -115,6 +115,8 @@ export const diningroomStyle = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderColor: '#e0e0e0',
+    width: '100%',
+    backgroundColor: '#d3d3d3',
   },
   columnHeader: {
     flex: 1,
@@ -132,9 +134,7 @@ export const diningroomStyle = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     backgroundColor: '#fff',
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 5,
+    height: 25,
   },
+  
 });
