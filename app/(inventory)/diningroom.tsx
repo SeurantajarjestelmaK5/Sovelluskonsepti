@@ -110,7 +110,7 @@ export default function Diningroom() {
 
   return (
     <View style={diningroomStyle.container}>
-      <Text style={diningroomStyle.headerText}>Inventaario - keittiö</Text>
+      <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
 
       <Pressable style={diningroomStyle.oneBox} onPress={() => setModalVisible(true)}>
         <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
