@@ -1,27 +1,24 @@
+import React, { useMemo } from "react";
 import { Link } from "expo-router";
-import React from "react";
 import { Text, View } from "react-native";
-import { Button } from "react-native-paper";
+import BackButton from "@/components/BackButton";
 
-
+import { useThemeColors } from "@/constants/ThemeColors";
+import { getWasteStyles } from "@/styles/monitoring/wasteStyles";
 
 export default function waste() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Jätteet</Text>
+  const ThemeColors = useThemeColors();
+  const styles = useMemo(() => getWasteStyles(ThemeColors), [ThemeColors]);
 
-      <Link href="../">
-      <Button
-        children="Back"
-        mode="contained"
-      />
-      </Link>
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Jätteet</Text>
+      <View style={styles.content}>
+        <Text style={styles.text}>Tähän tulee jätteiden seuranta</Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <BackButton />
+      </View>
     </View>
   );
 }
