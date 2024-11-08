@@ -148,4 +148,9 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       alignItems: "flex-start",
       maxHeight: 15,
     },
+    trashIcon: {
+      fontSize: 24,
+      color: "red",
+      marginLeft: 10,
+    },
   });
