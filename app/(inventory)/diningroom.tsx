@@ -145,11 +145,11 @@ export default function Diningroom() {
   
         const fetchedData: InventoryData = {
           Tankit: [],
-          Olut: [],
+          Oluet: [],
           Siiderit: [],
           Tyhjät: [],
           Viinit: [],
-          Alkoholi: [],
+          Alkoholit: [],
           ALV14: []
         };
   

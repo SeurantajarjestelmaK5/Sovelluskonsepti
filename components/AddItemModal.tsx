@@ -25,7 +25,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [alv, setAlv] = useState(24);
 
-  const categories = ["Tankit", "Olut", "Siiderit", "Tyhjät", "Viinit", "Alkoholi", "ALV14"];
+  const categories = ["Tankit", "Oluet", "Siiderit", "Tyhjät", "Viinit", "Alkoholit", "ALV14"];
 
   const handleAddItem = async () => {
     // Check that all fields are filled
