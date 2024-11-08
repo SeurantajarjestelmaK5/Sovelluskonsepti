@@ -74,19 +74,16 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "space-between",
     },
     scrollList: {
-      width: "100%",
-      height: 50,
-      justifyContent: "space-evenly",
-      alignContent: "center",
-      marginTop: 10,
+      height: 100,
     },
     categoryButton: {
       paddingVertical: 10,
-      paddingHorizontal: 45,
+      paddingHorizontal: 25,
       borderRadius: 10,
       backgroundColor: ThemeColors.navSelected,
       justifyContent: "center",
       alignItems: "center",
+      marginTop: 10,
     },
     selectedCategoryButton: {
       backgroundColor: ThemeColors.tint,

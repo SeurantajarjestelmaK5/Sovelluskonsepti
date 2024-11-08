@@ -200,35 +200,46 @@ export default function Diningroom() {
   return (
     <View style={diningroomStyle.container}>
       <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
-        <Pressable
-          style={diningroomStyle.oneBox}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
-          <MaterialCommunityIcons
-            name="calendar"
-            style={diningroomStyle.calendarIcon}
-          />
-        </Pressable>
-
-     <FlatList
-     contentContainerStyle={diningroomStyle.scrollList}
-        data={Object.keys(inventoryData)}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => setSelectedCategory(item)}
-            style={[
-              diningroomStyle.categoryButton,
-              selectedCategory === item && diningroomStyle.selectedCategoryButton,
-            ]}
-          >
-            <Text style={[diningroomStyle.categoryText, selectedCategory === item && diningroomStyle.selectedCategoryText]}>{item}</Text>
-          </Pressable>
-        )}
-        keyExtractor={(item) => item}
-      />
+      <Pressable
+        style={diningroomStyle.oneBox}
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
+        <MaterialCommunityIcons
+          name="calendar"
+          style={diningroomStyle.calendarIcon}
+        />
+      </Pressable>
+      <View style={diningroomStyle.container}>
+        <FlatList
+          contentContainerStyle={diningroomStyle.scrollList}
+          data={Object.keys(inventoryData)}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          nestedScrollEnabled={true}
+          renderItem={({ item }) => (
+            <Pressable
+              onPress={() => setSelectedCategory(item)}
+              style={[
+                diningroomStyle.categoryButton,
+                selectedCategory === item &&
+                  diningroomStyle.selectedCategoryButton,
+              ]}
+            >
+              <Text
+                style={[
+                  diningroomStyle.categoryText,
+                  selectedCategory === item &&
+                    diningroomStyle.selectedCategoryText,
+                ]}
+              >
+                {item}
+              </Text>
+            </Pressable>
+          )}
+          keyExtractor={(item) => item}
+        />
+      </View>
       <View style={diningroomStyle.tableHeader}>
         <Text style={diningroomStyle.columnHeader}>Tuote</Text>
         <Text style={diningroomStyle.columnHeader}>Määrä</Text>
@@ -237,19 +248,29 @@ export default function Diningroom() {
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
-      <FlatList
-        data={inventoryData[selectedCategory] || []}
-        renderItem={renderInventoryItem}
-        keyExtractor={(item, index) => `${item.Nimi}-${index}`}
-        ListEmptyComponent={<Text style={diningroomStyle.cellText}>No items available in this category.</Text>}
-      />
-  </View>
-      <View style={diningroomStyle.bottomButtons}>     
-      
-      <Pressable onPress={() => {setAddItemModalVisible(true)}}>
-          <MaterialCommunityIcons name="plus-thick" style={diningroomStyle.backIcon} />
-      </Pressable>
-      </View> 
+        <FlatList
+          data={inventoryData[selectedCategory] || []}
+          renderItem={renderInventoryItem}
+          keyExtractor={(item, index) => `${item.Nimi}-${index}`}
+          ListEmptyComponent={
+            <Text style={diningroomStyle.cellText}>
+              No items available in this category.
+            </Text>
+          }
+        />
+      </View>
+      <View style={diningroomStyle.bottomButtons}>
+        <Pressable
+          onPress={() => {
+            setAddItemModalVisible(true);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="plus-thick"
+            style={diningroomStyle.backIcon}
+          />
+        </Pressable>
+      </View>
 
       <YearMonthPickerModal
         visible={modalVisible}
