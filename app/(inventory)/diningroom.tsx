@@ -149,9 +149,13 @@ export default function Diningroom() {
         const querySnapshot = await getDocs(inventoryRef);
   
         const fetchedData: InventoryData = {
-          Viinat: [],
-          Miedot: [],
-          Limsat: [],
+          Tankit: [],
+          Oluet: [],
+          Siiderit: [],
+          Tyhjät: [],
+          Viinit: [],
+          Alkoholit: [],
+          ALV14: []
         };
   
         querySnapshot.forEach((doc) => {
