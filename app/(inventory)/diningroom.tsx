@@ -5,9 +5,10 @@ import { Link } from "expo-router";
 import { useState, useEffect } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
+import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
 
-interface InventoryItem {
+export interface InventoryItem {
   Alv: number;
   Hinta: number;
   Määrä: number;
@@ -24,10 +25,12 @@ type InventoryData = {
 export default function Diningroom() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [addItemModalVisible, setAddItemModalVisible] = useState(false); 
   const [selectedCategory, setSelectedCategory] = useState<string>("Viinat");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
 
+  /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
     "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kesäkuu",
     "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"
@@ -49,10 +52,24 @@ export default function Diningroom() {
     }
   }, [selectedDate]);
 
+  /** KUUKAUDET, PVM HAKU FUNKTIOT LOPPUU */
+
+
+/** MODAALIEN HELPPERIT ALKAA */
+
   const handleConfirm = (formattedDate: string) => {
     setSelectedDate(formattedDate);
     setModalVisible(false);
   };
+  const handleAddItem = () => setAddItemModalVisible(true); // Open AddItemModal
+
+  const handleItemAdded = () => {
+    setAddItemModalVisible(false);
+  };
+
+/** MODAALIEN HELPPERIT LOPPUU */
+
+
 /** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
   const getPreviousMonthDate = (dateString: string): string => {
     const [month, year] = dateString.split("-");
@@ -85,16 +102,23 @@ export default function Diningroom() {
     // Copy previous month's data to new month
     prevMonthSnapshot.forEach(async (item) => {
       const itemData = item.data();
+      const newItemData = {
+        ...itemData,
+        Määrä: 0,
+        Yhteishinta: 0,
+        Hinta: 0,
+      };
       const newDocRef = doc(db, "inventaario", month, "sali", item.id);
-      await setDoc(newDocRef, itemData);
+      await setDoc(newDocRef, newItemData);
     });
   
     console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
   };
 
   /** JA SE SITTEN LOPPUU TÄHÄN*/
+
+  /** INVENTAARION FUNKTIOT ALKAA */
   
-  // Fetch inventory data based on the selected date
   useEffect(() => {
     const fetchInventory = async () => {
       try {
@@ -126,7 +150,7 @@ export default function Diningroom() {
     if (selectedDate) {
       fetchInventory();
     }
-  }, [selectedDate, selectedCategory]);
+  }, [selectedDate, selectedCategory, handleItemAdded]);
 
   const selectCategory = (category: string) => {
     setSelectedCategory(category);
@@ -143,6 +167,7 @@ export default function Diningroom() {
       Määrä: parseInt(newQuantity) || 0,
     });
   };
+  /** INVENTAARION FUNKTIOT LOPPUU */
 
   if (isLoading || !selectedCategory) {
     return <Text>Loading...</Text>;
@@ -214,11 +239,23 @@ export default function Diningroom() {
           <MaterialCommunityIcons name="arrow-left" style={diningroomStyle.backIcon} />
         </Link>
       </Pressable>
+      
+      <Pressable onPress={() => {setAddItemModalVisible(true)}}>
+          <MaterialCommunityIcons name="plus-thick" style={diningroomStyle.backIcon} />
+      </Pressable>
+
 
       <YearMonthPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onConfirm={handleConfirm}
+      />
+       <AddItemModal
+       selectedDate={selectedDate}
+        location="sali"
+        visible={addItemModalVisible}
+        onClose={() => setAddItemModalVisible(false)}
+        onItemAdded={handleItemAdded} // Handle item addition and data refresh
       />
     </View>
   );
