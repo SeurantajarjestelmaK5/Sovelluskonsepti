@@ -5,7 +5,7 @@ import { Link } from "expo-router";
 import { useState, useEffect } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
 
 interface InventoryItem {
   Alv: number;
@@ -53,36 +53,76 @@ export default function Diningroom() {
     setSelectedDate(formattedDate);
     setModalVisible(false);
   };
+/** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
+  const getPreviousMonthDate = (dateString: string): string => {
+    const [month, year] = dateString.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
+    date.setMonth(date.getMonth() - 1); // Go to the previous month
+    const prevMonth = String(date.getMonth() + 1).padStart(2, "0");
+    const prevYear = date.getFullYear();
+    return `${prevMonth}-${prevYear}`;
+  };
+  
+  const checkOrCreateMonth = async (month: string) => {
+    const inventoryRef = collection(db, "inventaario", month, "sali");
+    const docSnapshot = await getDocs(inventoryRef);
+  
+    if (!docSnapshot.empty) {
+      // Data for this month already exists
+      return;
+    }
+  
+    // Get previous month's data
+    const previousMonth = getPreviousMonthDate(month);
+    const prevMonthRef = collection(db, "inventaario", previousMonth, "sali");
+    const prevMonthSnapshot = await getDocs(prevMonthRef);
+  
+    if (prevMonthSnapshot.empty) {
+      console.warn(`No data found for the previous month: ${previousMonth}`);
+      return;
+    }
+  
+    // Copy previous month's data to new month
+    prevMonthSnapshot.forEach(async (item) => {
+      const itemData = item.data();
+      const newDocRef = doc(db, "inventaario", month, "sali", item.id);
+      await setDoc(newDocRef, itemData);
+    });
+  
+    console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
+  };
 
+  /** JA SE SITTEN LOPPUU TÄHÄN*/
+  
   // Fetch inventory data based on the selected date
   useEffect(() => {
     const fetchInventory = async () => {
       try {
+        // Check or create month before fetching inventory
+        await checkOrCreateMonth(selectedDate!);
+  
         const inventoryRef = collection(db, "inventaario", selectedDate!, "sali");
         const querySnapshot = await getDocs(inventoryRef);
-
+  
         const fetchedData: InventoryData = {
           Viinat: [],
           Miedot: [],
           Limsat: [],
         };
-
+  
         querySnapshot.forEach((doc) => {
           const data = doc.data() as InventoryItem;
           fetchedData[data.Kategoria]?.push(data);
         });
-
+  
         setInventoryData(fetchedData);
-
-        // Automatically select first populated category if selectedCategory has no items
-       
       } catch (error) {
         console.error("Error fetching inventory data:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     if (selectedDate) {
       fetchInventory();
     }
