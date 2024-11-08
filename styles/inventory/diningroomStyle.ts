@@ -140,5 +140,10 @@ export const diningroomStyle = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-start',
     maxHeight: 15,
-  }
+  },
+  trashIcon: {
+    fontSize: 24,
+    color: "red",
+    marginLeft: 10,
+  },
 });

@@ -3,10 +3,10 @@ import { diningroomStyle } from "@/styles/inventory/diningroomStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useState, useEffect } from "react";
-import { FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
-import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
 export interface InventoryItem {
   Alv: number;
@@ -26,7 +26,7 @@ export default function Diningroom() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [addItemModalVisible, setAddItemModalVisible] = useState(false); 
-  const [selectedCategory, setSelectedCategory] = useState<string>("Viinat");
+  const [selectedCategory, setSelectedCategory] = useState<string>("Tankit");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -77,9 +77,13 @@ export default function Diningroom() {
         keyboardType="numeric"
       />
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
+      <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
       <Text style={diningroomStyle.cellText}>{item.Hinta?.toFixed(2)}</Text>
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-    </View>
+      <Pressable onPress={() => confirmDeleteItem(item)}>
+      <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
+    </Pressable>
+     </View>
   );
   
 /** MODAALIEN HELPPERIT LOPPUU */
@@ -186,6 +190,33 @@ export default function Diningroom() {
       Määrä: parseInt(newQuantity) || 0,
     });
   };
+  const confirmDeleteItem = (item: InventoryItem) => {
+    Alert.alert(
+      "Delete Item",
+      `Are you sure you want to delete ${item.Nimi}?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => removeInventoryItem(item) }
+      ],
+      { cancelable: true }
+    );
+  };
+  const removeInventoryItem = async (itemToRemove: InventoryItem) => {
+    try {
+      const itemRef = doc(db, "inventaario", selectedDate!, "sali", itemToRemove.Nimi);
+      await deleteDoc(itemRef); // Remove from Firebase
+  
+      // Remove from local state
+      setInventoryData((prevData) => {
+        const updatedCategoryItems = prevData[selectedCategory].filter(item => item.Nimi !== itemToRemove.Nimi);
+        return { ...prevData, [selectedCategory]: updatedCategoryItems };
+      });
+      
+      console.log(`${itemToRemove.Nimi} has been removed from inventory.`);
+    } catch (error) {
+      console.error("Error deleting inventory item:", error);
+    }
+  };
   /** INVENTAARION FUNKTIOT LOPPUU */
 
   if (isLoading || !selectedCategory) {
@@ -228,7 +259,8 @@ export default function Diningroom() {
         <Text style={diningroomStyle.columnHeader}>Tuote</Text>
         <Text style={diningroomStyle.columnHeader}>Määrä</Text>
         <Text style={diningroomStyle.columnHeader}>Yksikkö</Text>
-        <Text style={diningroomStyle.columnHeader}>€</Text>
+        <Text style={diningroomStyle.columnHeader}>ALV %</Text>
+        <Text style={diningroomStyle.columnHeader}>Kpl. €</Text>
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
