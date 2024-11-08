@@ -195,11 +195,16 @@ export default function Diningroom() {
   return (
     <View style={diningroomStyle.container}>
       <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
-
-      <Pressable style={diningroomStyle.oneBox} onPress={() => setModalVisible(true)}>
-        <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
-        <MaterialCommunityIcons name="calendar" style={diningroomStyle.calendarIcon} />
-      </Pressable>
+        <Pressable
+          style={diningroomStyle.oneBox}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
+          <MaterialCommunityIcons
+            name="calendar"
+            style={diningroomStyle.calendarIcon}
+          />
+        </Pressable>
 
      <FlatList
      contentContainerStyle={diningroomStyle.scrollList}
@@ -246,8 +251,8 @@ export default function Diningroom() {
         onClose={() => setModalVisible(false)}
         onConfirm={handleConfirm}
       />
-       <AddItemModal
-       selectedDate={selectedDate}
+      <AddItemModal
+        selectedDate={selectedDate}
         location="sali"
         visible={addItemModalVisible}
         onClose={() => setAddItemModalVisible(false)}
