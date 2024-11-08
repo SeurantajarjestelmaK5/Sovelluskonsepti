@@ -25,7 +25,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [alv, setAlv] = useState(24);
 
-  const categories = ["Viinat", "Miedot", "Limsat", "Other"];
+  const categories = ["Tankit", "Olut", "Siiderit", "Tyhjät", "Viinit", "Alkoholi", "ALV14"];
 
   const handleAddItem = async () => {
     // Check that all fields are filled
@@ -103,7 +103,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
           )}
 
           <Text style={styles.label}>Select ALV</Text>
-          {[14, 24].map((value) => (
+          {[14, 25.5].map((value) => (
             <Pressable key={value} onPress={() => setAlv(value)} style={styles.radioButtonContainer}>
               <View
                 style={[
