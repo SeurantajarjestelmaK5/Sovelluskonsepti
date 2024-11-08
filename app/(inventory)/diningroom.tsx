@@ -3,12 +3,11 @@ import { diningroomStyle } from "@/styles/inventory/diningroomStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useState, useEffect } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
-
 export interface InventoryItem {
   Alv: number;
   Hinta: number;
@@ -68,6 +67,21 @@ export default function Diningroom() {
     setAddItemModalVisible(false);
   };
 
+  const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
+    <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
+      <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
+      <TextInput
+        style={diningroomStyle.editableCell}
+        value={item.Määrä.toString()}
+        onChangeText={(text) => updateQuantity(index, text)}
+        keyboardType="numeric"
+      />
+      <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
+      <Text style={diningroomStyle.cellText}>{item.Hinta?.toFixed(2)}</Text>
+      <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
+    </View>
+  );
+  
 /** MODAALIEN HELPPERIT LOPPUU */
 
 
@@ -188,71 +202,40 @@ export default function Diningroom() {
           />
         </Pressable>
 
-        <ScrollView
-          contentContainerStyle={diningroomStyle.scrollList}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-        >
-          {Object.keys(inventoryData).map((category) => (
-            <Pressable
-              key={category}
-              onPress={() => selectCategory(category)}
-              style={[
-                diningroomStyle.categoryButton,
-                selectedCategory === category &&
-                  diningroomStyle.selectedCategoryButton,
-              ]}
-            >
-              <Text style={diningroomStyle.categoryText}>{category}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-
-        <View style={diningroomStyle.tableHeader}>
-          <Text style={diningroomStyle.columnHeader}>Tuote</Text>
-          <Text style={diningroomStyle.columnHeader}>Määrä</Text>
-          <Text style={diningroomStyle.columnHeader}>Yksikkö</Text>
-          <Text style={diningroomStyle.columnHeader}>€</Text>
-          <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
-        </View>
-
-        <ScrollView
-          style={{ flex: 1, width: "100%" }}
-          contentContainerStyle={diningroomStyle.inventoryTable}
-          showsVerticalScrollIndicator={true}
-        >
-          {inventoryData[selectedCategory] &&
-          inventoryData[selectedCategory].length > 0 ? (
-            inventoryData[selectedCategory].map((item, index) => (
-              <View
-                key={`${item.Nimi}-${index}`}
-                style={diningroomStyle.tableRow}
-              >
-                <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
-                <TextInput
-                  style={diningroomStyle.editableCell}
-                  value={item.Määrä.toString()}
-                  onChangeText={(text) => updateQuantity(index, text)}
-                  keyboardType="numeric"
-                />
-                <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
-                <Text style={diningroomStyle.cellText}>
-                  {item.Hinta?.toFixed(2)}
-                </Text>
-                <Text style={diningroomStyle.cellText}>
-                  {item.Yhteishinta?.toFixed(2)}
-                </Text>
-              </View>
-            ))
-          ) : (
-            <Text style={diningroomStyle.cellText}>
-              No items available in this category.
-            </Text>
-          )}
-        </ScrollView>
-
+     <FlatList
+     contentContainerStyle={diningroomStyle.scrollList}
+        data={Object.keys(inventoryData)}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <Pressable
+            onPress={() => setSelectedCategory(item)}
+            style={[
+              diningroomStyle.categoryButton,
+              selectedCategory === item && diningroomStyle.selectedCategoryButton,
+            ]}
+          >
+            <Text style={diningroomStyle.categoryText}>{item}</Text>
+          </Pressable>
+        )}
+        keyExtractor={(item) => item}
+      />
+      <View style={diningroomStyle.tableHeader}>
+        <Text style={diningroomStyle.columnHeader}>Tuote</Text>
+        <Text style={diningroomStyle.columnHeader}>Määrä</Text>
+        <Text style={diningroomStyle.columnHeader}>Yksikkö</Text>
+        <Text style={diningroomStyle.columnHeader}>€</Text>
+        <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
+      </View>
+      <View style={diningroomStyle.inventoryTable}>
+      <FlatList
+        data={inventoryData[selectedCategory] || []}
+        renderItem={renderInventoryItem}
+        keyExtractor={(item, index) => `${item.Nimi}-${index}`}
+        ListEmptyComponent={<Text style={diningroomStyle.cellText}>No items available in this category.</Text>}
+      />
+  </View>
       <View style={diningroomStyle.bottomButtons}>     
-        <BackButton/>
       
       <Pressable onPress={() => {setAddItemModalVisible(true)}}>
           <MaterialCommunityIcons name="plus-thick" style={diningroomStyle.backIcon} />

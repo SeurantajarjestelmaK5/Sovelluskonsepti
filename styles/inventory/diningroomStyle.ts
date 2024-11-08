@@ -138,6 +138,7 @@ export const diningroomStyle = StyleSheet.create({
   },
   bottomButtons: {
     flex: 1,
-    alignItems: 'flex-start'
+    alignItems: 'flex-start',
+    maxHeight: 15,
   }
 });
