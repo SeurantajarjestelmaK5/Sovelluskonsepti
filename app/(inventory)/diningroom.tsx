@@ -244,11 +244,14 @@ export default function Diningroom() {
           style={diningroomStyle.calendarIcon}
         />
       </Pressable>
-      <View style={{
-        flexDirection: "row",
-        justifyContent: "center",
-        marginVertical: 10,
-      }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          marginVertical: 10,
+        }}
+      >
         <FlatList
           contentContainerStyle={diningroomStyle.scrollList}
           data={Object.keys(inventoryData)}
@@ -277,6 +280,7 @@ export default function Diningroom() {
           keyExtractor={(item) => item}
         />
       </View>
+
       <View style={diningroomStyle.tableHeader}>
         <Text style={diningroomStyle.columnHeader}>Tuote</Text>
         <Text style={diningroomStyle.columnHeader}>Määrä</Text>
@@ -297,6 +301,7 @@ export default function Diningroom() {
           }
         />
       </View>
+
       <View style={diningroomStyle.bottomButtons}>
         <Pressable
           onPress={() => {
@@ -305,11 +310,14 @@ export default function Diningroom() {
         >
           <MaterialCommunityIcons
             name="plus-thick"
+            size={46}
             style={diningroomStyle.backIcon}
           />
         </Pressable>
       </View>
-
+      <View style={diningroomStyle.backButton}>
+        <BackButton />
+      </View>
       <YearMonthPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
