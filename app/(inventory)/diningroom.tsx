@@ -7,6 +7,7 @@ import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
+import BackButton from "@/components/BackButton";
 
 export interface InventoryItem {
   Alv: number;
@@ -250,26 +251,13 @@ export default function Diningroom() {
           )}
         </ScrollView>
 
-
-      <Pressable>
-        <Link href="../">
-          <MaterialCommunityIcons
-            name="arrow-left"
-            style={diningroomStyle.backIcon}
-          />
-        </Link>
+      <View style={diningroomStyle.bottomButtons}>     
+        <BackButton/>
+      
+      <Pressable onPress={() => {setAddItemModalVisible(true)}}>
+          <MaterialCommunityIcons name="plus-thick" style={diningroomStyle.backIcon} />
       </Pressable>
-
-      <Pressable
-        onPress={() => {
-          setAddItemModalVisible(true);
-        }}
-      >
-        <MaterialCommunityIcons
-          name="plus-thick"
-          style={diningroomStyle.backIcon}
-        />
-      </Pressable>
+      </View> 
 
       <YearMonthPickerModal
         visible={modalVisible}
