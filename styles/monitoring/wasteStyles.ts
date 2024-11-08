@@ -31,6 +31,11 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
         color: ThemeColors.tint,
         marginBottom: 15,
     },
+    logo: {
+        width: "60%",
+        height: "20%",
+
+    },
     text: {
       fontSize: 24,
       color: ThemeColors.text,
