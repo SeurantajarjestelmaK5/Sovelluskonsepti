@@ -176,82 +176,108 @@ export default function Diningroom() {
   return (
     <View style={diningroomStyle.container}>
       <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
+        <Pressable
+          style={diningroomStyle.oneBox}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
+          <MaterialCommunityIcons
+            name="calendar"
+            style={diningroomStyle.calendarIcon}
+          />
+        </Pressable>
 
-      <Pressable style={diningroomStyle.oneBox} onPress={() => setModalVisible(true)}>
-        <Text style={diningroomStyle.dateText}>{getFormattedDate()}</Text>
-        <MaterialCommunityIcons name="calendar" style={diningroomStyle.calendarIcon} />
-      </Pressable>
+        <ScrollView
+          contentContainerStyle={diningroomStyle.scrollList}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+        >
+          {Object.keys(inventoryData).map((category) => (
+            <Pressable
+              key={category}
+              onPress={() => selectCategory(category)}
+              style={[
+                diningroomStyle.categoryButton,
+                selectedCategory === category &&
+                  diningroomStyle.selectedCategoryButton,
+              ]}
+            >
+              <Text style={diningroomStyle.categoryText}>{category}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
 
-      <ScrollView
-        contentContainerStyle={diningroomStyle.scrollList}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-      >
-        {Object.keys(inventoryData).map((category) => (
-          <Pressable
-            key={category}
-            onPress={() => selectCategory(category)}
-            style={[
-              diningroomStyle.categoryButton,
-              selectedCategory === category && diningroomStyle.selectedCategoryButton
-            ]}
-          >
-            <Text style={diningroomStyle.categoryText}>{category}</Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+        <View style={diningroomStyle.tableHeader}>
+          <Text style={diningroomStyle.columnHeader}>Tuote</Text>
+          <Text style={diningroomStyle.columnHeader}>Määrä</Text>
+          <Text style={diningroomStyle.columnHeader}>Yksikkö</Text>
+          <Text style={diningroomStyle.columnHeader}>€</Text>
+          <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
+        </View>
 
-      <View style={diningroomStyle.tableHeader}>
-        <Text style={diningroomStyle.columnHeader}>Tuote</Text>
-        <Text style={diningroomStyle.columnHeader}>Määrä</Text>
-        <Text style={diningroomStyle.columnHeader}>Yksikkö</Text>
-        <Text style={diningroomStyle.columnHeader}>€</Text>
-        <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
-      </View>
+        <ScrollView
+          style={{ flex: 1, width: "100%" }}
+          contentContainerStyle={diningroomStyle.inventoryTable}
+          showsVerticalScrollIndicator={true}
+        >
+          {inventoryData[selectedCategory] &&
+          inventoryData[selectedCategory].length > 0 ? (
+            inventoryData[selectedCategory].map((item, index) => (
+              <View
+                key={`${item.Nimi}-${index}`}
+                style={diningroomStyle.tableRow}
+              >
+                <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
+                <TextInput
+                  style={diningroomStyle.editableCell}
+                  value={item.Määrä.toString()}
+                  onChangeText={(text) => updateQuantity(index, text)}
+                  keyboardType="numeric"
+                />
+                <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
+                <Text style={diningroomStyle.cellText}>
+                  {item.Hinta?.toFixed(2)}
+                </Text>
+                <Text style={diningroomStyle.cellText}>
+                  {item.Yhteishinta?.toFixed(2)}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={diningroomStyle.cellText}>
+              No items available in this category.
+            </Text>
+          )}
+        </ScrollView>
 
-      <ScrollView
-        style={{ flex: 1, width: "100%" }}
-        contentContainerStyle={diningroomStyle.inventoryTable}
-        showsVerticalScrollIndicator={true}
-      >
-        {inventoryData[selectedCategory] && inventoryData[selectedCategory].length > 0 ? (
-          inventoryData[selectedCategory].map((item, index) => (
-            <View key={`${item.Nimi}-${index}`} style={diningroomStyle.tableRow}>
-              <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
-              <TextInput
-                style={diningroomStyle.editableCell}
-                value={item.Määrä.toString()}
-                onChangeText={(text) => updateQuantity(index, text)}
-                keyboardType="numeric"
-              />
-              <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
-              <Text style={diningroomStyle.cellText}>{item.Hinta?.toFixed(2)}</Text>
-              <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-            </View>
-          ))
-        ) : (
-          <Text style={diningroomStyle.cellText}>No items available in this category.</Text>
-        )}
-      </ScrollView>
 
       <Pressable>
         <Link href="../">
-          <MaterialCommunityIcons name="arrow-left" style={diningroomStyle.backIcon} />
+          <MaterialCommunityIcons
+            name="arrow-left"
+            style={diningroomStyle.backIcon}
+          />
         </Link>
       </Pressable>
-      
-      <Pressable onPress={() => {setAddItemModalVisible(true)}}>
-          <MaterialCommunityIcons name="plus-thick" style={diningroomStyle.backIcon} />
-      </Pressable>
 
+      <Pressable
+        onPress={() => {
+          setAddItemModalVisible(true);
+        }}
+      >
+        <MaterialCommunityIcons
+          name="plus-thick"
+          style={diningroomStyle.backIcon}
+        />
+      </Pressable>
 
       <YearMonthPickerModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onConfirm={handleConfirm}
       />
-       <AddItemModal
-       selectedDate={selectedDate}
+      <AddItemModal
+        selectedDate={selectedDate}
         location="sali"
         visible={addItemModalVisible}
         onClose={() => setAddItemModalVisible(false)}
