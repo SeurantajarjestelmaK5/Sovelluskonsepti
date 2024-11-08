@@ -28,6 +28,11 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const categories = ["Viinat", "Miedot", "Limsat", "Other"];
 
   const handleAddItem = async () => {
+    // Check that all fields are filled
+    if (!name || !quantity || !unit || !category) {
+      return;
+    }
+
     const newItem: InventoryItem = {
       Nimi: name,
       Määrä: parseInt(quantity) || 0,
@@ -39,18 +44,22 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     };
 
     await addInventoryItem(selectedDate, location, newItem);
+    setShowCategoryDropdown(false);
+    onItemAdded();
+    onClose();
+
+    // Reset form fields
     setName("");
     setQuantity("");
     setUnit("");
     setCategory("");
-    setShowCategoryDropdown(false);
-    onItemAdded();
-    onClose();
   };
+
+  // Check if all fields are filled to enable the submit button
+  const isFormValid = name && quantity && unit && category;
 
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
-      {/* Click outside to close modal */}
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.modalContent} onPress={() => {}}>
           <Text style={styles.header}>Add New Item</Text>
@@ -108,7 +117,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             </Pressable>
           ))}
 
-          <Button title="Add Item" onPress={handleAddItem} />
+          {/* Disable "Add Item" button if form is not valid */}
+          <Button title="Add Item" onPress={handleAddItem} disabled={!isFormValid} />
           <Button title="Cancel" onPress={onClose} color="red" />
         </Pressable>
       </Pressable>
