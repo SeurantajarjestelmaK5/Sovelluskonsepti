@@ -136,5 +136,8 @@ export const diningroomStyle = StyleSheet.create({
     backgroundColor: '#fff',
     height: 25,
   },
-  
+  bottomButtons: {
+    flex: 1,
+    alignItems: 'flex-start'
+  }
 });
