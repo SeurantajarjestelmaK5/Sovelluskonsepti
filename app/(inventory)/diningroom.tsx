@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import YearMonthPickerModal from "@/components/YearPicker";
-import { diningroomStyle } from "@/styles/inventory/diningroomStyle";
+import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
+import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useState, useEffect } from "react";
@@ -8,6 +10,7 @@ import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
+
 export interface InventoryItem {
   Alv: number;
   Hinta: number;
@@ -29,6 +32,8 @@ export default function Diningroom() {
   const [selectedCategory, setSelectedCategory] = useState<string>("Viinat");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
+  const ThemeColors = useThemeColors();
+  const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
@@ -205,7 +210,7 @@ export default function Diningroom() {
      <FlatList
      contentContainerStyle={diningroomStyle.scrollList}
         data={Object.keys(inventoryData)}
-        horizontal
+        horizontal={true}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
           <Pressable
@@ -215,7 +220,7 @@ export default function Diningroom() {
               selectedCategory === item && diningroomStyle.selectedCategoryButton,
             ]}
           >
-            <Text style={diningroomStyle.categoryText}>{item}</Text>
+            <Text style={[diningroomStyle.categoryText, selectedCategory === item && diningroomStyle.selectedCategoryText]}>{item}</Text>
           </Pressable>
         )}
         keyExtractor={(item) => item}
