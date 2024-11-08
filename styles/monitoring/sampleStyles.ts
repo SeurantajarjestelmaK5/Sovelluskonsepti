@@ -3,8 +3,7 @@ import { ThemeColors } from "@/constants/ThemeColors";
 
 const windowHeight = Dimensions.get("window").height;
 
-
-export const getCleaningStyles = (ThemeColors: ThemeColors) =>
+export const getSampleStyles = (ThemeColors: ThemeColors) =>
   StyleSheet.create({
     buttonContainer: {
       flexDirection: "row",

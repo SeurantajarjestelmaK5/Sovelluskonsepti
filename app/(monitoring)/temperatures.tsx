@@ -1,27 +1,25 @@
+import React, {useMemo} from "react";
 import { Link } from "expo-router";
-import React from "react";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
+import BackButton from "@/components/BackButton";
 
-
+import { useThemeColors } from "@/constants/ThemeColors";
+import { getTempStyles } from "@/styles/monitoring/tempStyles";
 
 export default function temperatures() {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Lämpötilat</Text>
+  const ThemeColors = useThemeColors();
+  const styles = useMemo(() => getTempStyles(ThemeColors), [ThemeColors]);
 
-      <Link href="../">
-      <Button
-        children="Back"
-        mode="contained"
-      />
-      </Link>
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Lämpötila</Text>
+      <View style={styles.content}>
+        <Text style={styles.text}>Tähän tulee lämpötilaseuranta</Text>
+      </View>
+      <View style={styles.buttonContainer}>
+        <BackButton />
+      </View>
     </View>
   );
 }
