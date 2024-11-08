@@ -74,7 +74,9 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "space-between",
     },
     scrollList: {
-      height: 100,
+      justifyContent: "center",
+
+      flexGrow: 1,
     },
     categoryButton: {
       paddingVertical: 10,

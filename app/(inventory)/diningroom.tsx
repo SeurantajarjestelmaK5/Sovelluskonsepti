@@ -244,13 +244,16 @@ export default function Diningroom() {
           style={diningroomStyle.calendarIcon}
         />
       </Pressable>
-      <View style={diningroomStyle.container}>
+      <View style={{
+        flexDirection: "row",
+        justifyContent: "center",
+        marginVertical: 10,
+      }}>
         <FlatList
           contentContainerStyle={diningroomStyle.scrollList}
           data={Object.keys(inventoryData)}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
-          nestedScrollEnabled={true}
           renderItem={({ item }) => (
             <Pressable
               onPress={() => setSelectedCategory(item)}
