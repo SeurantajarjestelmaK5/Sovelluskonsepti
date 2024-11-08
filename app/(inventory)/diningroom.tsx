@@ -184,6 +184,7 @@ export default function Diningroom() {
     setSelectedCategory(category);
   };
 
+/** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
   const updateQuantity = async (index: number, newQuantity: string) => {
     const updatedInventory = inventoryData[selectedCategory].map((item, idx) =>
       idx === index ? { ...item, Määrä: parseInt(newQuantity) || 0 } : item
@@ -222,6 +223,8 @@ export default function Diningroom() {
       console.error("Error deleting inventory item:", error);
     }
   };
+  /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
+
   /** INVENTAARION FUNKTIOT LOPPUU */
 
   if (isLoading || !selectedCategory) {
