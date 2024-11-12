@@ -34,6 +34,7 @@ export default function Diningroom() {
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
   const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
+  const cachedData = useRef<Record<string, InventoryData>>({});
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
@@ -161,52 +162,53 @@ export default function Diningroom() {
 
   const fetchInventory = async (date: string) => {
     try {
-      if (!hasFetchedDataInitially){
-      setIsLoading(true);}
-
-      // Check or create month before fetching inventory
+      setIsLoading(true);
       await checkOrCreateMonth(date);
-
+  
       const inventoryRef = collection(db, "inventaario", date, "sali");
       const querySnapshot = await getDocs(inventoryRef);
-
-      const fetchedData: InventoryData = {
+  
+      const fetchedData : InventoryData = {
         Tankit: [],
         Oluet: [],
         Siiderit: [],
         Tyhjät: [],
         Viinit: [],
         Alkoholit: [],
-        ALV14: []
+        ALV14: [],
       };
-
+  
       querySnapshot.forEach((doc) => {
         const data = doc.data() as InventoryItem;
         fetchedData[data.Kategoria]?.push(data);
       });
-
-      setInventoryData(fetchedData);
+  
+      return fetchedData; // Return fetched data for caching
     } catch (error) {
       console.error("Error fetching inventory data:", error);
+      return {}; // Return empty object in case of error
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   // Fetch data on initial load or when selectedDate changes
   useEffect(() => {
-    if (!hasFetchedDataInitially.current && selectedDate) {
-      fetchInventory(selectedDate);
-      hasFetchedDataInitially.current = true;
-    } else if (hasFetchedDataInitially.current && selectedDate) {
-      fetchInventory(selectedDate);
+    if (selectedDate) {
+      if (cachedData.current[selectedDate]) {
+        // If data for the selected date is already cached, use it
+        setInventoryData(cachedData.current[selectedDate]);
+        setIsLoading(false);
+      } else {
+        // Fetch data if not cached
+        fetchInventory(selectedDate).then((data) => {
+          cachedData.current[selectedDate] = data;
+          setInventoryData(data);          
+        });
+      }
     }
-  }, [selectedDate, handleAddItem]);
-
-
-  const selectCategory = (category: string) => {
-    setSelectedCategory(category);
-  };
+  }, [selectedDate]);
 
 /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
 const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta", index: number) => {
