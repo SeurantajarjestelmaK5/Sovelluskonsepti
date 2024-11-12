@@ -8,12 +8,9 @@ import {
   Alert,
   FlatList,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
-  Image,
-  ActivityIndicator
 } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
