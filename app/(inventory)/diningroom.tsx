@@ -33,6 +33,7 @@ export default function Diningroom() {
   const [isLoading, setIsLoading] = useState(true);
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
+  const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
@@ -73,32 +74,32 @@ export default function Diningroom() {
     setAddItemModalVisible(false);
     
   };
+  const regex = /^[0-9]*\.?[0-9]*$/;
 
   const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
     <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
       <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
-  
-      {/* Quantity Input Field */}
       <TextInput
         style={diningroomStyle.editableCell}
-        value={item.Määrä.toString()}
-        onChangeText={(text) => updateInventoryItem(index, "Määrä", text)}
+        value={tempValues[item.Nimi]?.Määrä ?? item.Määrä.toString()}
+        onChangeText={(text) => handleChange(item.Nimi, "Määrä", text)}
+        onEndEditing={() => handleEditingEnd(item, "Määrä", index)}
         keyboardType="numeric"
       />
-  
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
       <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
-  
-      {/* Price Input Field */}
       <TextInput
         style={diningroomStyle.editableCell}
-        value={item.Hinta.toString()}
-        onChangeText={(text) => updateInventoryItem(index, "Hinta", text)}
+        value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
+        onChangeText={(text) => {
+          const regex = /^[0-9]*\.?[0-9]*$/
+          if (regex.test(text)){
+          handleChange(item.Nimi, "Hinta", text)}
+        }}
+        onEndEditing={() => handleEditingEnd(item, "Hinta", index)}
         keyboardType="decimal-pad"
       />
-  
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-  
       <Pressable onPress={() => confirmDeleteItem(item)}>
         <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
       </Pressable>
@@ -208,6 +209,47 @@ export default function Diningroom() {
   };
 
 /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
+const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta", index: number) => {
+  const tempValue = tempValues[item.Nimi]?.[field];
+  if (tempValue !== undefined) {
+    const parsedValue = parseFloat(tempValue);
+    if (!isNaN(parsedValue) && parsedValue !== item[field]) {
+      try {
+        // Recalculate Yhteishinta when either Määrä or Hinta changes
+        let newYhteishinta = item.Yhteishinta;
+        if (field === "Määrä") {
+          newYhteishinta = parsedValue * item.Hinta;
+        } else if (field === "Hinta") {
+          newYhteishinta = item.Määrä * parsedValue;
+        }
+
+        // Update Firestore with the new value and Yhteishinta
+        const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
+        await updateDoc(docRef, { [field]: parsedValue, Yhteishinta: newYhteishinta });
+
+        // Update the local inventory data with the new value and Yhteishinta
+        setInventoryData((prevData) => {
+          const updatedCategoryItems = [...prevData[selectedCategory]];
+          const updatedItem = { ...updatedCategoryItems[index], [field]: parsedValue, Yhteishinta: newYhteishinta };
+          updatedCategoryItems[index] = updatedItem;
+
+          return { ...prevData, [selectedCategory]: updatedCategoryItems };
+        });
+      } catch (error) {
+        console.error("Error updating inventory item:", error);
+      }
+    }
+  }
+};
+const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: string) => {
+  setTempValues((prevTempValues) => ({
+    ...prevTempValues,
+    [itemName]: {
+      ...prevTempValues[itemName],
+      [field]: value,
+    },
+  }));
+};
 const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", newValue: string) => {
   // Update local state
   const updatedInventory = inventoryData[selectedCategory].map((item, idx) => {
