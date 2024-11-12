@@ -2,6 +2,7 @@ import YearMonthPickerModal from "@/components/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native-paper";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
@@ -9,6 +10,7 @@ import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
 import LoadingScreen from "@/components/LoadingScreen";
+import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
 
 export interface InventoryItem {
   Alv: number;
@@ -37,6 +39,10 @@ export default function Diningroom() {
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
   const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
   const cachedData = useRef<Record<string, InventoryData>>({});
+  const styles = useMemo(
+    () => useLoadingScreenStyle(ThemeColors),
+    [ThemeColors]
+  );
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
@@ -364,7 +370,10 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       </View>
       <View style={diningroomStyle.inventoryTable}>
       {isLoading ? (
-        <Text>"Ladataan..."</Text>
+        <>
+        <Text style={styles.text}>Ladataan...</Text>
+        <ActivityIndicator size="large" color={ThemeColors.tint} />
+        </>
 ) : (
         <FlatList
           data={inventoryData[selectedCategory] || []}
