@@ -285,11 +285,11 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
 
   const confirmDeleteItem = (item: InventoryItem) => {
     Alert.alert(
-      "Delete Item",
-      `Are you sure you want to delete ${item.Nimi}?`,
+      "Poista tuote",
+      `Haluatko varmasti poistaa tuotteen ${item.Nimi}?`,
       [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => removeInventoryItem(item) }
+        { text: "Peruuta", style: "cancel" },
+        { text: "Poista", style: "destructive", onPress: () => removeInventoryItem(item) }
       ],
       { cancelable: true }
     );
@@ -384,7 +384,7 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
           keyExtractor={(item, index) => `${item.Nimi}-${index}`}
           ListEmptyComponent={
             <Text style={diningroomStyle.cellText}>
-              No items available in this category.
+              Tyhjältä näyttää!
             </Text>
           }
         />
