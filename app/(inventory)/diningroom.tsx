@@ -10,6 +10,7 @@ import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
+import LoadingScreen from "@/components/LoadingScreen";
 
 export interface InventoryItem {
   Alv: number;
@@ -239,7 +240,7 @@ export default function Diningroom() {
   /** INVENTAARION FUNKTIOT LOPPUU */
 
   if (isLoading || !selectedCategory) {
-    return <Text>Loading...</Text>;
+    return <LoadingScreen/>;
   }
 
   return (
