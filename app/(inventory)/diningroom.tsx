@@ -1,14 +1,12 @@
-import { useMemo, useRef } from "react";
 import YearMonthPickerModal from "@/components/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Link } from "expo-router";
-import { useState, useEffect } from "react";
-import { Alert, FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
-import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
 import LoadingScreen from "@/components/LoadingScreen";
 
@@ -35,6 +33,7 @@ export default function Diningroom() {
   const [isLoading, setIsLoading] = useState(true);
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
+  const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
@@ -75,24 +74,36 @@ export default function Diningroom() {
     setAddItemModalVisible(false);
     
   };
+  const regex = /^[0-9]*\.?[0-9]*$/;
 
   const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
     <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
       <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
       <TextInput
         style={diningroomStyle.editableCell}
-        value={item.Määrä.toString()}
-        onChangeText={(text) => updateQuantity(index, text)}
+        value={tempValues[item.Nimi]?.Määrä ?? item.Määrä.toString()}
+        onChangeText={(text) => handleChange(item.Nimi, "Määrä", text)}
+        onEndEditing={() => handleEditingEnd(item, "Määrä", index)}
         keyboardType="numeric"
       />
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
       <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Hinta?.toFixed(2)}</Text>
+      <TextInput
+        style={diningroomStyle.editableCell}
+        value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
+        onChangeText={(text) => {
+          const regex = /^[0-9]*\.?[0-9]*$/
+          if (regex.test(text)){
+          handleChange(item.Nimi, "Hinta", text)}
+        }}
+        onEndEditing={() => handleEditingEnd(item, "Hinta", index)}
+        keyboardType="decimal-pad"
+      />
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
       <Pressable onPress={() => confirmDeleteItem(item)}>
-      <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
-    </Pressable>
-     </View>
+        <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
+      </Pressable>
+    </View>
   );
   
 /** MODAALIEN HELPPERIT LOPPUU */
@@ -198,17 +209,78 @@ export default function Diningroom() {
   };
 
 /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
-  const updateQuantity = async (index: number, newQuantity: string) => {
-    const updatedInventory = inventoryData[selectedCategory].map((item, idx) =>
-      idx === index ? { ...item, Määrä: parseInt(newQuantity) || 0 } : item
-    );
-    setInventoryData((prevData) => ({ ...prevData, [selectedCategory]: updatedInventory }));
+const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta", index: number) => {
+  const tempValue = tempValues[item.Nimi]?.[field];
+  if (tempValue !== undefined) {
+    const parsedValue = parseFloat(tempValue);
+    if (!isNaN(parsedValue) && parsedValue !== item[field]) {
+      try {
+        // Recalculate Yhteishinta when either Määrä or Hinta changes
+        let newYhteishinta = item.Yhteishinta;
+        if (field === "Määrä") {
+          newYhteishinta = parsedValue * item.Hinta;
+        } else if (field === "Hinta") {
+          newYhteishinta = item.Määrä * parsedValue;
+        }
 
-    const docRef = doc(db, "inventaario", selectedDate!, "keittiö", /* itemId */);
+        // Update Firestore with the new value and Yhteishinta
+        const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
+        await updateDoc(docRef, { [field]: parsedValue, Yhteishinta: newYhteishinta });
+
+        // Update the local inventory data with the new value and Yhteishinta
+        setInventoryData((prevData) => {
+          const updatedCategoryItems = [...prevData[selectedCategory]];
+          const updatedItem = { ...updatedCategoryItems[index], [field]: parsedValue, Yhteishinta: newYhteishinta };
+          updatedCategoryItems[index] = updatedItem;
+
+          return { ...prevData, [selectedCategory]: updatedCategoryItems };
+        });
+      } catch (error) {
+        console.error("Error updating inventory item:", error);
+      }
+    }
+  }
+};
+const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: string) => {
+  setTempValues((prevTempValues) => ({
+    ...prevTempValues,
+    [itemName]: {
+      ...prevTempValues[itemName],
+      [field]: value,
+    },
+  }));
+};
+const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", newValue: string) => {
+  // Update local state
+  const updatedInventory = inventoryData[selectedCategory].map((item, idx) => {
+    if (idx === index) {
+      const updatedItem = {
+        ...item,
+        [field]: parseFloat(newValue) || 0
+      };
+
+      // Update Yhteishinta based on Määrä * Hinta if either field is updated
+      updatedItem.Yhteishinta = updatedItem.Määrä * updatedItem.Hinta;
+      return updatedItem;
+    }
+    return item;
+  });
+
+  setInventoryData((prevData) => ({ ...prevData, [selectedCategory]: updatedInventory }));
+
+  // Update Firestore
+  const item = inventoryData[selectedCategory][index];
+  const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
+  try {
     await updateDoc(docRef, {
-      Määrä: parseInt(newQuantity) || 0,
+      [field]: parseFloat(newValue) || 0,
+      Yhteishinta: updatedInventory[index].Yhteishinta, // Update Yhteishinta in Firestore as well
     });
-  };
+  } catch (error) {
+    console.error("Error updating inventory item:", error);
+  }
+};
+
   const confirmDeleteItem = (item: InventoryItem) => {
     Alert.alert(
       "Delete Item",
@@ -220,6 +292,7 @@ export default function Diningroom() {
       { cancelable: true }
     );
   };
+
   const removeInventoryItem = async (itemToRemove: InventoryItem) => {
     try {
       const itemRef = doc(db, "inventaario", selectedDate!, "sali", itemToRemove.Nimi);
