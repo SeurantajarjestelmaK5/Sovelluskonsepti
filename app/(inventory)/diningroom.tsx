@@ -70,7 +70,6 @@ export default function Diningroom() {
     setSelectedDate(formattedDate);
     setModalVisible(false);
   };
-  const handleAddItem = () => setAddItemModalVisible(true); // Open AddItemModal
 
   const handleItemAdded = () => {
     setAddItemModalVisible(false);
@@ -160,7 +159,6 @@ export default function Diningroom() {
   /** JA SE SITTEN LOPPUU TÄHÄN*/
 
   /** INVENTAARION FUNKTIOT ALKAA */
-  const hasFetchedDataInitially = useRef(false);
 
   const fetchInventory = async (date: string) => {
     try {
@@ -267,36 +265,6 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
     },
   }));
 };
-const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", newValue: string) => {
-  // Update local state
-  const updatedInventory = inventoryData[selectedCategory].map((item, idx) => {
-    if (idx === index) {
-      const updatedItem = {
-        ...item,
-        [field]: parseFloat(newValue) || 0
-      };
-
-      // Update Yhteishinta based on Määrä * Hinta if either field is updated
-      updatedItem.Yhteishinta = updatedItem.Määrä * updatedItem.Hinta;
-      return updatedItem;
-    }
-    return item;
-  });
-
-  setInventoryData((prevData) => ({ ...prevData, [selectedCategory]: updatedInventory }));
-
-  // Update Firestore
-  const item = inventoryData[selectedCategory][index];
-  const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
-  try {
-    await updateDoc(docRef, {
-      [field]: parseFloat(newValue) || 0,
-      Yhteishinta: updatedInventory[index].Yhteishinta, // Update Yhteishinta in Firestore as well
-    });
-  } catch (error) {
-    console.error("Error updating inventory item:", error);
-  }
-};
 
   const confirmDeleteItem = (item: InventoryItem) => {
     Alert.alert(
@@ -330,9 +298,6 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
 
   /** INVENTAARION FUNKTIOT LOPPUU */
 
-  if (isLoading || !selectedCategory) {
-    return <LoadingScreen/>;
-  }
 
   return (
     <View style={diningroomStyle.container}>
@@ -393,6 +358,9 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
+      {isLoading ? (
+        <LoadingScreen /> // Display LoadingScreen in the inventory data section
+      ) : (
         <FlatList
           data={inventoryData[selectedCategory] || []}
           renderItem={renderInventoryItem}
@@ -403,7 +371,8 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
             </Text>
           }
         />
-      </View>
+      )}
+    </View>
 
       <View style={diningroomStyle.bottomButtons}>
         <Pressable
