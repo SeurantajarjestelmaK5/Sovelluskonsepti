@@ -2,6 +2,7 @@ import YearMonthPickerModal from "@/components/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native-paper";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
@@ -9,6 +10,7 @@ import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
 import BackButton from "@/components/BackButton";
 import LoadingScreen from "@/components/LoadingScreen";
+import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
 
 export interface InventoryItem {
   Alv: number;
@@ -31,11 +33,16 @@ export default function Diningroom() {
   const [selectedCategory, setSelectedCategory] = useState<string>("Tankit");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [itemAdded, setItemAdded] = useState(false);
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
   const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
   const cachedData = useRef<Record<string, InventoryData>>({});
+  const styles = useMemo(
+    () => useLoadingScreenStyle(ThemeColors),
+    [ThemeColors]
+  );
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
@@ -70,7 +77,6 @@ export default function Diningroom() {
     setSelectedDate(formattedDate);
     setModalVisible(false);
   };
-  const handleAddItem = () => setAddItemModalVisible(true); // Open AddItemModal
 
   const handleItemAdded = () => {
     setAddItemModalVisible(false);
@@ -160,7 +166,6 @@ export default function Diningroom() {
   /** JA SE SITTEN LOPPUU TÄHÄN*/
 
   /** INVENTAARION FUNKTIOT ALKAA */
-  const hasFetchedDataInitially = useRef(false);
 
   const fetchInventory = async (date: string) => {
     try {
@@ -184,7 +189,9 @@ export default function Diningroom() {
         const data = doc.data() as InventoryItem;
         fetchedData[data.Kategoria]?.push(data);
       });
-  
+      if (isFirstLoad) {
+        setIsFirstLoad(false); // Update to false after first load completes
+      }
       return fetchedData; // Return fetched data for caching
     } catch (error) {
       console.error("Error fetching inventory data:", error);
@@ -267,36 +274,6 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
     },
   }));
 };
-const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", newValue: string) => {
-  // Update local state
-  const updatedInventory = inventoryData[selectedCategory].map((item, idx) => {
-    if (idx === index) {
-      const updatedItem = {
-        ...item,
-        [field]: parseFloat(newValue) || 0
-      };
-
-      // Update Yhteishinta based on Määrä * Hinta if either field is updated
-      updatedItem.Yhteishinta = updatedItem.Määrä * updatedItem.Hinta;
-      return updatedItem;
-    }
-    return item;
-  });
-
-  setInventoryData((prevData) => ({ ...prevData, [selectedCategory]: updatedInventory }));
-
-  // Update Firestore
-  const item = inventoryData[selectedCategory][index];
-  const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
-  try {
-    await updateDoc(docRef, {
-      [field]: parseFloat(newValue) || 0,
-      Yhteishinta: updatedInventory[index].Yhteishinta, // Update Yhteishinta in Firestore as well
-    });
-  } catch (error) {
-    console.error("Error updating inventory item:", error);
-  }
-};
 
   const confirmDeleteItem = (item: InventoryItem) => {
     Alert.alert(
@@ -329,11 +306,10 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
 
   /** INVENTAARION FUNKTIOT LOPPUU */
-
-  if (isLoading || !selectedCategory) {
-    return <LoadingScreen/>;
+  if (isLoading && isFirstLoad) {
+    // Show full screen LoadingScreen on first load
+    return <LoadingScreen />;
   }
-
   return (
     <View style={diningroomStyle.container}>
       <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
@@ -393,6 +369,12 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
+      {isLoading ? (
+        <>
+        <Text style={styles.text}>Ladataan...</Text>
+        <ActivityIndicator size="large" color={ThemeColors.tint} />
+        </>
+) : (
         <FlatList
           data={inventoryData[selectedCategory] || []}
           renderItem={renderInventoryItem}
@@ -403,7 +385,8 @@ const updateInventoryItem = async (index: number, field: "Määrä" | "Hinta", n
             </Text>
           }
         />
-      </View>
+      )}
+    </View>
 
       <View style={diningroomStyle.bottomButtons}>
         <Pressable
