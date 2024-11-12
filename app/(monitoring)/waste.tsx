@@ -4,6 +4,7 @@ import { ActivityIndicator } from "react-native-paper";
 import BackButton from "@/components/BackButton";
 import { db } from "@/firebase/config";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import LoadingScreen from "@/components/LoadingScreen";
 
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useColorScheme } from "react-native";
@@ -54,18 +55,7 @@ export default function waste() {
 
   if (isLoading) {
     return (
-      <View style={{ ...styles.container, justifyContent: "flex-start" }}>
-        <Image
-          source={
-            colorScheme === "light"
-              ? require("../../assets/images/k5light.png")
-              : require("../../assets/images/k5dark.jpg")
-          }
-          style={styles.logo}
-        />
-        <Text style={styles.text}>Ladataan...</Text>
-        <ActivityIndicator size="large" color={ThemeColors.tint} />
-      </View>
+      <LoadingScreen/>
     );
   } else {
     return (
