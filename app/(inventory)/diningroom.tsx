@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import YearMonthPickerModal from "@/components/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
@@ -145,45 +145,51 @@ export default function Diningroom() {
   /** JA SE SITTEN LOPPUU TÄHÄN*/
 
   /** INVENTAARION FUNKTIOT ALKAA */
-  
-  useEffect(() => {
-    const fetchInventory = async () => {
-      try {
-        // Check or create month before fetching inventory
-        await checkOrCreateMonth(selectedDate!);
-  
-        const inventoryRef = collection(db, "inventaario", selectedDate!, "sali");
-        const querySnapshot = await getDocs(inventoryRef);
-  
-        const fetchedData: InventoryData = {
-          Tankit: [],
-          Oluet: [],
-          Siiderit: [],
-          Tyhjät: [],
-          Viinit: [],
-          Alkoholit: [],
-          ALV14: []
-        };
-  
-        querySnapshot.forEach((doc) => {
-          const data = doc.data() as InventoryItem;
-          fetchedData[data.Kategoria]?.push(data);
-        });
-  
-        setInventoryData(fetchedData);
-      } catch (error) {
-        console.error("Error fetching inventory data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    if (selectedDate && !inventoryData) {
-      fetchInventory();
-      console.log("fetching inv in selectedDate");
-      
+  const hasFetchedDataInitially = useRef(false);
+
+  const fetchInventory = async (date: string) => {
+    try {
+      setIsLoading(true);
+
+      // Check or create month before fetching inventory
+      await checkOrCreateMonth(date);
+
+      const inventoryRef = collection(db, "inventaario", date, "sali");
+      const querySnapshot = await getDocs(inventoryRef);
+
+      const fetchedData: InventoryData = {
+        Tankit: [],
+        Oluet: [],
+        Siiderit: [],
+        Tyhjät: [],
+        Viinit: [],
+        Alkoholit: [],
+        ALV14: []
+      };
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data() as InventoryItem;
+        fetchedData[data.Kategoria]?.push(data);
+      });
+
+      setInventoryData(fetchedData);
+    } catch (error) {
+      console.error("Error fetching inventory data:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [selectedDate, selectedCategory, handleItemAdded]);
+  };
+
+  // Fetch data on initial load or when selectedDate changes
+  useEffect(() => {
+    if (!hasFetchedDataInitially.current && selectedDate) {
+      fetchInventory(selectedDate);
+      hasFetchedDataInitially.current = true;
+    } else if (hasFetchedDataInitially.current && selectedDate) {
+      fetchInventory(selectedDate);
+    }
+  }, [selectedDate]);
+
 
   const selectCategory = (category: string) => {
     setSelectedCategory(category);
