@@ -88,6 +88,8 @@ export default function Diningroom() {
       const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
       const currentYear = currentDate.getFullYear();
       setSelectedDate(`${currentMonth}-${currentYear}`);
+      console.log("date selected");
+      
     }
   }, [selectedDate]);
 
@@ -103,6 +105,7 @@ export default function Diningroom() {
 
   const handleItemAdded = () => {
     setAddItemModalVisible(false);
+    
   };
 
   const renderInventoryItem = ({
@@ -224,9 +227,11 @@ export default function Diningroom() {
         setIsLoading(false);
       }
     };
-
-    if (selectedDate) {
+  
+    if (selectedDate && !inventoryData) {
       fetchInventory();
+      console.log("fetching inv in selectedDate");
+      
     }
   }, [selectedDate, selectedCategory, handleItemAdded]);
 
