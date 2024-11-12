@@ -1,7 +1,18 @@
-import React, { useState } from "react";
-import { Modal, View, Text, TextInput, Button, Pressable, StyleSheet, FlatList } from "react-native";
+import React, { useState, useMemo } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  FlatList,
+} from "react-native";
+import { TextInput, Button } from "react-native-paper";
+import { Picker } from "@react-native-picker/picker";
 import { InventoryItem } from "@/app/(inventory)/diningroom";
 import { addInventoryItem } from "@/scripts/addInventoryItem";
+import { getModalStyles } from "@/styles/components/itemModalStyle";
+import { useThemeColors } from "@/constants/ThemeColors";
 
 interface AddItemModalProps {
   visible: boolean;
@@ -25,7 +36,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [alv, setAlv] = useState(24);
 
-  const categories = ["Tankit", "Oluet", "Siiderit", "Tyhjät", "Viinit", "Alkoholit", "ALV14"];
+  const categories = [
+    "Tankit",
+    "Oluet",
+    "Siiderit",
+    "Tyhjät",
+    "Viinit",
+    "Alkoholit",
+    "ALV14",
+  ];
+  const ThemeColors = useThemeColors();
+  const styles = useMemo(() => getModalStyles(ThemeColors), [ThemeColors]);
 
   const handleAddItem = async () => {
     // Check that all fields are filled
@@ -62,49 +83,51 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     <Modal visible={visible} transparent={true} animationType="slide">
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.modalContent} onPress={() => {}}>
-          <Text style={styles.header}>Add New Item</Text>
+          <Text style={styles.header}>Lisää tuote</Text>
 
           <TextInput
-            placeholder="Name"
+            placeholder="Nimi"
             value={name}
             onChangeText={setName}
             style={styles.input}
+            mode="outlined"
+            activeOutlineColor={ThemeColors.tint}
           />
           <TextInput
-            placeholder="Quantity"
+            placeholder="Määrä"
             value={quantity}
             onChangeText={setQuantity}
             keyboardType="numeric"
             style={styles.input}
+            mode="outlined"
+            activeOutlineColor={ThemeColors.tint}
           />
           <TextInput
-            placeholder="Unit"
+            placeholder="Yksikkö"
             value={unit}
             onChangeText={setUnit}
             style={styles.input}
+            mode="outlined"
+            activeOutlineColor={ThemeColors.tint}
           />
-
-          {/* Dropdown for Category */}
-          <Pressable onPress={() => setShowCategoryDropdown(!showCategoryDropdown)} style={styles.dropdownButton}>
-            <Text>{category || "Select Category"}</Text>
-          </Pressable>
-          {showCategoryDropdown && (
-            <View style={styles.dropdownList}>
-              <FlatList
-                data={categories}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <Pressable onPress={() => { setCategory(item); setShowCategoryDropdown(false); }}>
-                    <Text style={styles.dropdownItem}>{item}</Text>
-                  </Pressable>
-                )}
-              />
-            </View>
-          )}
+          <Picker
+            selectedValue={category}
+            onValueChange={(itemValue) => setCategory(itemValue as string)}
+            mode="dropdown"
+            style={styles.dropdownButton}
+          >
+            {categories.map((category) => (
+              <Picker.Item key={category} label={category} value={category} />
+            ))}
+          </Picker>
 
           <Text style={styles.label}>Select ALV</Text>
           {[14, 25.5].map((value) => (
-            <Pressable key={value} onPress={() => setAlv(value)} style={styles.radioButtonContainer}>
+            <Pressable
+              key={value}
+              onPress={() => setAlv(value)}
+              style={styles.radioButtonContainer}
+            >
               <View
                 style={[
                   styles.radioButton,
@@ -118,85 +141,22 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
           ))}
 
           {/* Disable "Add Item" button if form is not valid */}
-          <Button title="Add Item" onPress={handleAddItem} disabled={!isFormValid} />
-          <Button title="Cancel" onPress={onClose} color="red" />
+          <Button
+            children="Lisää tuote"
+            onPress={handleAddItem}
+            mode="contained"
+            disabled={!isFormValid}
+            theme={{ colors: { onSurfaceDisabled: ThemeColors.text, surfaceDisabled: ThemeColors.navDefault, primary: ThemeColors.tint } }}
+          />
+          <Button
+            children="Peruuta"
+            onPress={onClose}
+            mode="text"
+          />
         </Pressable>
       </Pressable>
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    width: "80%",
-    backgroundColor: "white",
-    padding: 20,
-    borderRadius: 10,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    paddingVertical: 8,
-    marginBottom: 12,
-  },
-  dropdownButton: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  dropdownList: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    maxHeight: 100,
-    marginBottom: 10,
-    borderRadius: 5,
-  },
-  dropdownItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  radioButtonContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 5,
-  },
-  radioButton: {
-    height: 20,
-    width: 20,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#333",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 8,
-  },
-  radioButtonSelected: {
-    backgroundColor: "#333",
-  },
-  radioButtonInner: {
-    height: 10,
-    width: 10,
-    borderRadius: 5,
-    backgroundColor: "white",
-  },
-});
 
 export default AddItemModal;
