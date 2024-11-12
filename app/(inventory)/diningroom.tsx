@@ -31,6 +31,7 @@ export default function Diningroom() {
   const [selectedCategory, setSelectedCategory] = useState<string>("Tankit");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [itemAdded, setItemAdded] = useState(false);
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
   const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
@@ -73,8 +74,9 @@ export default function Diningroom() {
 
   const handleItemAdded = () => {
     setAddItemModalVisible(false);
-    
+    setItemAdded(true)
   };
+
   const regex = /^[0-9]*\.?[0-9]*$/;
 
   const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
@@ -196,19 +198,32 @@ export default function Diningroom() {
   // Fetch data on initial load or when selectedDate changes
   useEffect(() => {
     if (selectedDate) {
+      if (itemAdded) {
+        // Fetch data if not cached
+        fetchInventory(selectedDate).then((data) => {
+          cachedData.current[selectedDate] = data;
+          setInventoryData(data);          
+          console.log('item added');
+          setItemAdded(false)
+          return
+        });
+      }
       if (cachedData.current[selectedDate]) {
         // If data for the selected date is already cached, use it
         setInventoryData(cachedData.current[selectedDate]);
         setIsLoading(false);
+        console.log('lagaa');
+
       } else {
         // Fetch data if not cached
         fetchInventory(selectedDate).then((data) => {
           cachedData.current[selectedDate] = data;
           setInventoryData(data);          
+          console.log('laga');
         });
       }
     }
-  }, [selectedDate]);
+  }, [selectedDate, itemAdded]);
 
 /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
 const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta", index: number) => {
