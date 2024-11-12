@@ -48,7 +48,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
     },
     backIcon: {
-      fontSize: 25,
+      color: ThemeColors.icon,
     },
     calendarIcon: {
       fontSize: 25,
@@ -74,19 +74,18 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "space-between",
     },
     scrollList: {
-      width: "100%",
-      height: 50,
-      justifyContent: "space-evenly",
-      alignContent: "center",
-      marginTop: 10,
+      justifyContent: "center",
+      alignItems: "center",
     },
     categoryButton: {
-      paddingVertical: 10,
+      paddingVertical: 20,
       paddingHorizontal: 45,
       borderRadius: 10,
       backgroundColor: ThemeColors.navSelected,
       justifyContent: "center",
       alignItems: "center",
+      marginHorizontal: 10,
+      marginVertical: 10,
     },
     selectedCategoryButton: {
       backgroundColor: ThemeColors.tint,
@@ -100,10 +99,10 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       color: ThemeColors.background,
     },
     inventoryTable: {
-      flex: 1,
-      marginTop: 20,
-      width: "100%",
-      padding: 10,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      marginVertical: 10,
     },
     tableHeader: {
       flexDirection: "row",
@@ -134,6 +133,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       fontSize: 16,
       textAlign: "center",
+      color: ThemeColors.text,
     },
     editableCell: {
       flex: 1,
@@ -145,8 +145,17 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
     },
     bottomButtons: {
       flex: 1,
-      alignItems: "flex-start",
-      maxHeight: 15,
+      width: "100%",
+      flexDirection: "row-reverse",
+      justifyContent: "space-evenly",
+      alignItems: "center",
+    },
+    backButton: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignContent: "flex-start",
+      width: "100%",
+      marginTop: 20,
     },
     trashIcon: {
       fontSize: 24,
