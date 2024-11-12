@@ -155,11 +155,21 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "space-between",
       alignContent: "flex-start",
       width: "100%",
-      marginTop: 20,
+      marginBottom: 10,
+      marginLeft: 10,
     },
     trashIcon: {
       fontSize: 24,
       color: "red",
       marginLeft: 10,
+    },
+    logo: {
+      width: "60%",
+      height: "20%",
+    },
+    loadingText: {
+      fontSize: 24,
+      color: ThemeColors.text,
+      marginBottom: 15,
     },
   });

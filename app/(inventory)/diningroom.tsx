@@ -1,15 +1,36 @@
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import YearMonthPickerModal from "@/components/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useState, useEffect } from "react";
-import { Alert, FlatList, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+  Image,
+  ActivityIndicator
+} from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
-import { collection, getDocs, updateDoc, doc, query, where, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  query,
+  where,
+  setDoc,
+  getDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import BackButton from "@/components/BackButton";
+import LoadingScreen from "@/components/LoadingScreen";
+import { useColorScheme } from "react-native";
 
 export interface InventoryItem {
   Alv: number;
@@ -28,17 +49,30 @@ type InventoryData = {
 export default function Diningroom() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [addItemModalVisible, setAddItemModalVisible] = useState(false); 
+  const [addItemModalVisible, setAddItemModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("Tankit");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
   const ThemeColors = useThemeColors();
-  const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
-
+  const diningroomStyle = useMemo(
+    () => getDiningroomStyles(ThemeColors),
+    [ThemeColors]
+  );
+  const colorScheme = useColorScheme();
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
-    "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kesäkuu",
-    "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
   ];
 
   const getFormattedDate = () => {
@@ -51,7 +85,7 @@ export default function Diningroom() {
   useEffect(() => {
     if (!selectedDate) {
       const currentDate = new Date();
-      const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
       const currentYear = currentDate.getFullYear();
       setSelectedDate(`${currentMonth}-${currentYear}`);
     }
@@ -59,8 +93,7 @@ export default function Diningroom() {
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT LOPPUU */
 
-
-/** MODAALIEN HELPPERIT ALKAA */
+  /** MODAALIEN HELPPERIT ALKAA */
 
   const handleConfirm = (formattedDate: string) => {
     setSelectedDate(formattedDate);
@@ -72,7 +105,13 @@ export default function Diningroom() {
     setAddItemModalVisible(false);
   };
 
-  const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
+  const renderInventoryItem = ({
+    item,
+    index,
+  }: {
+    item: InventoryItem;
+    index: number;
+  }) => (
     <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
       <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
       <TextInput
@@ -84,17 +123,21 @@ export default function Diningroom() {
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
       <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
       <Text style={diningroomStyle.cellText}>{item.Hinta?.toFixed(2)}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
+      <Text style={diningroomStyle.cellText}>
+        {item.Yhteishinta?.toFixed(2)}
+      </Text>
       <Pressable onPress={() => confirmDeleteItem(item)}>
-      <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
-    </Pressable>
-     </View>
+        <MaterialCommunityIcons
+          name="trash-can-outline"
+          style={diningroomStyle.trashIcon}
+        />
+      </Pressable>
+    </View>
   );
-  
-/** MODAALIEN HELPPERIT LOPPUU */
 
+  /** MODAALIEN HELPPERIT LOPPUU */
 
-/** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
+  /** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
   const getPreviousMonthDate = (dateString: string): string => {
     const [month, year] = dateString.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1, 1);
@@ -103,26 +146,26 @@ export default function Diningroom() {
     const prevYear = date.getFullYear();
     return `${prevMonth}-${prevYear}`;
   };
-  
+
   const checkOrCreateMonth = async (month: string) => {
     const inventoryRef = collection(db, "inventaario", month, "sali");
     const docSnapshot = await getDocs(inventoryRef);
-  
+
     if (!docSnapshot.empty) {
       // Data for this month already exists
       return;
     }
-  
+
     // Get previous month's data
     const previousMonth = getPreviousMonthDate(month);
     const prevMonthRef = collection(db, "inventaario", previousMonth, "sali");
     const prevMonthSnapshot = await getDocs(prevMonthRef);
-  
+
     if (prevMonthSnapshot.empty) {
       console.warn(`No data found for the previous month: ${previousMonth}`);
       return;
     }
-  
+
     // Copy previous month's data to new month
     prevMonthSnapshot.forEach(async (item) => {
       const itemData = item.data();
@@ -135,23 +178,30 @@ export default function Diningroom() {
       const newDocRef = doc(db, "inventaario", month, "sali", item.id);
       await setDoc(newDocRef, newItemData);
     });
-  
-    console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
+
+    console.log(
+      `Created new month entry for ${month} by copying data from ${previousMonth}`
+    );
   };
 
   /** JA SE SITTEN LOPPUU TÄHÄN*/
 
   /** INVENTAARION FUNKTIOT ALKAA */
-  
+
   useEffect(() => {
     const fetchInventory = async () => {
       try {
         // Check or create month before fetching inventory
         await checkOrCreateMonth(selectedDate!);
-  
-        const inventoryRef = collection(db, "inventaario", selectedDate!, "sali");
+
+        const inventoryRef = collection(
+          db,
+          "inventaario",
+          selectedDate!,
+          "sali"
+        );
         const querySnapshot = await getDocs(inventoryRef);
-  
+
         const fetchedData: InventoryData = {
           Tankit: [],
           Oluet: [],
@@ -159,14 +209,14 @@ export default function Diningroom() {
           Tyhjät: [],
           Viinit: [],
           Alkoholit: [],
-          ALV14: []
+          ALV14: [],
         };
-  
+
         querySnapshot.forEach((doc) => {
           const data = doc.data() as InventoryItem;
           fetchedData[data.Kategoria]?.push(data);
         });
-  
+
         setInventoryData(fetchedData);
       } catch (error) {
         console.error("Error fetching inventory data:", error);
@@ -174,7 +224,7 @@ export default function Diningroom() {
         setIsLoading(false);
       }
     };
-  
+
     if (selectedDate) {
       fetchInventory();
     }
@@ -184,14 +234,22 @@ export default function Diningroom() {
     setSelectedCategory(category);
   };
 
-/** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
+  /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
   const updateQuantity = async (index: number, newQuantity: string) => {
     const updatedInventory = inventoryData[selectedCategory].map((item, idx) =>
       idx === index ? { ...item, Määrä: parseInt(newQuantity) || 0 } : item
     );
-    setInventoryData((prevData) => ({ ...prevData, [selectedCategory]: updatedInventory }));
+    setInventoryData((prevData) => ({
+      ...prevData,
+      [selectedCategory]: updatedInventory,
+    }));
 
-    const docRef = doc(db, "inventaario", selectedDate!, "keittiö", /* itemId */);
+    const docRef = doc(
+      db,
+      "inventaario",
+      selectedDate!,
+      "keittiö" /* itemId */
+    );
     await updateDoc(docRef, {
       Määrä: parseInt(newQuantity) || 0,
     });
@@ -202,22 +260,34 @@ export default function Diningroom() {
       `Are you sure you want to delete ${item.Nimi}?`,
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: () => removeInventoryItem(item) }
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => removeInventoryItem(item),
+        },
       ],
       { cancelable: true }
     );
   };
   const removeInventoryItem = async (itemToRemove: InventoryItem) => {
     try {
-      const itemRef = doc(db, "inventaario", selectedDate!, "sali", itemToRemove.Nimi);
+      const itemRef = doc(
+        db,
+        "inventaario",
+        selectedDate!,
+        "sali",
+        itemToRemove.Nimi
+      );
       await deleteDoc(itemRef); // Remove from Firebase
-  
+
       // Remove from local state
       setInventoryData((prevData) => {
-        const updatedCategoryItems = prevData[selectedCategory].filter(item => item.Nimi !== itemToRemove.Nimi);
+        const updatedCategoryItems = prevData[selectedCategory].filter(
+          (item) => item.Nimi !== itemToRemove.Nimi
+        );
         return { ...prevData, [selectedCategory]: updatedCategoryItems };
       });
-      
+
       console.log(`${itemToRemove.Nimi} has been removed from inventory.`);
     } catch (error) {
       console.error("Error deleting inventory item:", error);
@@ -228,7 +298,9 @@ export default function Diningroom() {
   /** INVENTAARION FUNKTIOT LOPPUU */
 
   if (isLoading || !selectedCategory) {
-    return <Text>Loading...</Text>;
+    return (
+      <LoadingScreen/>
+    );
   }
 
   return (
