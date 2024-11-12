@@ -32,7 +32,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Tankit");
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [alv, setAlv] = useState(24);
 
@@ -115,6 +115,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             onValueChange={(itemValue) => setCategory(itemValue as string)}
             mode="dropdown"
             style={styles.dropdownButton}
+            dropdownIconColor={ThemeColors.tint}
           >
             {categories.map((category) => (
               <Picker.Item key={category} label={category} value={category} />
@@ -136,7 +137,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
               >
                 {alv === value && <View style={styles.radioButtonInner} />}
               </View>
-              <Text>{value}%</Text>
+              <Text style={{color: 'white'}}>{value}%</Text>
             </Pressable>
           ))}
 
@@ -147,11 +148,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             mode="contained"
             disabled={!isFormValid}
             theme={{ colors: { onSurfaceDisabled: ThemeColors.text, surfaceDisabled: ThemeColors.navDefault, primary: ThemeColors.tint } }}
+            style={{ marginBottom: 10, padding: 15}}
           />
           <Button
             children="Peruuta"
             onPress={onClose}
             mode="text"
+            textColor={ThemeColors.text}
           />
         </Pressable>
       </Pressable>
