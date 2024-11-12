@@ -31,6 +31,7 @@ export default function Diningroom() {
   const [selectedCategory, setSelectedCategory] = useState<string>("Tankit");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [itemAdded, setItemAdded] = useState(false);
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
@@ -182,7 +183,9 @@ export default function Diningroom() {
         const data = doc.data() as InventoryItem;
         fetchedData[data.Kategoria]?.push(data);
       });
-  
+      if (isFirstLoad) {
+        setIsFirstLoad(false); // Update to false after first load completes
+      }
       return fetchedData; // Return fetched data for caching
     } catch (error) {
       console.error("Error fetching inventory data:", error);
@@ -297,8 +300,10 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
 
   /** INVENTAARION FUNKTIOT LOPPUU */
-
-
+  if (isLoading && isFirstLoad) {
+    // Show full screen LoadingScreen on first load
+    return <LoadingScreen />;
+  }
   return (
     <View style={diningroomStyle.container}>
       <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
@@ -359,8 +364,8 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       </View>
       <View style={diningroomStyle.inventoryTable}>
       {isLoading ? (
-        <LoadingScreen /> // Display LoadingScreen in the inventory data section
-      ) : (
+        <Text>"Ladataan..."</Text>
+) : (
         <FlatList
           data={inventoryData[selectedCategory] || []}
           renderItem={renderInventoryItem}
