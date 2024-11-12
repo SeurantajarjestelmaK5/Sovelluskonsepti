@@ -150,7 +150,8 @@ export default function Diningroom() {
 
   const fetchInventory = async (date: string) => {
     try {
-      setIsLoading(true);
+      if (!hasFetchedDataInitially){
+      setIsLoading(true);}
 
       // Check or create month before fetching inventory
       await checkOrCreateMonth(date);
@@ -189,7 +190,7 @@ export default function Diningroom() {
     } else if (hasFetchedDataInitially.current && selectedDate) {
       fetchInventory(selectedDate);
     }
-  }, [selectedDate]);
+  }, [selectedDate, handleAddItem]);
 
 
   const selectCategory = (category: string) => {
