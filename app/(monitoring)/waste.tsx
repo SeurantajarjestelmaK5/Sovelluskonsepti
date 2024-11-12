@@ -19,21 +19,36 @@ interface WasteData {
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+  const [date, setDate] = useState("");
 
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
   const styles = useMemo(() => getWasteStyles(ThemeColors), [ThemeColors]);
-  const date = "1-10-24";
 
   const checkOrientation = async () => {
     const windowHeight = Dimensions.get("window").height;
     console.log(windowHeight);
   };
 
+  const getCurrentDate = () => {
+    const date = new Date();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const currDate = `${day}-${month}-${year}`;
+    setDate(currDate);
+  };
+
+  useEffect(() => {
+    getCurrentDate();
+  }, []);
+
+
   useEffect(() => {
     setIsLoading(true);
     const fetchWaste = async () => {
+      if (!date) return;
+
       try {
         const querySnapshot = await getDocs(
           collection(db, "omavalvonta", "jätteet", date)
@@ -43,26 +58,24 @@ export default function waste() {
           ...doc.data(),
         })) as WasteData[];
         setDocData(data);
-        console.log(data, orientation);
+        console.log(data, date);
       } catch (error) {
         console.error("Error getting documents: ", error);
       }
     };
-    checkOrientation();
     fetchWaste();
     setIsLoading(false);
-  }, []);
+  }, [date]);
 
   if (isLoading) {
-    return (
-      <LoadingScreen/>
-    );
+    return <LoadingScreen />;
   } else {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>Jätteet</Text>
         <View style={styles.content}>
           <Text style={styles.text}>Tähän tulee jätteiden seuranta</Text>
+          <Text style={styles.text}>Päivämäärä: {date}</Text>
           {docData.map((doc) => (
             <View key={doc.id}>
               <Text style={styles.text}>{doc.id}</Text>

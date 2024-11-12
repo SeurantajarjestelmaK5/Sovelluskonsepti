@@ -12,8 +12,9 @@ export const useLoadingScreenStyle = (ThemeColors: ThemeColors) =>
         backgroundColor: ThemeColors.background,
         },
         logo: {
-        width: "60%",
-        height: "20%",
+        width: "65%",
+        height: "25%",
+        borderRadius: 20,
         },
         text: {
         fontSize: 24,
