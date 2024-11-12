@@ -14,6 +14,15 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       width: "100%",
       marginTop: 20,
     },
+    calendar: {
+      width: "100%",
+      backgroundColor: ThemeColors.navDefault,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 10,
+      borderRadius: 10,
+    },
     container: {
       flex: 1,
       justifyContent: "center",
@@ -23,7 +32,7 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
     },
     content: {
       flex: 1,
-      justifyContent: "center",
+      justifyContent: "flex-start",
       alignItems: "center",
       padding: 16,
       backgroundColor: ThemeColors.background,
@@ -42,4 +51,14 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       color: ThemeColors.text,
       marginBottom: 15,
     },
+    wasteContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+      padding: 10,
+      margin: 5,
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 10,
+    }
   });

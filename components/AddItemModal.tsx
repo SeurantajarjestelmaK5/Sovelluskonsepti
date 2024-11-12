@@ -148,7 +148,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             mode="contained"
             disabled={!isFormValid}
             theme={{ colors: { onSurfaceDisabled: ThemeColors.text, surfaceDisabled: ThemeColors.navDefault, primary: ThemeColors.tint } }}
-            style={{ marginBottom: 10, padding: 15}}
+            style={{ marginBottom: 10, marginTop: 10 }}
+            contentStyle={{ padding: 10 }}
           />
           <Button
             children="Peruuta"
