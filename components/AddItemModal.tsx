@@ -5,7 +5,6 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  FlatList,
 } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
@@ -36,20 +35,16 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [alv, setAlv] = useState(24);
 
-  const categories = [
-    "Tankit",
-    "Oluet",
-    "Siiderit",
-    "Tyhjät",
-    "Viinit",
-    "Alkoholit",
-    "ALV14",
-  ];
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getModalStyles(ThemeColors), [ThemeColors]);
 
+  const categories = useMemo(() => {
+    return location === "sali"
+      ? ["Tankit", "Oluet", "Siiderit", "Tyhjät", "Viinit", "Alkoholit", "ALV14"]
+      : ["Lihat", "Tuoreet", "Maitokylmiö", "Kuivat", "Pakasteet", "Muut"];
+  }, [location]);
+
   const handleAddItem = async () => {
-    // Check that all fields are filled
     if (!name || !quantity || !unit || !category) {
       return;
     }
@@ -69,14 +64,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     onItemAdded();
     onClose();
 
-    // Reset form fields
     setName("");
     setQuantity("");
     setUnit("");
     setCategory("");
   };
 
-  // Check if all fields are filled to enable the submit button
   const isFormValid = name && quantity && unit && category;
 
   return (
@@ -110,6 +103,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             mode="outlined"
             activeOutlineColor={ThemeColors.tint}
           />
+          
           <Picker
             selectedValue={category}
             onValueChange={(itemValue) => setCategory(itemValue as string)}
@@ -117,8 +111,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             style={styles.dropdownButton}
             dropdownIconColor={ThemeColors.tint}
           >
-            {categories.map((category) => (
-              <Picker.Item key={category} label={category} value={category} />
+            {categories.map((categoryOption) => (
+              <Picker.Item key={categoryOption} label={categoryOption} value={categoryOption} />
             ))}
           </Picker>
 
@@ -137,11 +131,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
               >
                 {alv === value && <View style={styles.radioButtonInner} />}
               </View>
-              <Text style={{color: 'white'}}>{value}%</Text>
+              <Text style={{ color: 'white' }}>{value}%</Text>
             </Pressable>
           ))}
 
-          {/* Disable "Add Item" button if form is not valid */}
           <Button
             children="Lisää tuote"
             onPress={handleAddItem}

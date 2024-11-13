@@ -312,7 +312,7 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
   }
   return (
     <View style={diningroomStyle.container}>
-      <Text style={diningroomStyle.headerText}>Inventaario - sali</Text>
+      <Text style={diningroomStyle.headerText}>Inventaario - Sali</Text>
       <Pressable
         style={diningroomStyle.oneBox}
         onPress={() => setModalVisible(true)}
