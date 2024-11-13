@@ -1,11 +1,14 @@
 import React, { useMemo, useEffect, useState } from "react";
-import { Text, View, Image, Dimensions, Pressable } from "react-native";
 import {
-  Calendar,
-  CalendarList,
-  Agenda,
-  LocaleConfig,
-} from "react-native-calendars";
+  Text,
+  View,
+  Image,
+  Dimensions,
+  Pressable,
+  Modal,
+  TouchableWithoutFeedback,
+} from "react-native";
+import CalendarComponent from "@/components/CalendarComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackButton from "@/components/BackButton";
 import { db } from "@/firebase/config";
@@ -22,49 +25,6 @@ interface WasteData {
   määrä: number;
 }
 
-LocaleConfig.locales["fi"] = {
-  monthNames: [
-    "Tammikuu",
-    "Helmikuu",
-    "Maaliskuu",
-    "Huhtikuu",
-    "Toukokuu",
-    "Kesäkuu",
-    "Heinäkuu",
-    "Elokuu",
-    "Syyskuu",
-    "Lokakuu",
-    "Marraskuu",
-    "Joulukuu",
-  ],
-  monthNamesShort: [
-    "Tammi",
-    "Helmi",
-    "Maalis",
-    "Huhti",
-    "Touko",
-    "Kesä",
-    "Heinä",
-    "Elo",
-    "Syys",
-    "Loka",
-    "Marras",
-    "Joulu",
-  ],
-  dayNames: [
-    "Sunnuntai",
-    "Maanantai",
-    "Tiistai",
-    "Keskiviikko",
-    "Torstai",
-    "Perjantai",
-    "Lauantai",
-  ],
-  dayNamesShort: ["Su", "Ma", "Ti", "Ke", "To", "Pe", "La"],
-};
-
-LocaleConfig.defaultLocale = "fi";
-
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,12 +40,12 @@ export default function waste() {
     console.log(windowHeight);
   };
 
-    const handleDatePress = (day: any) => {
-      const [year, month, dayOfMonth] = day.dateString.split("-");
-      const formattedDate = `${dayOfMonth}.${month}.${year}`;
-      setDate(formattedDate); // Set date in "DD.MM.YYYY" format
-      setCalendarModal(false);
-    };
+  const handleDatePress = (day: any) => {
+    const [year, month, dayOfMonth] = day.dateString.split("-");
+    const formattedDate = `${dayOfMonth}.${month}.${year}`;
+    setDate(formattedDate); // Set date in "DD.MM.YYYY" format
+    setCalendarModal(false);
+  };
 
   const getCurrentDate = () => {
     const date = new Date();
@@ -141,10 +101,18 @@ export default function waste() {
           />
         </Pressable>
         {calendarModal && (
-          <Calendar
-            onDayPress={handleDatePress}
-            firstDay={1}  
-          />
+          <Modal
+            visible={calendarModal}
+            animationType="slide"
+            transparent={true}
+            onDismiss={() => setCalendarModal(false)}
+          >
+            <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
+              <View style={{ flex: 1 }}>
+                <CalendarComponent onDayPress={handleDatePress} />
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
         )}
         <View style={styles.content}>
           {docData.map((doc) => (
