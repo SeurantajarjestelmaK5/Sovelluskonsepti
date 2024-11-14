@@ -1,5 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { ThemeColors } from "@/constants/ThemeColors";
+import waste from "@/app/(monitoring)/waste";
 
 const windowHeight = Dimensions.get("window").height;
 
@@ -34,7 +35,7 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       justifyContent: "flex-start",
       alignItems: "center",
-      padding: 16,
+      paddingTop: 50,
       backgroundColor: ThemeColors.background,
     },
     header: {
@@ -55,7 +56,6 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
     text: {
       fontSize: 24,
       color: ThemeColors.text,
-      marginBottom: 15,
     },
     wasteContainer: {
       flexDirection: "row",
@@ -63,8 +63,32 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
       width: "100%",
       padding: 10,
-      margin: 5,
+      marginBottom: 15,
       backgroundColor: ThemeColors.navDefault,
       borderRadius: 10,
-    }
+    },
+    wasteContent: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      flex: 0.6,
+    },
+    wasteModal: {
+      width: "85%",
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 10,
+      padding: 20,
+      alignItems: "center",
+    },
+    wasteModalContainer: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    wasteInput: {
+      width: "100%",
+      marginBottom: 15,
+      backgroundColor: "white",
+    },
   });

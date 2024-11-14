@@ -9,7 +9,7 @@ export const getCalendarStyles = (ThemeColors: ThemeColors) =>
             width: "90%",
             padding: 10,
             borderRadius: 10,
-            marginTop: 40,
+            marginTop: 50,
             alignSelf: "center",
         },
     });

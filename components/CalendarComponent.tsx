@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Calendar,
   CalendarList,
@@ -53,35 +53,57 @@ LocaleConfig.locales["fi"] = {
 LocaleConfig.defaultLocale = "fi";
 
 type CalendarProps = {
-    onDayPress: (day: DateData) => void;
-    };
+  onDayPress: (day: DateData) => void;
+  dataDates: string[];
+  selectedDate: string | null;
+};
 
+export default function CalendarComponent({
+  onDayPress,
+  dataDates,
+  selectedDate,
+}: CalendarProps) {
+  const ThemeColors = useThemeColors();
+  const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 
-export default function CalendarComponent({onDayPress}: CalendarProps) {
-    const ThemeColors = useThemeColors();
-    const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
+  const markedDates = useMemo(() => {
+    const marks = dataDates.reduce((acc, date) => {
+      acc[date] = { marked: true, dotColor: ThemeColors.tint };
+      return acc;
+    }, {} as Record<string, { marked: boolean; dotColor?: string; selected?: boolean; selectedColor?: string }>);
 
-    return (
-        <Calendar
-            onDayPress={onDayPress}
-            firstDay={1} 
-            style={styles.calendar} 
-            theme={{
-                calendarBackground: ThemeColors.navDefault,
-                textSectionTitleColor: ThemeColors.text,
-                selectedDayBackgroundColor: ThemeColors.tint,
-                selectedDayTextColor: ThemeColors.text,
-                todayTextColor: ThemeColors.tint,
-                dayTextColor: ThemeColors.text,
-                textDisabledColor: ThemeColors.text,
-                dotColor: ThemeColors.text,
-                selectedDotColor: ThemeColors.text,
-                arrowColor: ThemeColors.text,
-                monthTextColor: ThemeColors.text,
-                textDayFontSize: 20,
-                textMonthFontSize: 25,
-                textDayHeaderFontSize: 22,
-            }}
-          />
-    )
+    if (selectedDate) {
+      marks[selectedDate] = {
+        ...marks[selectedDate],
+        selected: true,
+        selectedColor: ThemeColors.tint,
+      };
+    }
+
+    return marks;
+  }, [dataDates, selectedDate, ThemeColors]);
+
+  return (
+    <Calendar
+      onDayPress={onDayPress}
+      firstDay={1}
+      style={styles.calendar}
+      hideExtraDays={true}
+      markedDates={markedDates}
+      theme={{
+        calendarBackground: ThemeColors.navDefault,
+        textSectionTitleColor: ThemeColors.text,
+        todayTextColor: ThemeColors.tint,
+        dayTextColor: ThemeColors.text,
+        textDisabledColor: ThemeColors.text,
+        dotColor: ThemeColors.text,
+        selectedDotColor: ThemeColors.text,
+        arrowColor: ThemeColors.text,
+        monthTextColor: ThemeColors.text,
+        textDayFontSize: 20,
+        textMonthFontSize: 25,
+        textDayHeaderFontSize: 22,
+      }}
+    />
+  );
 }

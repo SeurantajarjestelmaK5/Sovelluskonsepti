@@ -7,6 +7,7 @@ import {
   Pressable,
   Modal,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from "react-native";
 import CalendarComponent from "@/components/CalendarComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useColorScheme } from "react-native";
 import { getWasteStyles } from "@/styles/monitoring/wasteStyles";
+import { TextInput, Button, Icon } from "react-native-paper";
 
 interface WasteData {
   id: string;
@@ -30,6 +32,9 @@ export default function waste() {
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState("");
   const [calendarModal, setCalendarModal] = useState(false);
+  const [wasteModal, setWasteModal] = useState(false);
+  const [dateList, setDateList] = useState<string[]>(["2024-11-12"]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
@@ -40,11 +45,16 @@ export default function waste() {
     console.log(windowHeight);
   };
 
+  const addDate = (date: string) => {
+    setDateList([...dateList, date]);
+  };
+
   const handleDatePress = (day: any) => {
     const [year, month, dayOfMonth] = day.dateString.split("-");
     const formattedDate = `${dayOfMonth}.${month}.${year}`;
-    setDate(formattedDate); // Set date in "DD.MM.YYYY" format
-    setCalendarModal(false);
+    setDate(formattedDate);
+    setSelectedDate(day.dateString);
+    setTimeout(() => setCalendarModal(false), 50);
   };
 
   const getCurrentDate = () => {
@@ -109,7 +119,11 @@ export default function waste() {
           >
             <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
               <View style={{ flex: 1 }}>
-                <CalendarComponent onDayPress={handleDatePress} />
+                <CalendarComponent
+                  onDayPress={handleDatePress}
+                  dataDates={dateList}
+                  selectedDate={selectedDate}
+                />
               </View>
             </TouchableWithoutFeedback>
           </Modal>
@@ -117,11 +131,45 @@ export default function waste() {
         <View style={styles.content}>
           {docData.map((doc) => (
             <View key={doc.id} style={styles.wasteContainer}>
-              <Text style={styles.text}>{doc.id}</Text>
-              <Text style={styles.text}>{doc.määrä}</Text>
-              <Text style={styles.text}>{doc.yksikkö}</Text>
+              <View style={styles.wasteContent}>
+                <Text style={styles.text}>{doc.id}</Text>
+                <Text style={styles.text}>
+                  {doc.määrä}
+                  {doc.yksikkö}
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name="plus"
+                size={35}
+                color={ThemeColors.tint}
+                onPress={() => setWasteModal(true)}
+              />
             </View>
           ))}
+          <Modal
+            visible={wasteModal}
+            animationType="slide"
+            transparent={true}
+            onDismiss={() => setWasteModal(false)}
+          >
+            <TouchableWithoutFeedback onPress={() => setWasteModal(false)}>
+              <View style={styles.wasteModalContainer}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.wasteModal}>
+                    <Text style={styles.header}>Lisää jäte</Text>
+                    <TextInput mode="outlined" style={styles.wasteInput} />
+                    <Button
+                      children="Lisää"
+                      icon={() => <MaterialCommunityIcons name="plus" size={20} />}
+                      contentStyle={{ flexDirection: "row-reverse" }}
+                      mode="contained"
+                      onPress={() => setWasteModal(false)}
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
         </View>
         <View style={styles.buttonContainer}>
           <BackButton />
