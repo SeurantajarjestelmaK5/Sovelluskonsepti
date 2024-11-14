@@ -46,6 +46,12 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       width: "60%",
       height: "20%",
     },
+    modal: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: ThemeColors.background,
+    },
     text: {
       fontSize: 24,
       color: ThemeColors.text,
