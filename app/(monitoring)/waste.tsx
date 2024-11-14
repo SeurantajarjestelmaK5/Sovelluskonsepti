@@ -35,6 +35,7 @@ export default function waste() {
   const [wasteModal, setWasteModal] = useState(false);
   const [dateList, setDateList] = useState<string[]>(["2024-11-12"]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
 
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
@@ -55,6 +56,11 @@ export default function waste() {
     setDate(formattedDate);
     setSelectedDate(day.dateString);
     setTimeout(() => setCalendarModal(false), 50);
+  };
+
+  const showWasteModal = (docId: string) => {
+    setSelectedDocId(docId);
+    setWasteModal(true);
   };
 
   const getCurrentDate = () => {
@@ -142,34 +148,45 @@ export default function waste() {
                 name="plus"
                 size={35}
                 color={ThemeColors.tint}
-                onPress={() => setWasteModal(true)}
+                onPress={() => showWasteModal(doc.id)}
               />
-            </View>
-          ))}
-          <Modal
-            visible={wasteModal}
-            animationType="slide"
-            transparent={true}
-            onDismiss={() => setWasteModal(false)}
-          >
-            <TouchableWithoutFeedback onPress={() => setWasteModal(false)}>
-              <View style={styles.wasteModalContainer}>
-                <TouchableWithoutFeedback>
-                  <View style={styles.wasteModal}>
-                    <Text style={styles.header}>Lisää jäte</Text>
-                    <TextInput mode="outlined" style={styles.wasteInput} />
-                    <Button
-                      children="Lisää"
-                      icon={() => <MaterialCommunityIcons name="plus" size={20} />}
-                      contentStyle={{ flexDirection: "row-reverse" }}
-                      mode="contained"
-                      onPress={() => setWasteModal(false)}
-                    />
+              <Modal
+                visible={wasteModal}
+                animationType="slide"
+                transparent={true}
+                onDismiss={() => setWasteModal(false)}
+              >
+                <TouchableWithoutFeedback onPress={() => setWasteModal(false)}>
+                  <View style={styles.wasteModalContainer}>
+                    <TouchableWithoutFeedback>
+                      <View style={styles.wasteModal}>
+                        {selectedDocId && (
+                          <>
+                            <Text style={styles.header}>{selectedDocId}</Text>
+                            <TextInput
+                              mode="outlined"
+                              style={styles.wasteInput}
+                              placeholder="Määrä"
+                              keyboardType="numeric"
+                            />
+                            <Button
+                              children="Lisää"
+                              icon={() => (
+                                <MaterialCommunityIcons name="plus" size={20} />
+                              )}
+                              contentStyle={{ flexDirection: "row-reverse" }}
+                              mode="contained"
+                              onPress={() => setWasteModal(false)}
+                            />
+                          </>
+                        )}
+                      </View>
+                    </TouchableWithoutFeedback>
                   </View>
                 </TouchableWithoutFeedback>
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
+              </Modal>
+            </View>
+          ))}
         </View>
         <View style={styles.buttonContainer}>
           <BackButton />

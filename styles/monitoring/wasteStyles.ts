@@ -82,7 +82,7 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
     },
     wasteModalContainer: {
       flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      backgroundColor: "rgba(0, 0, 0, 0.2)",
       justifyContent: "center",
       alignItems: "center",
     },
