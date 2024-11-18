@@ -100,9 +100,10 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
     },
     inventoryTable: {
       flexDirection: "row",
-      justifyContent: "center",
+      justifyContent: "flex-start",
       alignItems: "center",
       marginVertical: 10,
+      flex: 1,
     },
     tableHeader: {
       flexDirection: "row",
@@ -144,7 +145,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       height: 25,
     },
     bottomButtons: {
-      flex: 1,
+      flex: 0.1,
       width: "100%",
       flexDirection: "row-reverse",
       justifyContent: "space-evenly",

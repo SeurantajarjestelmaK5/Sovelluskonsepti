@@ -66,6 +66,10 @@ export default function CalendarComponent({
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 
+  useEffect(() => {
+    console.log(dataDates);
+  }, []);
+
   const markedDates = useMemo(() => {
     const marks = dataDates.reduce((acc, date) => {
       acc[date] = { marked: true, dotColor: ThemeColors.tint };

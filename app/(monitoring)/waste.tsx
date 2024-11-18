@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -12,8 +12,16 @@ import {
 import CalendarComponent from "@/components/CalendarComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackButton from "@/components/BackButton";
-import { db } from "@/firebase/config";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { db } from "@/firebase/config.js";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  QuerySnapshot,
+  DocumentData,
+  CollectionReference,
+} from "firebase/firestore";
 import LoadingScreen from "@/components/LoadingScreen";
 
 import { useThemeColors } from "@/constants/ThemeColors";
@@ -27,14 +35,16 @@ interface WasteData {
   määrä: number;
 }
 
+
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [date, setDate] = useState("");
   const [calendarModal, setCalendarModal] = useState(false);
   const [wasteModal, setWasteModal] = useState(false);
-  const [dateList, setDateList] = useState<string[]>(["2024-11-12"]);
+  const [dateList, setDateList] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
 
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
@@ -43,10 +53,6 @@ export default function waste() {
   const checkOrientation = async () => {
     const windowHeight = Dimensions.get("window").height;
     console.log(windowHeight);
-  };
-
-  const addDate = (date: string) => {
-    setDateList([...dateList, date]);
   };
 
   const handleDatePress = (day: any) => {
@@ -72,6 +78,22 @@ export default function waste() {
 
   useEffect(() => {
     setIsLoading(true);
+    const fetchAllDates = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "omavalvonta", "jätteet", "tallennetut"));
+        const data: string[] = querySnapshot.docs.map((doc) => doc.id);
+        setDateList(data);
+        console.log(data)
+      } catch (error) {
+        console.error("Error getting documents: ", error);
+      }
+    }
+
+    fetchAllDates();
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
     const fetchWaste = async () => {
       if (!date) return;
 
@@ -84,7 +106,6 @@ export default function waste() {
           ...doc.data(),
         })) as WasteData[];
         setDocData(data);
-        console.log(data, date);
       } catch (error) {
         console.error("Error getting documents: ", error);
       }
@@ -160,7 +181,9 @@ export default function waste() {
                     <TextInput mode="outlined" style={styles.wasteInput} />
                     <Button
                       children="Lisää"
-                      icon={() => <MaterialCommunityIcons name="plus" size={20} />}
+                      icon={() => (
+                        <MaterialCommunityIcons name="plus" size={20} />
+                      )}
                       contentStyle={{ flexDirection: "row-reverse" }}
                       mode="contained"
                       onPress={() => setWasteModal(false)}
