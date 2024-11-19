@@ -35,7 +35,6 @@ interface WasteData {
   määrä: number;
 }
 
-
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,16 +44,11 @@ export default function waste() {
   const [dateList, setDateList] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
-
+  const [wasteAmount, setWasteAmount] = useState<number>(0);
 
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
   const styles = useMemo(() => getWasteStyles(ThemeColors), [ThemeColors]);
-
-  const checkOrientation = async () => {
-    const windowHeight = Dimensions.get("window").height;
-    console.log(windowHeight);
-  };
 
   const handleDatePress = (day: any) => {
     const [year, month, dayOfMonth] = day.dateString.split("-");
@@ -69,16 +63,15 @@ export default function waste() {
     setWasteModal(true);
   };
 
-  const getCurrentDate = () => {
-    const date = new Date();
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    const currDate = `${day}.${month}.${year}`;
-    setDate(currDate);
-  };
-
   useEffect(() => {
+    const getCurrentDate = () => {
+      const date = new Date();
+      const day = date.getDate();
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      const currDate = `${day}.${month}.${year}`;
+      setDate(currDate);
+    };
     getCurrentDate();
   }, []);
 
@@ -86,39 +79,51 @@ export default function waste() {
     setIsLoading(true);
     const fetchAllDates = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "omavalvonta", "jätteet", "tallennetut"));
+        const querySnapshot = await getDocs(
+          collection(db, "omavalvonta", "jätteet", "tallennetut")
+        );
         const data: string[] = querySnapshot.docs.map((doc) => doc.id);
         setDateList(data);
-        console.log(data)
-      } catch (error) {
-        console.error("Error getting documents: ", error);
-      }
-    }
-
-    fetchAllDates();
-  }, []);
-
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchWaste = async () => {
-      if (!date) return;
-
-      try {
-        const querySnapshot = await getDocs(
-          collection(db, "omavalvonta", "jätteet", date)
-        );
-        const data: WasteData[] = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as WasteData[];
-        setDocData(data);
       } catch (error) {
         console.error("Error getting documents: ", error);
       }
     };
+
+    fetchAllDates();
+  }, []);
+
+  const fetchWaste = async () => {
+    if (!date) return;
+
+    try {
+      const querySnapshot = await getDocs(
+        collection(db, "omavalvonta", "jätteet", date)
+      );
+      const data: WasteData[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as WasteData[];
+      setDocData(data);
+    } catch (error) {
+      console.error("Error getting documents: ", error);
+    }
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
     fetchWaste();
     setIsLoading(false);
   }, [date]);
+
+  const addWaste = async (docId: string, amount: number) => {
+    const docRef = doc(db, "omavalvonta", "jätteet", date, docId);
+    await updateDoc(docRef, {
+      määrä: (docData.find((doc) => doc.id === docId)?.määrä ?? 0) + amount,
+    });
+    setWasteAmount(0);
+    fetchWaste();
+    setWasteModal(false);
+  }
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -189,6 +194,8 @@ export default function waste() {
                               style={styles.wasteInput}
                               placeholder="Määrä"
                               keyboardType="numeric"
+                              activeOutlineColor={ThemeColors.tint}
+                              onChangeText={(text) => setWasteAmount(Number(text))}
                             />
                             <Button
                               children="Lisää"
@@ -197,7 +204,8 @@ export default function waste() {
                               )}
                               contentStyle={{ flexDirection: "row-reverse" }}
                               mode="contained"
-                              onPress={() => setWasteModal(false)}
+                              buttonColor={ThemeColors.tint}
+                              onPress={() => addWaste(selectedDocId, wasteAmount)}
                             />
                           </>
                         )}
