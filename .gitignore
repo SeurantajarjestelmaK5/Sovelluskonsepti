@@ -10,6 +10,8 @@ npm-debug.*
 *.orig.*
 web-build/
 config.js
+adminsdk.json
+admin.js
 serviceAccountKey.json
 
 # macOS

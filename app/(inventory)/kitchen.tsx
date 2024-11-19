@@ -368,24 +368,24 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
-      {isLoading ? (
-        <>
-        <Text style={styles.text}>Ladataan...</Text>
-        <ActivityIndicator size="large" color={ThemeColors.tint} />
-        </>
-) : (
-        <FlatList
-          data={inventoryData[selectedCategory] || []}
-          renderItem={renderInventoryItem}
-          keyExtractor={(item, index) => `${item.Nimi}-${index}`}
-          ListEmptyComponent={
-            <Text style={diningroomStyle.cellText}>
-              Tyhjältä näyttää!
-            </Text>
-          }
-        />
-      )}
-    </View>
+        {isLoading ? (
+          <>
+            <Text style={styles.text}>Ladataan...</Text>
+            <ActivityIndicator size="large" color={ThemeColors.tint} />
+          </>
+        ) : (
+          <View>
+            <FlatList
+              data={inventoryData[selectedCategory] || []}
+              renderItem={renderInventoryItem}
+              keyExtractor={(item, index) => `${item.Nimi}-${index}`}
+              ListEmptyComponent={
+                <Text style={diningroomStyle.cellText}>Tyhjältä näyttää!</Text>
+              }
+            />
+          </View>
+        )}
+      </View>
 
       <View style={diningroomStyle.bottomButtons}>
         <Pressable
