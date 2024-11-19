@@ -18,9 +18,9 @@ import {
   getDocs,
   updateDoc,
   doc,
-  QuerySnapshot,
-  DocumentData,
-  CollectionReference,
+  getDoc,
+  setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import LoadingScreen from "@/components/LoadingScreen";
 
@@ -63,6 +63,15 @@ export default function waste() {
     setWasteModal(true);
   };
 
+  const initialWasteList = [
+    { id: "Bio", yksikkö: "g", määrä: 0 },
+    { id: "Muovi", yksikkö: "g", määrä: 0 },
+    { id: "Pahvi", yksikkö: "g", määrä: 0 },
+    { id: "Seka", yksikkö: "g", määrä: 0 },
+    { id: "Metalli", yksikkö: "g", määrä: 0 },
+    { id: "Lasi", yksikkö: "g", määrä: 0 },
+  ];
+
   useEffect(() => {
     const getCurrentDate = () => {
       const date = new Date();
@@ -90,7 +99,8 @@ export default function waste() {
     };
 
     fetchAllDates();
-  }, []);
+    setIsLoading(false);
+  }, [date]);
 
   const fetchWaste = async () => {
     if (!date) return;
@@ -115,15 +125,58 @@ export default function waste() {
     setIsLoading(false);
   }, [date]);
 
+  const initializeWasteForDate = async () => {
+    if (!date) return;
+
+    try {
+      const dateRef = collection(db, "omavalvonta", "jätteet", date);
+
+      for (const waste of initialWasteList) {
+        const wasteDocRef = doc(dateRef, waste.id);
+        const wasteSnap = await getDoc(wasteDocRef);
+
+        if (!wasteSnap.exists()) {
+          await setDoc(wasteDocRef, {
+            määrä: waste.määrä,
+            yksikkö: waste.yksikkö,
+          });
+        }
+      }
+
+      fetchWaste();
+    } catch (error) {
+      console.error("Error initializing waste data: ", error);
+    }
+  };
+
   const addWaste = async (docId: string, amount: number) => {
-    const docRef = doc(db, "omavalvonta", "jätteet", date, docId);
-    await updateDoc(docRef, {
-      määrä: (docData.find((doc) => doc.id === docId)?.määrä ?? 0) + amount,
-    });
-    setWasteAmount(0);
-    fetchWaste();
-    setWasteModal(false);
-  }
+    try {
+      const docRef = collection(db, "omavalvonta", "jätteet", date);
+      const docSnap = await getDoc(doc(docRef, docId));
+      const dateRef = collection(db, "omavalvonta", "jätteet", "tallennetut");
+
+      if (docSnap.exists()) {
+        await updateDoc(doc(docRef, docId), {
+          määrä: amount + docSnap.data().määrä,
+        });
+      } else {
+        await setDoc(doc(docRef, docId), {
+          määrä: amount,
+          yksikkö: "g",
+        });
+      }
+
+      await setDoc(doc(dateRef, date), {
+        date: date,
+      });
+
+      initializeWasteForDate();
+      setWasteModal(false);
+      fetchWaste();
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  };
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -161,61 +214,143 @@ export default function waste() {
           </Modal>
         )}
         <View style={styles.content}>
-          {docData.map((doc) => (
-            <View key={doc.id} style={styles.wasteContainer}>
-              <View style={styles.wasteContent}>
-                <Text style={styles.text}>{doc.id}</Text>
-                <Text style={styles.text}>
-                  {doc.määrä}
-                  {doc.yksikkö}
-                </Text>
-              </View>
-              <MaterialCommunityIcons
-                name="plus"
-                size={35}
-                color={ThemeColors.tint}
-                onPress={() => showWasteModal(doc.id)}
-              />
-              <Modal
-                visible={wasteModal}
-                animationType="slide"
-                transparent={true}
-                onDismiss={() => setWasteModal(false)}
-              >
-                <TouchableWithoutFeedback onPress={() => setWasteModal(false)}>
-                  <View style={styles.wasteModalContainer}>
-                    <TouchableWithoutFeedback>
-                      <View style={styles.wasteModal}>
-                        {selectedDocId && (
-                          <>
-                            <Text style={styles.header}>{selectedDocId}</Text>
-                            <TextInput
-                              mode="outlined"
-                              style={styles.wasteInput}
-                              placeholder="Määrä"
-                              keyboardType="numeric"
-                              activeOutlineColor={ThemeColors.tint}
-                              onChangeText={(text) => setWasteAmount(Number(text))}
-                            />
-                            <Button
-                              children="Lisää"
-                              icon={() => (
-                                <MaterialCommunityIcons name="plus" size={20} />
-                              )}
-                              contentStyle={{ flexDirection: "row-reverse" }}
-                              mode="contained"
-                              buttonColor={ThemeColors.tint}
-                              onPress={() => addWaste(selectedDocId, wasteAmount)}
-                            />
-                          </>
-                        )}
+          {!docData || docData.length === 0
+            ? initialWasteList.map((doc) => (
+                <View key={doc.id} style={styles.wasteContainer}>
+                  <View style={styles.wasteContent}>
+                    <Text style={styles.text}>{doc.id}</Text>
+                    <Text style={styles.text}>
+                      {doc.määrä}
+                      {doc.yksikkö}
+                    </Text>
+                  </View>
+                  <MaterialCommunityIcons
+                    name="plus"
+                    size={35}
+                    color={ThemeColors.tint}
+                    onPress={() => showWasteModal(doc.id)}
+                  />
+                  <Modal
+                    visible={wasteModal}
+                    animationType="slide"
+                    transparent={true}
+                    onDismiss={() => setWasteModal(false)}
+                  >
+                    <TouchableWithoutFeedback
+                      onPress={() => setWasteModal(false)}
+                    >
+                      <View style={styles.wasteModalContainer}>
+                        <TouchableWithoutFeedback>
+                          <View style={styles.wasteModal}>
+                            {selectedDocId && (
+                              <>
+                                <Text style={styles.header}>
+                                  {selectedDocId}
+                                </Text>
+                                <TextInput
+                                  mode="outlined"
+                                  style={styles.wasteInput}
+                                  placeholder="Määrä"
+                                  keyboardType="numeric"
+                                  activeOutlineColor={ThemeColors.tint}
+                                  onChangeText={(text) =>
+                                    setWasteAmount(Number(text))
+                                  }
+                                />
+                                <Button
+                                  children="Lisää"
+                                  icon={() => (
+                                    <MaterialCommunityIcons
+                                      name="plus"
+                                      size={20}
+                                    />
+                                  )}
+                                  contentStyle={{
+                                    flexDirection: "row-reverse",
+                                  }}
+                                  mode="contained"
+                                  buttonColor={ThemeColors.tint}
+                                  onPress={() =>
+                                    addWaste(selectedDocId, wasteAmount)
+                                  }
+                                />
+                              </>
+                            )}
+                          </View>
+                        </TouchableWithoutFeedback>
                       </View>
                     </TouchableWithoutFeedback>
+                  </Modal>
+                </View>
+              ))
+            : docData.map((doc) => (
+                <View key={doc.id} style={styles.wasteContainer}>
+                  <View style={styles.wasteContent}>
+                    <Text style={styles.text}>{doc.id}</Text>
+                    <Text style={styles.text}>
+                      {doc.määrä}
+                      {doc.yksikkö}
+                    </Text>
                   </View>
-                </TouchableWithoutFeedback>
-              </Modal>
-            </View>
-          ))}
+                  <MaterialCommunityIcons
+                    name="plus"
+                    size={35}
+                    color={ThemeColors.tint}
+                    onPress={() => showWasteModal(doc.id)}
+                  />
+                  <Modal
+                    visible={wasteModal}
+                    animationType="slide"
+                    transparent={true}
+                    onDismiss={() => setWasteModal(false)}
+                  >
+                    <TouchableWithoutFeedback
+                      onPress={() => setWasteModal(false)}
+                    >
+                      <View style={styles.wasteModalContainer}>
+                        <TouchableWithoutFeedback>
+                          <View style={styles.wasteModal}>
+                            {selectedDocId && (
+                              <>
+                                <Text style={styles.header}>
+                                  {selectedDocId}
+                                </Text>
+                                <TextInput
+                                  mode="outlined"
+                                  style={styles.wasteInput}
+                                  placeholder="Määrä"
+                                  keyboardType="numeric"
+                                  activeOutlineColor={ThemeColors.tint}
+                                  onChangeText={(text) =>
+                                    setWasteAmount(Number(text))
+                                  }
+                                />
+                                <Button
+                                  children="Lisää"
+                                  icon={() => (
+                                    <MaterialCommunityIcons
+                                      name="plus"
+                                      size={20}
+                                    />
+                                  )}
+                                  contentStyle={{
+                                    flexDirection: "row-reverse",
+                                  }}
+                                  mode="contained"
+                                  buttonColor={ThemeColors.tint}
+                                  onPress={() =>
+                                    addWaste(selectedDocId, wasteAmount)
+                                  }
+                                />
+                              </>
+                            )}
+                          </View>
+                        </TouchableWithoutFeedback>
+                      </View>
+                    </TouchableWithoutFeedback>
+                  </Modal>
+                </View>
+              ))}
         </View>
         <View style={styles.buttonContainer}>
           <BackButton />

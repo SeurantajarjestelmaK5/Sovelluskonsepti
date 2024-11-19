@@ -73,6 +73,7 @@ export default function CalendarComponent({
     });
   }, [dataDates]);
 
+
   const markedDates = useMemo(() => {
     const marks = transformedDates.reduce((acc, date) => {
       acc[date] = { marked: true, dotColor: ThemeColors.tint };
