@@ -18,8 +18,17 @@ export default function TabsLayout() {
             onPress={() => router.push("/(settings)")}
           />
         ),
-        tabBarStyle: { height: 80, backgroundColor: ThemeColors.navDefault },
-        tabBarLabelStyle: { fontSize: 23, fontWeight: "bold"},
+        headerLeft: () => (
+          <MaterialCommunityIcons
+            name="menu"
+            size={40}
+            style={{ marginLeft: 20 }}
+            color={ThemeColors.tint}
+            onPress={() => router.push("/(menu)")}
+          />
+        ),
+        tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
+        tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
         tabBarActiveTintColor: ThemeColors.tabIconSelected,
         tabBarInactiveTintColor: ThemeColors.tabIconDefault,
         tabBarActiveBackgroundColor: ThemeColors.navSelected,
@@ -27,6 +36,7 @@ export default function TabsLayout() {
         tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
         headerStyle: { backgroundColor: ThemeColors.background },
         headerTintColor: ThemeColors.tint,
+
       }}
     >
       <Tabs.Screen

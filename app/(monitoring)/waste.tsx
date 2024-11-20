@@ -38,6 +38,7 @@ interface WasteData {
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [date, setDate] = useState("");
   const [calendarModal, setCalendarModal] = useState(false);
   const [wasteModal, setWasteModal] = useState(false);
@@ -150,6 +151,7 @@ export default function waste() {
   };
 
   const addWaste = async (docId: string, amount: number) => {
+    setIsAdding(true);
     try {
       const docRef = collection(db, "omavalvonta", "jätteet", date);
       const docSnap = await getDoc(doc(docRef, docId));
@@ -173,6 +175,7 @@ export default function waste() {
       initializeWasteForDate();
       setWasteModal(false);
       fetchWaste();
+      setIsAdding(false);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -180,6 +183,41 @@ export default function waste() {
 
   if (isLoading) {
     return <LoadingScreen />;
+  } else if (isAdding) {
+    return <View style={styles.container}>
+        <Text style={styles.header}>Jätteet</Text>
+        <Pressable
+          style={styles.calendar}
+          onPress={() => setCalendarModal(!calendarModal)}
+        >
+          <Text style={styles.text}>{date}</Text>
+          <MaterialCommunityIcons
+            name="calendar"
+            size={35}
+            color={ThemeColors.tint}
+          />
+        </Pressable>
+        {calendarModal && (
+          <Modal
+            visible={calendarModal}
+            animationType="slide"
+            transparent={true}
+            onDismiss={() => setCalendarModal(false)}
+          >
+            <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
+              <View style={{ flex: 1 }}>
+                <CalendarComponent
+                  onDayPress={handleDatePress}
+                  dataDates={dateList}
+                  selectedDate={selectedDate}
+                />
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>)
+        }
+
+    </View>;
+
   } else {
     return (
       <View style={styles.container}>
