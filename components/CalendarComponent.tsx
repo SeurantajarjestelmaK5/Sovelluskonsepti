@@ -66,8 +66,16 @@ export default function CalendarComponent({
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 
+  const transformedDates = useMemo(() => {
+    return dataDates.map((date) => {
+      const [day, month, year] = date.split(".");
+      return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+    });
+  }, [dataDates]);
+
+
   const markedDates = useMemo(() => {
-    const marks = dataDates.reduce((acc, date) => {
+    const marks = transformedDates.reduce((acc, date) => {
       acc[date] = { marked: true, dotColor: ThemeColors.tint };
       return acc;
     }, {} as Record<string, { marked: boolean; dotColor?: string; selected?: boolean; selectedColor?: string }>);
@@ -81,7 +89,7 @@ export default function CalendarComponent({
     }
 
     return marks;
-  }, [dataDates, selectedDate, ThemeColors]);
+  }, [transformedDates, selectedDate, ThemeColors]);
 
   return (
     <Calendar
