@@ -113,7 +113,7 @@ export default function Diningroom() {
         keyboardType="decimal-pad"
       />
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Alv0?.toFixed(2)}</Text> {/* New ALV0 Column */}
+      <Text style={diningroomStyle.cellText}>{item.Alv0?.toFixed(2)}</Text>
       <Pressable onPress={() => confirmDeleteItem(item)}>
         <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
       </Pressable>
