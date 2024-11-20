@@ -98,13 +98,8 @@ export default function Diningroom() {
         keyboardType="numeric"
       />
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
-      <TextInput
-        style={diningroomStyle.editableCell}
-        value={tempValues[item.Nimi]?.Alv ?? item.Alv.toString()}
-        onChangeText={(text) => handleChange(item.Nimi, "Alv", text)}
-        onEndEditing={() => handleEditingEnd(item, "Alv", index)}
-        keyboardType="numeric"
-      />
+      <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
+
       <TextInput
         style={diningroomStyle.editableCell}
         value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
@@ -243,15 +238,13 @@ const handleEditingEnd = async (item: InventoryItem, field: "Määrä" | "Hinta"
     if (!isNaN(parsedValue) && parsedValue !== item[field]) {
       try {
         let newYhteishinta = item.Yhteishinta;
-        let newALV0 = item.Alv0;
+        let newALV0 = 0;
 
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
-          newALV0 = parsedValue / (1 + item.Alv / 100);
-        } else if (field === "Alv") {
-          newALV0 = item.Hinta / (1 + parsedValue / 100);
+          newALV0 = item.Määrä * (parsedValue / (1 + item.Alv / 100));
         }
 
         const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
