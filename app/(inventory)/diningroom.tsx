@@ -231,21 +231,27 @@ export default function Diningroom() {
   }, [selectedDate, itemAdded]);
 
 /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
-const handleEditingEnd = async (item: InventoryItem, field: "Määrä" | "Hinta" | "Alv", index: number) => {
+const handleEditingEnd = async (
+  item: InventoryItem,
+  field: "Määrä" | "Hinta" | "Alv",
+  index: number
+) => {
   const tempValue = tempValues[item.Nimi]?.[field];
   if (tempValue !== undefined) {
     const parsedValue = parseFloat(tempValue);
     if (!isNaN(parsedValue) && parsedValue !== item[field]) {
       try {
         let newYhteishinta = item.Yhteishinta;
-        let newALV0 = 0;
+        let newALV0 = item.Alv0;
 
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
-          newALV0 = item.Määrä * (parsedValue / (1 + item.Alv / 100));
-        }
+
+          // Remove ALV from Hinta to calculate ALV0
+          newALV0 = parsedValue / (1 + item.Alv / 100);
+        } 
 
         const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
         await updateDoc(docRef, {
@@ -272,7 +278,8 @@ const handleEditingEnd = async (item: InventoryItem, field: "Määrä" | "Hinta"
     }
   }
 };
-const handleChange = (itemName: string, field: "Määrä" | "Hinta" | "Alv", value: string) => {
+
+const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: string) => {
   setTempValues((prevTempValues) => ({
     ...prevTempValues,
     [itemName]: {
