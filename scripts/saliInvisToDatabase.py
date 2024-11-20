@@ -1,10 +1,6 @@
 import pandas as pd
-import json
 import firebase_admin
 from firebase_admin import credentials, firestore
-import os
-
-
 
 excel_file_path = "invis_sali.xlsx"
 # REQUIRES PRIVATE KEY FROM FIREBASE TO WORK
@@ -19,9 +15,7 @@ def parse_excel_to_data(file_path):
     all_items = []
     current_category = None
 
-
     df = excel_data.parse(excel_data.sheet_names[0], skiprows=3, nrows=109)
-
 
     for _, row in df.iterrows():
         name = row[0]  
@@ -37,6 +31,9 @@ def parse_excel_to_data(file_path):
         elif not pd.isna(name) and not pd.isna(quantity):
             alv = 14 if current_category == "ALV14" else 25.5  # Set ALV based on category
 
+            # Calculate the ALV0 (tax-free price)
+            alv0_price = unit_price / (1 + alv / 100) if unit_price else 0
+
             item = {
                 "Nimi": name,
                 "Määrä": quantity,
@@ -45,6 +42,7 @@ def parse_excel_to_data(file_path):
                 "Alv": alv,
                 "Hinta": unit_price,
                 "Yhteishinta": total_price,
+                "Alv0": round(alv0_price, 2)  # Round to 2 decimal places
             }
             all_items.append(item)
 
@@ -54,9 +52,8 @@ def push_data_to_firebase(data):
     # Push each item to Firebase
     for item in data:
         try:
-
             location = "sali"
-            selected_date = "10-2024"
+            selected_date = "11-2024"
             doc_ref = db.collection("inventaario").document(selected_date).collection(location).document(item["Nimi"])
 
             # Upload item to Firestore
@@ -69,5 +66,5 @@ if __name__ == "__main__":
     # Parse the Excel data
     parsed_data = parse_excel_to_data(excel_file_path)
     
-    # Log the parsed data instead of pushing to Firebase
+    # Push the parsed data to Firebase
     push_data_to_firebase(parsed_data)
