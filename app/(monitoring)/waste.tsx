@@ -23,11 +23,12 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import LoadingScreen from "@/components/LoadingScreen";
-
+import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useColorScheme } from "react-native";
 import { getWasteStyles } from "@/styles/monitoring/wasteStyles";
 import { TextInput, Button, Icon } from "react-native-paper";
+
 
 interface WasteData {
   id: string;
@@ -63,6 +64,10 @@ export default function waste() {
     setSelectedDocId(docId);
     setWasteModal(true);
   };
+
+  const fetchMonthlyWaste = async () => {
+
+  }
 
   const initialWasteList = [
     { id: "Bio", yksikkö: "g", määrä: 0 },
@@ -183,42 +188,7 @@ export default function waste() {
 
   if (isLoading) {
     return <LoadingScreen />;
-  } else if (isAdding) {
-    return <View style={styles.container}>
-        <Text style={styles.header}>Jätteet</Text>
-        <Pressable
-          style={styles.calendar}
-          onPress={() => setCalendarModal(!calendarModal)}
-        >
-          <Text style={styles.text}>{date}</Text>
-          <MaterialCommunityIcons
-            name="calendar"
-            size={35}
-            color={ThemeColors.tint}
-          />
-        </Pressable>
-        {calendarModal && (
-          <Modal
-            visible={calendarModal}
-            animationType="slide"
-            transparent={true}
-            onDismiss={() => setCalendarModal(false)}
-          >
-            <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
-              <View style={{ flex: 1 }}>
-                <CalendarComponent
-                  onDayPress={handleDatePress}
-                  dataDates={dateList}
-                  selectedDate={selectedDate}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>)
-        }
-
-    </View>;
-
-  } else {
+  }  else {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>Jätteet</Text>
@@ -251,6 +221,7 @@ export default function waste() {
             </TouchableWithoutFeedback>
           </Modal>
         )}
+
         <View style={styles.content}>
           {!docData || docData.length === 0
             ? initialWasteList.map((doc) => (
@@ -389,6 +360,15 @@ export default function waste() {
                   </Modal>
                 </View>
               ))}
+        </View>
+        <View style={styles.wasteTotal}>
+          <Text style={{ ...styles.text }}>Kuukausi yhteensä: {}</Text>
+          {initialWasteList.map((doc) => (
+            <Text key={doc.id} style={{ ...styles.text }}>
+              {doc.id}: {doc.määrä}
+               kg
+            </Text>
+          ))}
         </View>
         <View style={styles.buttonContainer}>
           <BackButton />
