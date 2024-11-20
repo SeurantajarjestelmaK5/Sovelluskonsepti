@@ -35,7 +35,7 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       justifyContent: "flex-start",
       alignItems: "center",
-      paddingTop: 50,
+      paddingTop: 20,
       backgroundColor: ThemeColors.background,
     },
     header: {
@@ -90,5 +90,14 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       width: "100%",
       marginBottom: 15,
       backgroundColor: "white",
+    },
+    wasteTotal: {
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+      padding: 10,
+      marginBottom: 15,
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 10,
     },
   });
