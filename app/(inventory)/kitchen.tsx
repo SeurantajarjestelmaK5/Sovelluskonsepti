@@ -11,9 +11,12 @@ import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase
 import BackButton from "@/components/BackButton";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
+import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
+
 
 export interface InventoryItem {
   Alv: number;
+  Alv0: number;
   Hinta: number;
   Määrä: number;
   Yksikkö: string;
@@ -37,7 +40,7 @@ export default function Diningroom() {
   const [itemAdded, setItemAdded] = useState(false);
   const ThemeColors = useThemeColors();
   const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
-  const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string } }>({});
+  const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string, Alv?: string  } }>({});
   const cachedData = useRef<Record<string, InventoryData>>({});
   const styles = useMemo(
     () => useLoadingScreenStyle(ThemeColors),
@@ -83,7 +86,6 @@ export default function Diningroom() {
     setItemAdded(true)
   };
 
-  const regex = /^[0-9]*\.?[0-9]*$/;
 
   const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
     <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
@@ -109,6 +111,7 @@ export default function Diningroom() {
         keyboardType="decimal-pad"
       />
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
+      <Text style={diningroomStyle.cellText}>{item.Alv0?.toFixed(2)}</Text>
       <Pressable onPress={() => confirmDeleteItem(item)}>
         <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
       </Pressable>
@@ -154,6 +157,7 @@ export default function Diningroom() {
         ...itemData,
         Määrä: 0,
         Yhteishinta: 0,
+        Alv0: 0 / (1 + itemData.Alv / 100),
         Hinta: 0,
       };
       const newDocRef = doc(db, "inventaario", month, "keittiö", item.id);
@@ -218,14 +222,11 @@ export default function Diningroom() {
         // If data for the selected date is already cached, use it
         setInventoryData(cachedData.current[selectedDate]);
         setIsLoading(false);
-        console.log('lagaa');
-
       } else {
         // Fetch data if not cached
         fetchInventory(selectedDate).then((data) => {
           cachedData.current[selectedDate] = data;
           setInventoryData(data);          
-          console.log('laga');
         });
       }
     }
@@ -238,24 +239,33 @@ const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta
     const parsedValue = parseFloat(tempValue);
     if (!isNaN(parsedValue) && parsedValue !== item[field]) {
       try {
-        // Recalculate Yhteishinta when either Määrä or Hinta changes
         let newYhteishinta = item.Yhteishinta;
+        let newALV0 = 0;
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
+          newALV0 = item.Hinta / (1 + item.Alv / 100) * parsedValue;
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
+          newALV0 = parsedValue / (1 + item.Alv / 100) * item.Määrä;
         }
 
         // Update Firestore with the new value and Yhteishinta
         const docRef = doc(db, "inventaario", selectedDate!, "keittiö", item.Nimi);
-        await updateDoc(docRef, { [field]: parsedValue, Yhteishinta: newYhteishinta });
+        await updateDoc(docRef, { 
+          [field]: parsedValue, 
+          Yhteishinta: newYhteishinta,
+           Alv0: newALV0,
+        });
 
         // Update the local inventory data with the new value and Yhteishinta
         setInventoryData((prevData) => {
           const updatedCategoryItems = [...prevData[selectedCategory]];
-          const updatedItem = { ...updatedCategoryItems[index], [field]: parsedValue, Yhteishinta: newYhteishinta };
+          const updatedItem = { ...updatedCategoryItems[index], 
+            [field]: parsedValue, 
+            Yhteishinta: newYhteishinta,
+            Alv0: newALV0 
+          };
           updatedCategoryItems[index] = updatedItem;
-
           return { ...prevData, [selectedCategory]: updatedCategoryItems };
         });
       } catch (error) {
@@ -358,7 +368,6 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
           keyExtractor={(item) => item}
         />
       </View>
-
       <View style={diningroomStyle.tableHeader}>
         <Text style={diningroomStyle.columnHeader}>Tuote</Text>
         <Text style={diningroomStyle.columnHeader}>Määrä</Text>
@@ -366,13 +375,11 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         <Text style={diningroomStyle.columnHeader}>ALV %</Text>
         <Text style={diningroomStyle.columnHeader}>Kpl. €</Text>
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
+        <Text style={diningroomStyle.columnHeader}>Yht. AVL 0%</Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
         {isLoading ? (
-          <>
-            <Text style={styles.text}>Ladataan...</Text>
-            <ActivityIndicator size="large" color={ThemeColors.tint} />
-          </>
+        <SmallLoadingIndicator/>
         ) : (
           <View>
             <FlatList

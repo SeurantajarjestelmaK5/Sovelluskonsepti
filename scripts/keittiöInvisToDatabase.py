@@ -40,6 +40,9 @@ def parse_kitchen_inventory(file_path):
             else:
                 yksikko = ""  
             alv = 25.5 if current_category == "Muut" else 14  # Set ALV based on category
+            
+            alv0_price = unit_price / (1 + alv / 100) if unit_price else 0
+
 
             total_price_rounded = round(total_price, 2)
 
@@ -51,7 +54,8 @@ def parse_kitchen_inventory(file_path):
                 "Kategoria": current_category,
                 "Alv": alv,
                 "Hinta": unit_price,
-                "Yhteishinta": total_price_rounded 
+                "Yhteishinta": total_price_rounded,
+                "Alv0": round(alv0_price, 2)  # Round to 2 decimal places
             }
             all_items.append(item)
 
@@ -63,7 +67,7 @@ def push_data_to_firebase(data):
         try:
 
             location = "keittiö"
-            selected_date = "10-2024"
+            selected_date = "11-2024"
             doc_ref = db.collection("inventaario").document(selected_date).collection(location).document(item["Nimi"])
 
             # Upload item to Firestore

@@ -85,7 +85,6 @@ export default function Diningroom() {
     setItemAdded(true)
   };
 
-  const regex = /^[0-9]*\.?[0-9]*$/;
 
   const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
     <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
@@ -99,11 +98,14 @@ export default function Diningroom() {
       />
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
       <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
-
       <TextInput
         style={diningroomStyle.editableCell}
         value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
-        onChangeText={(text) => handleChange(item.Nimi, "Hinta", text)}
+        onChangeText={(text) => {
+          const regex = /^[0-9]*\.?[0-9]*$/
+          if (regex.test(text)){
+          handleChange(item.Nimi, "Hinta", text)}
+        }}
         onEndEditing={() => handleEditingEnd(item, "Hinta", index)}
         keyboardType="decimal-pad"
       />
@@ -242,16 +244,15 @@ const handleEditingEnd = async (
     if (!isNaN(parsedValue) && parsedValue !== item[field]) {
       try {
         let newYhteishinta = item.Yhteishinta;
-        let newALV0 = item.Alv0;
+        let newALV0 = 0;
 
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
+          newALV0 = item.Hinta / (1 + item.Alv / 100) * parsedValue;
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
-
-          // Remove ALV from Hinta to calculate ALV0
-          newALV0 = parsedValue / (1 + item.Alv / 100);
-        } 
+          newALV0 = parsedValue / (1 + item.Alv / 100) * item.Määrä;
+        }
 
         const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);
         await updateDoc(docRef, {
@@ -278,6 +279,7 @@ const handleEditingEnd = async (
     }
   }
 };
+
 
 const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: string) => {
   setTempValues((prevTempValues) => ({
@@ -387,6 +389,7 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       {isLoading ? (
        <SmallLoadingIndicator/>
 ) : (
+    <View>
         <FlatList
           data={inventoryData[selectedCategory] || []}
           renderItem={renderInventoryItem}
@@ -397,6 +400,7 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
             </Text>
           }
         />
+    </View>
       )}
     </View>
 

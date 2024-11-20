@@ -32,7 +32,7 @@ def parse_excel_to_data(file_path):
             alv = 14 if current_category == "ALV14" else 25.5  # Set ALV based on category
 
             # Calculate the ALV0 (tax-free price)
-            alv0_price = unit_price * (1 - alv / 100) if unit_price else 0
+            alv0_price = unit_price / (1 + alv / 100) if unit_price else 0
 
             item = {
                 "Nimi": name,
