@@ -36,6 +36,9 @@ interface WasteData {
   määrä: number;
 }
 
+
+
+
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,9 +68,6 @@ export default function waste() {
     setWasteModal(true);
   };
 
-  const fetchMonthlyWaste = async () => {
-
-  }
 
   const initialWasteList = [
     { id: "Bio", yksikkö: "g", määrä: 0 },
@@ -120,16 +120,72 @@ export default function waste() {
         ...doc.data(),
       })) as WasteData[];
       setDocData(data);
+      console.log(data);
     } catch (error) {
       console.error("Error getting documents: ", error);
     }
   };
+
 
   useEffect(() => {
     setIsLoading(true);
     fetchWaste();
     setIsLoading(false);
   }, [date]);
+
+       useEffect(() => {
+         const fetchMonthlyDocuments = async () => {
+           try {
+             const parentDocRef = doc(db, "omavalvonta", "jätteet2");
+
+             // First, fetch the subcollection names
+             const parentDocSnapshot = await getDoc(parentDocRef);
+             if (!parentDocSnapshot.exists()) {
+               console.error("Parent document does not exist!");
+               return;
+             }
+
+             const subcollectionNames =
+               parentDocSnapshot.data()?.subcollectionNames;
+             if (!Array.isArray(subcollectionNames)) {
+               console.error("subcollectionNames field is missing or invalid!");
+               return;
+             }
+
+             const allMonthlyData: Record<string, any[]> = {};
+
+             for (const subcollectionName of subcollectionNames) {
+               // Access each subcollection
+               const subcollectionRef = collection(
+                 db,
+                 "omavalvonta",
+                 "jätteet2",
+                 subcollectionName
+               );
+               const subcollectionSnapshot = await getDocs(subcollectionRef);
+
+               const monthlyDocs = subcollectionSnapshot.docs.map((doc) => ({
+                 id: doc.id, // e.g., '11-2024'
+                 ...doc.data(), // fields like `1.`, `14.`, `21.` in the documents
+               }));
+
+               allMonthlyData[subcollectionName] = monthlyDocs; // Organize data by subcollection
+             }
+
+             console.log("Fetched Monthly Data:", allMonthlyData);
+             console.log("Data for Bio:", allMonthlyData["Bio"]);
+             console.log("Data for Bio 1.:", allMonthlyData["Bio"][0]);
+
+             // Example: Accessing a specific subcollection's monthly data
+             // console.log("Data for Bio:", allMonthlyData["Bio"]);
+           } catch (error) {
+             console.error("Error fetching monthly documents:", error);
+           }
+         };
+
+         fetchMonthlyDocuments();
+       }, []);
+
 
   const initializeWasteForDate = async () => {
     if (!date) return;
