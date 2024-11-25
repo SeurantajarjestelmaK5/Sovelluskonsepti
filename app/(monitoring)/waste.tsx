@@ -130,6 +130,7 @@ export default function waste() {
       console.log(bioData);
     };
     fetchWasteData();
+  
   }, [month, year, date]);
 
   // useEffect(() => {
