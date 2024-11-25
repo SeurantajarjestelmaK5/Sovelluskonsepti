@@ -22,6 +22,7 @@ import {
   setDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import * as WasteFunctions from "@/components/functions/WasteFunctions";
 import LoadingScreen from "@/components/LoadingScreen";
 import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
 import { useThemeColors } from "@/constants/ThemeColors";
@@ -29,21 +30,21 @@ import { useColorScheme } from "react-native";
 import { getWasteStyles } from "@/styles/monitoring/wasteStyles";
 import { TextInput, Button, Icon } from "react-native-paper";
 
-
 interface WasteData {
   id: string;
   yksikkö: string;
   määrä: number;
 }
 
-
-
-
 export default function waste() {
   const [docData, setDocData] = useState<WasteData[]>([]);
+  const [bioData, setBioData] = useState<WasteData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [date, setDate] = useState("");
+  const [calendarDate, setCalendarDate] = useState<string>("");
+  const [date, setDate] = useState<string>("");
+  const [month, setMonth] = useState<string>("");
+  const [year, setYear] = useState<string>("");
   const [calendarModal, setCalendarModal] = useState(false);
   const [wasteModal, setWasteModal] = useState(false);
   const [dateList, setDateList] = useState<string[]>([]);
@@ -58,7 +59,9 @@ export default function waste() {
   const handleDatePress = (day: any) => {
     const [year, month, dayOfMonth] = day.dateString.split("-");
     const formattedDate = `${dayOfMonth}.${month}.${year}`;
-    setDate(formattedDate);
+    setCalendarDate(formattedDate);
+    setDate(dayOfMonth);
+    setMonth(month);
     setSelectedDate(day.dateString);
     setTimeout(() => setCalendarModal(false), 50);
   };
@@ -67,7 +70,6 @@ export default function waste() {
     setSelectedDocId(docId);
     setWasteModal(true);
   };
-
 
   const initialWasteList = [
     { id: "Bio", yksikkö: "g", määrä: 0 },
@@ -84,167 +86,145 @@ export default function waste() {
       const day = date.getDate();
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
-      const currDate = `${day}.${month}.${year}`;
+      const fullDate = `${day}.${month}.${year}`;
+      const currDate = `${day}`;
+      const currMonth = `${month}`;
+      const currYear = `${year}`;
+      setCalendarDate(fullDate);
       setDate(currDate);
+      setMonth(currMonth);
+      setYear(currYear);
     };
     getCurrentDate();
   }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-    const fetchAllDates = async () => {
-      try {
-        const querySnapshot = await getDocs(
-          collection(db, "omavalvonta", "jätteet", "tallennetut")
-        );
-        const data: string[] = querySnapshot.docs.map((doc) => doc.id);
-        setDateList(data);
-      } catch (error) {
-        console.error("Error getting documents: ", error);
-      }
-    };
-
-    fetchAllDates();
-    setIsLoading(false);
-  }, [date]);
-
-  const fetchWaste = async () => {
-    if (!date) return;
-
-    try {
-      const querySnapshot = await getDocs(
-        collection(db, "omavalvonta", "jätteet", date)
+    const fetchWasteData = async () => {
+      const mixedWaste = await WasteFunctions.FetchMixedWaste(
+        month,
+        year,
+        date
       );
-      const data: WasteData[] = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as WasteData[];
-      setDocData(data);
-      console.log(data);
-    } catch (error) {
-      console.error("Error getting documents: ", error);
-    }
-  };
+      const plasticWaste = await WasteFunctions.FetchPlasticWaste(
+        month,
+        year,
+        date
+      );
+      const cardboardWaste = await WasteFunctions.FetchCardboardWaste(
+        month,
+        year,
+        date
+      );
+      const metalWaste = await WasteFunctions.FetchMetalWaste(
+        month,
+        year,
+        date
+      );
+      const glassWaste = await WasteFunctions.FetchGlassWaste(
+        month,
+        year,
+        date
+      );
+      const bioWaste = await WasteFunctions.FetchBioWaste(month, year, date);
+      setBioData(bioWaste ? [bioWaste] : []);
+      console.log(bioData);
+    };
+    fetchWasteData();
+  }, [month, year, date]);
 
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   const fetchAllDates = async () => {
+  //     try {
+  //       const querySnapshot = await getDocs(
+  //         collection(db, "omavalvonta", "jätteet", "tallennetut")
+  //       );
+  //       const data: string[] = querySnapshot.docs.map((doc) => doc.id);
+  //       setDateList(data);
+  //     } catch (error) {
+  //       console.error("Error getting documents: ", error);
+  //     }
+  //   };
 
-  useEffect(() => {
-    setIsLoading(true);
-    fetchWaste();
-    setIsLoading(false);
-  }, [date]);
+  //   fetchAllDates();
+  //   setIsLoading(false);
+  // }, [date]);
 
-       useEffect(() => {
-         const fetchMonthlyDocuments = async () => {
-           try {
-             const parentDocRef = doc(db, "omavalvonta", "jätteet2");
+  // const fetchWaste = async () => {
+  //   if (!date) return;
 
-             // First, fetch the subcollection names
-             const parentDocSnapshot = await getDoc(parentDocRef);
-             if (!parentDocSnapshot.exists()) {
-               console.error("Parent document does not exist!");
-               return;
-             }
+  //   try {
+  //     const querySnapshot = await getDocs(
+  //       collection(db, "omavalvonta", "jätteet", date)
+  //     );
+  //     const data: WasteData[] = querySnapshot.docs.map((doc) => ({
+  //       id: doc.id,
+  //       ...doc.data(),
+  //     })) as WasteData[];
+  //     setDocData(data);
+  //   } catch (error) {
+  //     console.error("Error getting documents: ", error);
+  //   }
+  // };
 
-             const subcollectionNames =
-               parentDocSnapshot.data()?.subcollectionNames;
-             if (!Array.isArray(subcollectionNames)) {
-               console.error("subcollectionNames field is missing or invalid!");
-               return;
-             }
+  // const initializeWasteForDate = async () => {
+  //   if (!date) return;
 
-             const allMonthlyData: Record<string, any[]> = {};
+  //   try {
+  //     const dateRef = collection(db, "omavalvonta", "jätteet", date);
 
-             for (const subcollectionName of subcollectionNames) {
-               // Access each subcollection
-               const subcollectionRef = collection(
-                 db,
-                 "omavalvonta",
-                 "jätteet2",
-                 subcollectionName
-               );
-               const subcollectionSnapshot = await getDocs(subcollectionRef);
+  //     for (const waste of initialWasteList) {
+  //       const wasteDocRef = doc(dateRef, waste.id);
+  //       const wasteSnap = await getDoc(wasteDocRef);
 
-               const monthlyDocs = subcollectionSnapshot.docs.map((doc) => ({
-                 id: doc.id, // e.g., '11-2024'
-                 ...doc.data(), // fields like `1.`, `14.`, `21.` in the documents
-               }));
+  //       if (!wasteSnap.exists()) {
+  //         await setDoc(wasteDocRef, {
+  //           määrä: waste.määrä,
+  //           yksikkö: waste.yksikkö,
+  //         });
+  //       }
+  //     }
 
-               allMonthlyData[subcollectionName] = monthlyDocs; // Organize data by subcollection
-             }
+  //     fetchWaste();
+  //   } catch (error) {
+  //     console.error("Error initializing waste data: ", error);
+  //   }
+  // };
 
-             console.log("Fetched Monthly Data:", allMonthlyData);
-             console.log("Data for Bio:", allMonthlyData["Bio"]);
-             console.log("Data for Bio 1.:", allMonthlyData["Bio"][0]);
+  // const addWaste = async (docId: string, amount: number) => {
+  //   setIsAdding(true);
+  //   try {
+  //     const docRef = collection(db, "omavalvonta", "jätteet", date);
+  //     const docSnap = await getDoc(doc(docRef, docId));
+  //     const dateRef = collection(db, "omavalvonta", "jätteet", "tallennetut");
 
-             // Example: Accessing a specific subcollection's monthly data
-             // console.log("Data for Bio:", allMonthlyData["Bio"]);
-           } catch (error) {
-             console.error("Error fetching monthly documents:", error);
-           }
-         };
+  //     if (docSnap.exists()) {
+  //       await updateDoc(doc(docRef, docId), {
+  //         määrä: amount + docSnap.data().määrä,
+  //       });
+  //     } else {
+  //       await setDoc(doc(docRef, docId), {
+  //         määrä: amount,
+  //         yksikkö: "g",
+  //       });
+  //     }
 
-         fetchMonthlyDocuments();
-       }, []);
+  //     await setDoc(doc(dateRef, date), {
+  //       date: date,
+  //     });
 
-
-  const initializeWasteForDate = async () => {
-    if (!date) return;
-
-    try {
-      const dateRef = collection(db, "omavalvonta", "jätteet", date);
-
-      for (const waste of initialWasteList) {
-        const wasteDocRef = doc(dateRef, waste.id);
-        const wasteSnap = await getDoc(wasteDocRef);
-
-        if (!wasteSnap.exists()) {
-          await setDoc(wasteDocRef, {
-            määrä: waste.määrä,
-            yksikkö: waste.yksikkö,
-          });
-        }
-      }
-
-      fetchWaste();
-    } catch (error) {
-      console.error("Error initializing waste data: ", error);
-    }
-  };
-
-  const addWaste = async (docId: string, amount: number) => {
-    setIsAdding(true);
-    try {
-      const docRef = collection(db, "omavalvonta", "jätteet", date);
-      const docSnap = await getDoc(doc(docRef, docId));
-      const dateRef = collection(db, "omavalvonta", "jätteet", "tallennetut");
-
-      if (docSnap.exists()) {
-        await updateDoc(doc(docRef, docId), {
-          määrä: amount + docSnap.data().määrä,
-        });
-      } else {
-        await setDoc(doc(docRef, docId), {
-          määrä: amount,
-          yksikkö: "g",
-        });
-      }
-
-      await setDoc(doc(dateRef, date), {
-        date: date,
-      });
-
-      initializeWasteForDate();
-      setWasteModal(false);
-      fetchWaste();
-      setIsAdding(false);
-    } catch (error) {
-      console.error("Error adding document: ", error);
-    }
-  };
+  //     initializeWasteForDate();
+  //     setWasteModal(false);
+  //     fetchWaste();
+  //     setIsAdding(false);
+  //   } catch (error) {
+  //     console.error("Error adding document: ", error);
+  //   }
+  // };
 
   if (isLoading) {
     return <LoadingScreen />;
-  }  else {
+  } else {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>Jätteet</Text>
@@ -252,7 +232,7 @@ export default function waste() {
           style={styles.calendar}
           onPress={() => setCalendarModal(!calendarModal)}
         >
-          <Text style={styles.text}>{date}</Text>
+          <Text style={styles.text}>{calendarDate}</Text>
           <MaterialCommunityIcons
             name="calendar"
             size={35}
@@ -348,7 +328,7 @@ export default function waste() {
                   </Modal>
                 </View>
               ))
-            : docData.map((doc) => (
+            : bioData.map((doc) => (
                 <View key={doc.id} style={styles.wasteContainer}>
                   <View style={styles.wasteContent}>
                     <Text style={styles.text}>{doc.id}</Text>
@@ -422,7 +402,7 @@ export default function waste() {
           {initialWasteList.map((doc) => (
             <Text key={doc.id} style={{ ...styles.text }}>
               {doc.id}: {doc.määrä}
-               kg
+              kg
             </Text>
           ))}
         </View>
