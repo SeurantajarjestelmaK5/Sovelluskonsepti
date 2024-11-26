@@ -66,6 +66,7 @@ export default function CalendarComponent({
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 
+
   const transformedDates = useMemo(() => {
     return dataDates.map((date) => {
       const [day, month, year] = date.split(".");

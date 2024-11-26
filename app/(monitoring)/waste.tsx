@@ -12,6 +12,7 @@ import {
 import CalendarComponent from "@/components/CalendarComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackButton from "@/components/BackButton";
+import WasteButton from "@/components/WasteButton";
 import { db } from "@/firebase/config.js";
 import {
   collection,
@@ -37,19 +38,25 @@ interface WasteData {
 }
 
 export default function waste() {
-  const [docData, setDocData] = useState<WasteData[]>([]);
   const [bioData, setBioData] = useState<WasteData[]>([]);
+  const [plasticData, setPlasticData] = useState<WasteData[]>([]);
+  const [cardboardData, setCardboardData] = useState<WasteData[]>([]);
+  const [metalData, setMetalData] = useState<WasteData[]>([]);
+  const [glassData, setGlassData] = useState<WasteData[]>([]);
+  const [mixedData, setMixedData] = useState<WasteData[]>([]);
+
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+
   const [calendarDate, setCalendarDate] = useState<string>("");
   const [date, setDate] = useState<string>("");
   const [month, setMonth] = useState<string>("");
   const [year, setYear] = useState<string>("");
+
   const [calendarModal, setCalendarModal] = useState(false);
   const [wasteModal, setWasteModal] = useState(false);
   const [dateList, setDateList] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [wasteAmount, setWasteAmount] = useState<number>(0);
 
   const ThemeColors = useThemeColors();
@@ -66,8 +73,7 @@ export default function waste() {
     setTimeout(() => setCalendarModal(false), 50);
   };
 
-  const showWasteModal = (docId: string) => {
-    setSelectedDocId(docId);
+  const showWasteModal = (id: string, type: string) => {
     setWasteModal(true);
   };
 
@@ -99,6 +105,7 @@ export default function waste() {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     const fetchWasteData = async () => {
       const mixedWaste = await WasteFunctions.FetchMixedWaste(
         month,
@@ -127,70 +134,34 @@ export default function waste() {
       );
       const bioWaste = await WasteFunctions.FetchBioWaste(month, year, date);
       setBioData(bioWaste ? [bioWaste] : []);
-      console.log(bioData);
+      setMixedData(mixedWaste ? [mixedWaste] : []);
+      setPlasticData(plasticWaste ? [plasticWaste] : []);
+      setCardboardData(cardboardWaste ? [cardboardWaste] : []);
+      setMetalData(metalWaste ? [metalWaste] : []);
+      setGlassData(glassWaste ? [glassWaste] : []);
     };
     fetchWasteData();
-  
+    setIsLoading(false);
   }, [month, year, date]);
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   const fetchAllDates = async () => {
-  //     try {
-  //       const querySnapshot = await getDocs(
-  //         collection(db, "omavalvonta", "jätteet", "tallennetut")
-  //       );
-  //       const data: string[] = querySnapshot.docs.map((doc) => doc.id);
-  //       setDateList(data);
-  //     } catch (error) {
-  //       console.error("Error getting documents: ", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchWasteData = async () => {
+      setIsLoading(true);
+      try {
+        const dates = await WasteFunctions.FetchDatesWithData(month, year);
+        console.log("Fetched dates:", dates); // Debugging log
+        setDateList(dates);
+      } catch (error) {
+        console.error("Error fetching waste data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  //   fetchAllDates();
-  //   setIsLoading(false);
-  // }, [date]);
-
-  // const fetchWaste = async () => {
-  //   if (!date) return;
-
-  //   try {
-  //     const querySnapshot = await getDocs(
-  //       collection(db, "omavalvonta", "jätteet", date)
-  //     );
-  //     const data: WasteData[] = querySnapshot.docs.map((doc) => ({
-  //       id: doc.id,
-  //       ...doc.data(),
-  //     })) as WasteData[];
-  //     setDocData(data);
-  //   } catch (error) {
-  //     console.error("Error getting documents: ", error);
-  //   }
-  // };
-
-  // const initializeWasteForDate = async () => {
-  //   if (!date) return;
-
-  //   try {
-  //     const dateRef = collection(db, "omavalvonta", "jätteet", date);
-
-  //     for (const waste of initialWasteList) {
-  //       const wasteDocRef = doc(dateRef, waste.id);
-  //       const wasteSnap = await getDoc(wasteDocRef);
-
-  //       if (!wasteSnap.exists()) {
-  //         await setDoc(wasteDocRef, {
-  //           määrä: waste.määrä,
-  //           yksikkö: waste.yksikkö,
-  //         });
-  //       }
-  //     }
-
-  //     fetchWaste();
-  //   } catch (error) {
-  //     console.error("Error initializing waste data: ", error);
-  //   }
-  // };
+    if (month && year) {
+      fetchWasteData(); // Fetch only when month and year are valid
+    }
+  }, [month, year]);
 
   // const addWaste = async (docId: string, amount: number) => {
   //   setIsAdding(true);
@@ -260,143 +231,84 @@ export default function waste() {
         )}
 
         <View style={styles.content}>
-          {!docData || docData.length === 0
-            ? initialWasteList.map((doc) => (
-                <View key={doc.id} style={styles.wasteContainer}>
-                  <View style={styles.wasteContent}>
-                    <Text style={styles.text}>{doc.id}</Text>
-                    <Text style={styles.text}>
-                      {doc.määrä}
-                      {doc.yksikkö}
-                    </Text>
-                  </View>
-                  <MaterialCommunityIcons
-                    name="plus"
-                    size={35}
-                    color={ThemeColors.tint}
-                    onPress={() => showWasteModal(doc.id)}
-                  />
-                  <Modal
-                    visible={wasteModal}
-                    animationType="slide"
-                    transparent={true}
-                    onDismiss={() => setWasteModal(false)}
-                  >
-                    <TouchableWithoutFeedback
-                      onPress={() => setWasteModal(false)}
-                    >
-                      <View style={styles.wasteModalContainer}>
-                        <TouchableWithoutFeedback>
-                          <View style={styles.wasteModal}>
-                            {selectedDocId && (
-                              <>
-                                <Text style={styles.header}>
-                                  {selectedDocId}
-                                </Text>
-                                <TextInput
-                                  mode="outlined"
-                                  style={styles.wasteInput}
-                                  placeholder="Määrä"
-                                  keyboardType="numeric"
-                                  activeOutlineColor={ThemeColors.tint}
-                                  onChangeText={(text) =>
-                                    setWasteAmount(Number(text))
-                                  }
-                                />
-                                <Button
-                                  children="Lisää"
-                                  icon={() => (
-                                    <MaterialCommunityIcons
-                                      name="plus"
-                                      size={20}
-                                    />
-                                  )}
-                                  contentStyle={{
-                                    flexDirection: "row-reverse",
-                                  }}
-                                  mode="contained"
-                                  buttonColor={ThemeColors.tint}
-                                  onPress={() =>
-                                    addWaste(selectedDocId, wasteAmount)
-                                  }
-                                />
-                              </>
-                            )}
-                          </View>
-                        </TouchableWithoutFeedback>
-                      </View>
-                    </TouchableWithoutFeedback>
-                  </Modal>
-                </View>
-              ))
-            : bioData.map((doc) => (
-                <View key={doc.id} style={styles.wasteContainer}>
-                  <View style={styles.wasteContent}>
-                    <Text style={styles.text}>{doc.id}</Text>
-                    <Text style={styles.text}>
-                      {doc.määrä}
-                      {doc.yksikkö}
-                    </Text>
-                  </View>
-                  <MaterialCommunityIcons
-                    name="plus"
-                    size={35}
-                    color={ThemeColors.tint}
-                    onPress={() => showWasteModal(doc.id)}
-                  />
-                  <Modal
-                    visible={wasteModal}
-                    animationType="slide"
-                    transparent={true}
-                    onDismiss={() => setWasteModal(false)}
-                  >
-                    <TouchableWithoutFeedback
-                      onPress={() => setWasteModal(false)}
-                    >
-                      <View style={styles.wasteModalContainer}>
-                        <TouchableWithoutFeedback>
-                          <View style={styles.wasteModal}>
-                            {selectedDocId && (
-                              <>
-                                <Text style={styles.header}>
-                                  {selectedDocId}
-                                </Text>
-                                <TextInput
-                                  mode="outlined"
-                                  style={styles.wasteInput}
-                                  placeholder="Määrä"
-                                  keyboardType="numeric"
-                                  activeOutlineColor={ThemeColors.tint}
-                                  onChangeText={(text) =>
-                                    setWasteAmount(Number(text))
-                                  }
-                                />
-                                <Button
-                                  children="Lisää"
-                                  icon={() => (
-                                    <MaterialCommunityIcons
-                                      name="plus"
-                                      size={20}
-                                    />
-                                  )}
-                                  contentStyle={{
-                                    flexDirection: "row-reverse",
-                                  }}
-                                  mode="contained"
-                                  buttonColor={ThemeColors.tint}
-                                  onPress={() =>
-                                    addWaste(selectedDocId, wasteAmount)
-                                  }
-                                />
-                              </>
-                            )}
-                          </View>
-                        </TouchableWithoutFeedback>
-                      </View>
-                    </TouchableWithoutFeedback>
-                  </Modal>
-                </View>
-              ))}
+          {bioData.map((data) => (
+            <WasteButton
+              key={data.id}
+              data={data}
+              wasteName="Bio" // Pass the type of waste
+              wasteModal={wasteModal}
+              showModal={showWasteModal}
+              setWasteModal={setWasteModal}
+              addWaste={() => {}}
+              styles={styles}
+              ThemeColors={ThemeColors}
+            />
+          ))}
+          {mixedData.map((data) => (
+            <WasteButton
+              key={data.id}
+              data={data}
+              wasteName="Seka"
+              wasteModal={wasteModal}
+              showModal={showWasteModal}
+              setWasteModal={setWasteModal}
+              addWaste={() => {}}
+              styles={styles}
+              ThemeColors={ThemeColors}
+            />
+          ))}
+          {plasticData.map((data) => (
+            <WasteButton
+              key={data.id}
+              data={data}
+              wasteName="Muovi"
+              wasteModal={wasteModal}
+              showModal={showWasteModal}
+              setWasteModal={setWasteModal}
+              addWaste={() => {}}
+              styles={styles}
+              ThemeColors={ThemeColors}
+            />
+          ))}
+          {cardboardData.map((data) => (
+            <WasteButton
+              key={data.id}
+              data={data}
+              wasteName="Pahvi"
+              wasteModal={wasteModal}
+              showModal={showWasteModal}
+              setWasteModal={setWasteModal}
+              addWaste={() => {}}
+              styles={styles}
+              ThemeColors={ThemeColors}
+            />
+          ))}
+          {metalData.map((data) => (
+            <WasteButton
+              key={data.id}
+              data={data}
+              wasteName="Metalli"
+              wasteModal={wasteModal}
+              showModal={showWasteModal}
+              setWasteModal={setWasteModal}
+              addWaste={() => {}}
+              styles={styles}
+              ThemeColors={ThemeColors}
+            />
+          ))}
+          {glassData.map((data) => (
+            <WasteButton
+              key={data.id}
+              data={data}
+              wasteName="Lasi"
+              wasteModal={wasteModal}
+              showModal={showWasteModal}
+              setWasteModal={setWasteModal}
+              addWaste={() => {}}
+              styles={styles}
+              ThemeColors={ThemeColors}
+            />
+          ))}
         </View>
         <View style={styles.wasteTotal}>
           <Text style={{ ...styles.text }}>Kuukausi yhteensä: {}</Text>
