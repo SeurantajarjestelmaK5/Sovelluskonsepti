@@ -4,7 +4,7 @@ import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, PermissionsAndroid, Pressable, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
@@ -12,6 +12,8 @@ import BackButton from "@/components/BackButton";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
 import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
+import { exportAndSendData } from "@/scripts/mailSender";
+import * as Permissions from 'expo-permissions';
 
 export interface InventoryItem {
   Alv: number;
@@ -319,6 +321,12 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       console.error("Error deleting inventory item:", error);
     }
   };
+  const handleInventorySend = async (selectedDate : any) => {
+    
+        exportAndSendData(selectedDate, "sali")
+   
+  }
+
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
 
   /** INVENTAARION FUNKTIOT LOPPUU */
@@ -412,6 +420,17 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         >
           <MaterialCommunityIcons
             name="plus-thick"
+            size={46}
+            style={diningroomStyle.backIcon}
+          />
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            handleInventorySend(selectedDate);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="plus"
             size={46}
             style={diningroomStyle.backIcon}
           />
