@@ -73,7 +73,7 @@ export default function waste() {
     setTimeout(() => setCalendarModal(false), 50);
   };
 
-  const showWasteModal = (id: string, type: string) => {
+  const showWasteModal = () => {
     setWasteModal(true);
   };
 

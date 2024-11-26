@@ -17,7 +17,7 @@ interface WasteButtonProps {
   data: WasteData;
   wasteName: string;
   wasteModal: boolean;
-  showModal: (id: string, wasteName: string) => void;
+  showModal: (id: string) => void;
   setWasteModal: (visible: boolean) => void;
   addWaste: (id: string, amount: number) => void;
   styles: any; // Pass the styles for layout, typography, etc.
@@ -52,7 +52,7 @@ export default function WasteButton({
           name="plus"
           size={35}
           color={ThemeColors.tint}
-          onPress={() => showModal(data.id, wasteName)} // Pass the waste type to the handler
+          onPress={() => showModal(data.id)} // Pass the waste type to the handler
         />
 
         {/* Waste modal */}
