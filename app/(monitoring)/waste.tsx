@@ -44,6 +44,10 @@ export default function waste() {
   const [metalData, setMetalData] = useState<WasteData[]>([]);
   const [glassData, setGlassData] = useState<WasteData[]>([]);
   const [mixedData, setMixedData] = useState<WasteData[]>([]);
+  const [chosenWaste, setChosenWaste] = useState<{
+    name: string;
+    visible: boolean;
+  } | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -73,9 +77,13 @@ export default function waste() {
     setTimeout(() => setCalendarModal(false), 50);
   };
 
-  const showWasteModal = (id: string, type: string) => {
-    setWasteModal(true);
-  };
+const showWasteModal = (wasteName: string) => {
+  setChosenWaste({ name: wasteName, visible: true });
+};
+
+const hideWasteModal = () => {
+  setChosenWaste(null); // Close modal
+};
 
   const initialWasteList = [
     { id: "Bio", yksikkö: "g", määrä: 0 },
@@ -235,10 +243,10 @@ export default function waste() {
             <WasteButton
               key={data.id}
               data={data}
-              wasteName="Bio" // Pass the type of waste
-              wasteModal={wasteModal}
-              showModal={showWasteModal}
-              setWasteModal={setWasteModal}
+              wasteName="Bio"
+              wasteModal={chosenWaste?.name === "Bio" && chosenWaste?.visible}
+              showModal={() => showWasteModal("Bio")}
+              setWasteModal={hideWasteModal}
               addWaste={() => {}}
               styles={styles}
               ThemeColors={ThemeColors}
@@ -249,9 +257,9 @@ export default function waste() {
               key={data.id}
               data={data}
               wasteName="Seka"
-              wasteModal={wasteModal}
-              showModal={showWasteModal}
-              setWasteModal={setWasteModal}
+              wasteModal={chosenWaste?.name === "Seka" && chosenWaste?.visible}
+              showModal={() => showWasteModal("Seka")}
+              setWasteModal={hideWasteModal}
               addWaste={() => {}}
               styles={styles}
               ThemeColors={ThemeColors}
@@ -262,9 +270,9 @@ export default function waste() {
               key={data.id}
               data={data}
               wasteName="Muovi"
-              wasteModal={wasteModal}
-              showModal={showWasteModal}
-              setWasteModal={setWasteModal}
+              wasteModal={chosenWaste?.name === "Muovi" && chosenWaste?.visible}
+              showModal={() => showWasteModal("Muovi")}
+              setWasteModal={hideWasteModal}
               addWaste={() => {}}
               styles={styles}
               ThemeColors={ThemeColors}
@@ -275,9 +283,9 @@ export default function waste() {
               key={data.id}
               data={data}
               wasteName="Pahvi"
-              wasteModal={wasteModal}
-              showModal={showWasteModal}
-              setWasteModal={setWasteModal}
+              wasteModal={chosenWaste?.name === "Pahvi" && chosenWaste?.visible}
+              showModal={() => showWasteModal("Pahvi")}
+              setWasteModal={hideWasteModal}
               addWaste={() => {}}
               styles={styles}
               ThemeColors={ThemeColors}
@@ -288,9 +296,11 @@ export default function waste() {
               key={data.id}
               data={data}
               wasteName="Metalli"
-              wasteModal={wasteModal}
-              showModal={showWasteModal}
-              setWasteModal={setWasteModal}
+              wasteModal={
+                chosenWaste?.name === "Metalli" && chosenWaste?.visible
+              }
+              showModal={() => showWasteModal("Metalli")}
+              setWasteModal={hideWasteModal}
               addWaste={() => {}}
               styles={styles}
               ThemeColors={ThemeColors}
@@ -301,9 +311,9 @@ export default function waste() {
               key={data.id}
               data={data}
               wasteName="Lasi"
-              wasteModal={wasteModal}
-              showModal={showWasteModal}
-              setWasteModal={setWasteModal}
+              wasteModal={chosenWaste?.name === "Lasi" && chosenWaste?.visible}
+              showModal={() => showWasteModal("Lasi")}
+              setWasteModal={hideWasteModal}
               addWaste={() => {}}
               styles={styles}
               ThemeColors={ThemeColors}
