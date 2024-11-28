@@ -2,9 +2,8 @@ import YearMonthPickerModal from "@/components/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator } from "react-native-paper";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Alert, FlatList, PermissionsAndroid, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/AddItemModal";
 import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
@@ -13,7 +12,6 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
 import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
 import { exportAndSendData } from "@/scripts/mailSender";
-import * as Permissions from 'expo-permissions';
 
 export interface InventoryItem {
   Alv: number;
@@ -322,9 +320,7 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
     }
   };
   const handleInventorySend = async (selectedDate : any) => {
-    
         exportAndSendData(selectedDate, "sali")
-   
   }
 
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */

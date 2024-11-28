@@ -12,6 +12,7 @@ import BackButton from "@/components/BackButton";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
 import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
+import { exportAndSendData } from "@/scripts/mailSender";
 
 
 export interface InventoryItem {
@@ -312,6 +313,9 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       console.error("Error deleting inventory item:", error);
     }
   };
+  const handleInventorySend = async (selectedDate : any) => {
+    exportAndSendData(selectedDate, "keittiö")
+}
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
 
   /** INVENTAARION FUNKTIOT LOPPUU */
@@ -395,6 +399,17 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       </View>
 
       <View style={diningroomStyle.bottomButtons}>
+      <Pressable
+          onPress={() => {
+            handleInventorySend(selectedDate);
+          }}
+        >
+          <MaterialCommunityIcons
+            name="plus"
+            size={46}
+            style={diningroomStyle.backIcon}
+          />
+        </Pressable>
         <Pressable
           onPress={() => {
             setAddItemModalVisible(true);
