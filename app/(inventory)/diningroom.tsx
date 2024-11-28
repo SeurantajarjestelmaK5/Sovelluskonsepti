@@ -112,7 +112,7 @@ export default function Diningroom() {
         keyboardType="decimal-pad"
       />
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Alv0?.toFixed(2)}</Text>
+      <Text style={diningroomStyle.cellText}>{item.Alv0}</Text>
       <Pressable onPress={() => confirmDeleteItem(item)}>
         <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
       </Pressable>
@@ -250,10 +250,10 @@ const handleEditingEnd = async (
 
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
-          newALV0 = item.Hinta / (1 + item.Alv / 100) * parsedValue;
+          newALV0 = +(item.Hinta / (1 + item.Alv / 100) * parsedValue).toFixed(2);
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
-          newALV0 = parsedValue / (1 + item.Alv / 100) * item.Määrä;
+          newALV0 = +(parsedValue / (1 + item.Alv / 100) * item.Määrä).toFixed(2);
         }
 
         const docRef = doc(db, "inventaario", selectedDate!, "sali", item.Nimi);

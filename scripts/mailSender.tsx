@@ -63,7 +63,6 @@ export const exportAndSendData = async (selectedDate : any, location : string) =
             item.Hinta || 0,
             totalPrice.toFixed(2),
             item.Alv,
-            item.Alv0
           ]);
         });
 
