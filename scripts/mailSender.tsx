@@ -17,11 +17,7 @@ export const exportAndSendData = async (selectedDate : any, location : string) =
       });
       return data;
     };
-
-    const data = await fetchData(selectedDate, location);
-
-    console.log(data);
-    
+    const data = await fetchData(selectedDate, location);    
     if (data.length === 0) {
       console.log('No data found.');
       return;
@@ -78,17 +74,19 @@ export const exportAndSendData = async (selectedDate : any, location : string) =
         return sum + vatRemovedTotal;
       }, 0);
       
-      worksheetData.push(['', '', '', 'Yhteensä Alv 0%:', overallTotal.toFixed(2), '']);
+      worksheetData.push(['', '', '', 'Inventaario Alv 0%:', overallTotal.toFixed(2), '']);
 
       const overallAlv25 : any = Object.values(groupedData["25.5"]).flat().reduce((sum : any, item : any) => {
         return sum + (item.Määrä || 0) * (item.Hinta || 0);
       }, 0);
-      worksheetData.push(['', '', '', 'Yhteensä Alv 25.5%:', overallAlv25.toFixed(2), '']);
+      const Alv25Alv0 : any = overallAlv25 / (1 + 25.5 / 100)
+      worksheetData.push(['', '', '', 'Yhteensä Alv 25.5%:', overallAlv25.toFixed(2), 'Alv 0%', Alv25Alv0.toFixed(2)]);
       
       const overallAlv14 : any = Object.values(groupedData["14"]).flat().reduce((sum : any, item : any) => {
         return sum + (item.Määrä || 0) * (item.Hinta || 0);
       }, 0);
-      worksheetData.push(['', '', '', 'Yhteensä Alv 14%:', overallAlv14.toFixed(2), '']);
+      const Alv14Alv0 : any = overallAlv14 / (1 + 14 / 100)
+      worksheetData.push(['', '', '', 'Yhteensä Alv 14%:', overallAlv14.toFixed(2), 'Alv 0%', Alv14Alv0.toFixed(2)]);
 
       // Create worksheet and workbook
       const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -101,8 +99,6 @@ export const exportAndSendData = async (selectedDate : any, location : string) =
       await FileSystem.writeAsStringAsync(fileUri, base64, {
         encoding: FileSystem.EncodingType.Base64,
       });
-
-      console.log('File written successfully:', fileUri);
       return fileUri;
     };
 
@@ -111,7 +107,6 @@ export const exportAndSendData = async (selectedDate : any, location : string) =
     // Step 3: Send Email with Attachment
     const sendEmail = async (fileUri : string) => {
       const fileExists = await FileSystem.getInfoAsync(fileUri);
-      console.log('File exists:', fileExists.exists);
       const available = await MailComposer.isAvailableAsync();
       if (available) {
         const options = {

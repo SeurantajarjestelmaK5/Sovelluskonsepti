@@ -244,10 +244,10 @@ const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta
         let newALV0 = 0;
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
-          newALV0 = item.Hinta / (1 + item.Alv / 100) * parsedValue;
+          newALV0 = +(item.Hinta / (1 + item.Alv / 100) * parsedValue).toFixed(2);
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
-          newALV0 = parsedValue / (1 + item.Alv / 100) * item.Määrä;
+          newALV0 = +(parsedValue / (1 + item.Alv / 100) * item.Määrä).toFixed(2);
         }
 
         // Update Firestore with the new value and Yhteishinta
