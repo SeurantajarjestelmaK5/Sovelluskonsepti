@@ -55,6 +55,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       Yksikkö: unit,
       Kategoria: category,
       Alv: alv,
+      Alv0: 0 / (1 + alv / 100),
       Hinta: 0,
       Yhteishinta: 0,
     };
