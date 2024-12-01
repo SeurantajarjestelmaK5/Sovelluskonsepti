@@ -229,9 +229,10 @@ export const AddWaste = async (
   month: string,
   year: string,
   date: string,
-  amount: number,
+  amount: number
 ): Promise<void> => {
   try {
+    // Construct document reference path
     const docRef = doc(
       db,
       "omavalvonta",
@@ -239,9 +240,18 @@ export const AddWaste = async (
       wasteType,
       year,
       month,
-      date
+      date // Path now includes 'year', 'month', 'date'
     );
-    await setDoc(docRef,
+
+    // Check if document exists
+    const docSnapshot = await getDoc(docRef);
+    if (!docSnapshot.exists()) {
+      console.log("Document does not exist, creating new document...");
+    }
+
+    // Set the document (this will create it if it doesn't exist)
+    await setDoc(
+      docRef,
       {
         määrä: amount,
         yksikkö: "g",
@@ -251,7 +261,7 @@ export const AddWaste = async (
   } catch (error) {
     console.error("Error adding waste data:", error);
   }
-}
+};
 
  export const getMonthTotal = async (
   month: string,
