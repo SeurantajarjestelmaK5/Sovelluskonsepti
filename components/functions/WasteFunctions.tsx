@@ -252,3 +252,31 @@ export const AddWaste = async (
     console.error("Error adding waste data:", error);
   }
 }
+
+ export const getMonthTotal = async (
+  month: string,
+  year: string,
+  wasteType: string
+): Promise<number> => {
+  try {
+    const monthRef = collection(
+      db,
+      "omavalvonta",
+      "jätteet2",
+      wasteType,
+      year,
+      month
+    );
+    const querySnapshot = await getDocs(monthRef);
+    let total = 0;
+
+    querySnapshot.forEach((doc) => {
+      total += doc.data().määrä;
+    });
+
+    return total;
+  } catch (error) {
+    console.error("Error fetching month total:", error);
+    return 0;
+  }
+};
