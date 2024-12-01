@@ -34,6 +34,26 @@ export default function WasteButton({
 }: WasteButtonProps) {
   const [wasteAmount, setWasteAmount] = useState<number>(0);
 
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
+
+    if (!data) {
+      return (
+        <View style={styles.wasteContainer}>
+          <Text style={styles.text}>{wasteName}</Text>
+          <Text style={styles.text}>Ei tietoja</Text>{" "}
+          {/* Display placeholder */}
+          <MaterialCommunityIcons
+            name="plus"
+            size={35}
+            color={ThemeColors.tint}
+            onPress={() => showModal(wasteName)}
+          />
+        </View>
+      );
+    }
 
   return (
     <View key={data.id} style={styles.wasteContainer}>

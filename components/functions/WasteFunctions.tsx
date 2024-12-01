@@ -1,5 +1,5 @@
 import { db } from "../../firebase/config";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
 
 interface WasteData {
   id: string;
@@ -223,3 +223,32 @@ export const FetchDatesWithData = async (
     return [];
   }
 };
+
+export const AddWaste = async (
+  wasteType: string,
+  month: string,
+  year: string,
+  date: string,
+  amount: number,
+): Promise<void> => {
+  try {
+    const docRef = doc(
+      db,
+      "omavalvonta",
+      "jätteet2",
+      wasteType,
+      year,
+      month,
+      date
+    );
+    await setDoc(docRef,
+      {
+        määrä: amount,
+        yksikkö: "g",
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Error adding waste data:", error);
+  }
+}

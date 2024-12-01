@@ -50,7 +50,7 @@ export default function waste() {
   } | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [isAdding, setIsAdding] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const [calendarDate, setCalendarDate] = useState<string>("");
   const [date, setDate] = useState<string>("");
@@ -77,13 +77,13 @@ export default function waste() {
     setTimeout(() => setCalendarModal(false), 50);
   };
 
-const showWasteModal = (wasteName: string) => {
-  setChosenWaste({ name: wasteName, visible: true });
-};
+  const showWasteModal = (wasteName: string) => {
+    setChosenWaste({ name: wasteName, visible: true });
+  };
 
-const hideWasteModal = () => {
-  setChosenWaste(null); // Close modal
-};
+  const hideWasteModal = () => {
+    setChosenWaste(null); // Close modal
+  };
 
   const initialWasteList = [
     { id: "Bio", yksikkö: "g", määrä: 0 },
@@ -95,116 +95,149 @@ const hideWasteModal = () => {
   ];
 
   useEffect(() => {
+    setIsLoading(true);
     const getCurrentDate = () => {
       const date = new Date();
       const day = date.getDate();
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
       const fullDate = `${day}.${month}.${year}`;
-      const currDate = `${day}`;
+      const currDate = `0${day}`;
       const currMonth = `${month}`;
       const currYear = `${year}`;
       setCalendarDate(fullDate);
       setDate(currDate);
       setMonth(currMonth);
       setYear(currYear);
+      console.log(currDate);
     };
     getCurrentDate();
+    setIsLoading(false);
   }, []);
 
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchWasteData = async () => {
-      const mixedWaste = await WasteFunctions.FetchMixedWaste(
+useEffect(() => {
+  const fetchAndSetWasteData = async () => {
+    setIsFetching(true);
+
+    // First fetch existing data
+    const mixedWaste = await WasteFunctions.FetchMixedWaste(month, year, date);
+    const plasticWaste = await WasteFunctions.FetchPlasticWaste(
+      month,
+      year,
+      date
+    );
+    const cardboardWaste = await WasteFunctions.FetchCardboardWaste(
+      month,
+      year,
+      date
+    );
+    const metalWaste = await WasteFunctions.FetchMetalWaste(month, year, date);
+    const glassWaste = await WasteFunctions.FetchGlassWaste(month, year, date);
+    const bioWaste = await WasteFunctions.FetchBioWaste(month, year, date);
+
+    // Check for missing data and insert defaults if necessary
+    let shouldRefetch = false;
+
+    if (bioWaste === null) {
+      await WasteFunctions.AddWaste("Bio", month, year, date, 0);
+      shouldRefetch = true;
+    }
+    if (mixedWaste === null) {
+      await WasteFunctions.AddWaste("Seka", month, year, date, 0);
+      shouldRefetch = true;
+    }
+    if (plasticWaste === null) {
+      await WasteFunctions.AddWaste("Muovi", month, year, date, 0);
+      shouldRefetch = true;
+    }
+    if (cardboardWaste === null) {
+      await WasteFunctions.AddWaste("Pahvi", month, year, date, 0);
+      shouldRefetch = true;
+    }
+    if (metalWaste === null) {
+      await WasteFunctions.AddWaste("Metalli", month, year, date, 0);
+      shouldRefetch = true;
+    }
+    if (glassWaste === null) {
+      await WasteFunctions.AddWaste("Lasi", month, year, date, 0);
+      shouldRefetch = true;
+    }
+
+    // Re-fetch data if defaults were added
+    if (shouldRefetch) {
+      setIsFetching(true); // Show loading while re-fetching
+      const updatedMixedWaste = await WasteFunctions.FetchMixedWaste(
         month,
         year,
         date
       );
-      const plasticWaste = await WasteFunctions.FetchPlasticWaste(
+      const updatedPlasticWaste = await WasteFunctions.FetchPlasticWaste(
         month,
         year,
         date
       );
-      const cardboardWaste = await WasteFunctions.FetchCardboardWaste(
+      const updatedCardboardWaste = await WasteFunctions.FetchCardboardWaste(
         month,
         year,
         date
       );
-      const metalWaste = await WasteFunctions.FetchMetalWaste(
+      const updatedMetalWaste = await WasteFunctions.FetchMetalWaste(
         month,
         year,
         date
       );
-      const glassWaste = await WasteFunctions.FetchGlassWaste(
+      const updatedGlassWaste = await WasteFunctions.FetchGlassWaste(
         month,
         year,
         date
       );
-      const bioWaste = await WasteFunctions.FetchBioWaste(month, year, date);
+      const updatedBioWaste = await WasteFunctions.FetchBioWaste(
+        month,
+        year,
+        date
+      );
+
+      setBioData(updatedBioWaste ? [updatedBioWaste] : []);
+      setMixedData(updatedMixedWaste ? [updatedMixedWaste] : []);
+      setPlasticData(updatedPlasticWaste ? [updatedPlasticWaste] : []);
+      setCardboardData(updatedCardboardWaste ? [updatedCardboardWaste] : []);
+      setMetalData(updatedMetalWaste ? [updatedMetalWaste] : []);
+      setGlassData(updatedGlassWaste ? [updatedGlassWaste] : []);
+    } else {
+      // Update state if no re-fetch is necessary
       setBioData(bioWaste ? [bioWaste] : []);
       setMixedData(mixedWaste ? [mixedWaste] : []);
       setPlasticData(plasticWaste ? [plasticWaste] : []);
       setCardboardData(cardboardWaste ? [cardboardWaste] : []);
       setMetalData(metalWaste ? [metalWaste] : []);
       setGlassData(glassWaste ? [glassWaste] : []);
-    };
-    fetchWasteData();
-    setIsLoading(false);
-  }, [month, year, date]);
+    }
+
+    setIsFetching(false); // End loading
+  };
+
+  fetchAndSetWasteData();
+}, [month, year, date]);
 
   useEffect(() => {
-    const fetchWasteData = async () => {
-      setIsLoading(true);
+    const fetchDatesWithData = async () => {
       try {
         const dates = await WasteFunctions.FetchDatesWithData(month, year);
-        console.log("Fetched dates:", dates); // Debugging log
         setDateList(dates);
       } catch (error) {
         console.error("Error fetching waste data:", error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     if (month && year) {
-      fetchWasteData(); // Fetch only when month and year are valid
+      fetchDatesWithData(); // Fetch only when month and year are valid
     }
-  }, [month, year]);
-
-  // const addWaste = async (docId: string, amount: number) => {
-  //   setIsAdding(true);
-  //   try {
-  //     const docRef = collection(db, "omavalvonta", "jätteet", date);
-  //     const docSnap = await getDoc(doc(docRef, docId));
-  //     const dateRef = collection(db, "omavalvonta", "jätteet", "tallennetut");
-
-  //     if (docSnap.exists()) {
-  //       await updateDoc(doc(docRef, docId), {
-  //         määrä: amount + docSnap.data().määrä,
-  //       });
-  //     } else {
-  //       await setDoc(doc(docRef, docId), {
-  //         määrä: amount,
-  //         yksikkö: "g",
-  //       });
-  //     }
-
-  //     await setDoc(doc(dateRef, date), {
-  //       date: date,
-  //     });
-
-  //     initializeWasteForDate();
-  //     setWasteModal(false);
-  //     fetchWaste();
-  //     setIsAdding(false);
-  //   } catch (error) {
-  //     console.error("Error adding document: ", error);
-  //   }
-  // };
+  }, [month, year, date]);
 
   if (isLoading) {
     return <LoadingScreen />;
-  } else {
+  }
+  if (isFetching) {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>Jätteet</Text>
@@ -237,102 +270,135 @@ const hideWasteModal = () => {
             </TouchableWithoutFeedback>
           </Modal>
         )}
-
-        <View style={styles.content}>
-          {bioData.map((data) => (
-            <WasteButton
-              key={data.id}
-              data={data}
-              wasteName="Bio"
-              wasteModal={chosenWaste?.name === "Bio" && chosenWaste?.visible}
-              showModal={() => showWasteModal("Bio")}
-              setWasteModal={hideWasteModal}
-              addWaste={() => {}}
-              styles={styles}
-              ThemeColors={ThemeColors}
-            />
-          ))}
-          {mixedData.map((data) => (
-            <WasteButton
-              key={data.id}
-              data={data}
-              wasteName="Seka"
-              wasteModal={chosenWaste?.name === "Seka" && chosenWaste?.visible}
-              showModal={() => showWasteModal("Seka")}
-              setWasteModal={hideWasteModal}
-              addWaste={() => {}}
-              styles={styles}
-              ThemeColors={ThemeColors}
-            />
-          ))}
-          {plasticData.map((data) => (
-            <WasteButton
-              key={data.id}
-              data={data}
-              wasteName="Muovi"
-              wasteModal={chosenWaste?.name === "Muovi" && chosenWaste?.visible}
-              showModal={() => showWasteModal("Muovi")}
-              setWasteModal={hideWasteModal}
-              addWaste={() => {}}
-              styles={styles}
-              ThemeColors={ThemeColors}
-            />
-          ))}
-          {cardboardData.map((data) => (
-            <WasteButton
-              key={data.id}
-              data={data}
-              wasteName="Pahvi"
-              wasteModal={chosenWaste?.name === "Pahvi" && chosenWaste?.visible}
-              showModal={() => showWasteModal("Pahvi")}
-              setWasteModal={hideWasteModal}
-              addWaste={() => {}}
-              styles={styles}
-              ThemeColors={ThemeColors}
-            />
-          ))}
-          {metalData.map((data) => (
-            <WasteButton
-              key={data.id}
-              data={data}
-              wasteName="Metalli"
-              wasteModal={
-                chosenWaste?.name === "Metalli" && chosenWaste?.visible
-              }
-              showModal={() => showWasteModal("Metalli")}
-              setWasteModal={hideWasteModal}
-              addWaste={() => {}}
-              styles={styles}
-              ThemeColors={ThemeColors}
-            />
-          ))}
-          {glassData.map((data) => (
-            <WasteButton
-              key={data.id}
-              data={data}
-              wasteName="Lasi"
-              wasteModal={chosenWaste?.name === "Lasi" && chosenWaste?.visible}
-              showModal={() => showWasteModal("Lasi")}
-              setWasteModal={hideWasteModal}
-              addWaste={() => {}}
-              styles={styles}
-              ThemeColors={ThemeColors}
-            />
-          ))}
-        </View>
-        <View style={styles.wasteTotal}>
-          <Text style={{ ...styles.text }}>Kuukausi yhteensä: {}</Text>
-          {initialWasteList.map((doc) => (
-            <Text key={doc.id} style={{ ...styles.text }}>
-              {doc.id}: {doc.määrä}
-              kg
-            </Text>
-          ))}
-        </View>
-        <View style={styles.buttonContainer}>
-          <BackButton />
-        </View>
+        <SmallLoadingIndicator />
       </View>
     );
   }
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Jätteet</Text>
+      <Pressable
+        style={styles.calendar}
+        onPress={() => setCalendarModal(!calendarModal)}
+      >
+        <Text style={styles.text}>{calendarDate}</Text>
+        <MaterialCommunityIcons
+          name="calendar"
+          size={35}
+          color={ThemeColors.tint}
+        />
+      </Pressable>
+      {calendarModal && (
+        <Modal
+          visible={calendarModal}
+          animationType="slide"
+          transparent={true}
+          onDismiss={() => setCalendarModal(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
+            <View style={{ flex: 1 }}>
+              <CalendarComponent
+                onDayPress={handleDatePress}
+                dataDates={dateList}
+                selectedDate={selectedDate}
+              />
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      )}
+
+      <View style={styles.content}>
+        {bioData.map((data) => (
+          <WasteButton
+            key={data.id}
+            data={data}
+            wasteName="Bio"
+            wasteModal={chosenWaste?.name === "Bio" && chosenWaste?.visible}
+            showModal={() => showWasteModal("Bio")}
+            setWasteModal={hideWasteModal}
+            addWaste={() => {}}
+            styles={styles}
+            ThemeColors={ThemeColors}
+          />
+        ))}
+        {mixedData.map((data) => (
+          <WasteButton
+            key={data.id}
+            data={data}
+            wasteName="Seka"
+            wasteModal={chosenWaste?.name === "Seka" && chosenWaste?.visible}
+            showModal={() => showWasteModal("Seka")}
+            setWasteModal={hideWasteModal}
+            addWaste={() => {}}
+            styles={styles}
+            ThemeColors={ThemeColors}
+          />
+        ))}
+        {plasticData.map((data) => (
+          <WasteButton
+            key={data.id}
+            data={data}
+            wasteName="Muovi"
+            wasteModal={chosenWaste?.name === "Muovi" && chosenWaste?.visible}
+            showModal={() => showWasteModal("Muovi")}
+            setWasteModal={hideWasteModal}
+            addWaste={() => {}}
+            styles={styles}
+            ThemeColors={ThemeColors}
+          />
+        ))}
+        {cardboardData.map((data) => (
+          <WasteButton
+            key={data.id}
+            data={data}
+            wasteName="Pahvi"
+            wasteModal={chosenWaste?.name === "Pahvi" && chosenWaste?.visible}
+            showModal={() => showWasteModal("Pahvi")}
+            setWasteModal={hideWasteModal}
+            addWaste={() => {}}
+            styles={styles}
+            ThemeColors={ThemeColors}
+          />
+        ))}
+        {metalData.map((data) => (
+          <WasteButton
+            key={data.id}
+            data={data}
+            wasteName="Metalli"
+            wasteModal={chosenWaste?.name === "Metalli" && chosenWaste?.visible}
+            showModal={() => showWasteModal("Metalli")}
+            setWasteModal={hideWasteModal}
+            addWaste={() => {}}
+            styles={styles}
+            ThemeColors={ThemeColors}
+          />
+        ))}
+        {glassData.map((data) => (
+          <WasteButton
+            key={data.id}
+            data={data}
+            wasteName="Lasi"
+            wasteModal={chosenWaste?.name === "Lasi" && chosenWaste?.visible}
+            showModal={() => showWasteModal("Lasi")}
+            setWasteModal={hideWasteModal}
+            addWaste={() => {}}
+            styles={styles}
+            ThemeColors={ThemeColors}
+          />
+        ))}
+      </View>
+      <View style={styles.wasteTotal}>
+        <Text style={{ ...styles.text }}>Kuukausi yhteensä: {}</Text>
+        {initialWasteList.map((doc) => (
+          <Text key={doc.id} style={{ ...styles.text }}>
+            {doc.id}: {doc.määrä}
+            kg
+          </Text>
+        ))}
+      </View>
+      <View style={styles.buttonContainer}>
+        <BackButton />
+      </View>
+    </View>
+  );
 }
