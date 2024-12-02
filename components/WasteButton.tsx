@@ -16,9 +16,9 @@ interface WasteButtonProps {
   showModal: (wasteName: string) => void;
   setWasteModal: (visible: boolean) => void;
   addWaste: () => void;
-  styles: any; 
+  styles: any;
   ThemeColors: { tint: string };
-  date: {day: string, month: string, year: string};
+  date: { day: string; month: string; year: string };
 }
 
 export default function WasteButton({
@@ -32,8 +32,11 @@ export default function WasteButton({
   ThemeColors,
   date,
 }: WasteButtonProps) {
-  const [wasteAmount, setWasteAmount] = useState<number>(0);
+  const [wasteAmount, setWasteAmount] = useState<number>(data.määrä);
 
+  useEffect(() => {
+    setWasteAmount(data.määrä);
+  }, [data.määrä]);
 
   return (
     <View key={data.id} style={styles.wasteContainer}>
@@ -80,7 +83,13 @@ export default function WasteButton({
                   mode="contained"
                   buttonColor={ThemeColors.tint}
                   onPress={() => {
-                    WasteFunctions.AddWaste(wasteName, date.month, date.year, date.day, wasteAmount);
+                    WasteFunctions.AddWaste(
+                      wasteName,
+                      date.month,
+                      date.year,
+                      date.day,
+                      wasteAmount
+                    );
                     addWaste();
                     setWasteModal(false);
                   }}

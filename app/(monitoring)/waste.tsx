@@ -52,7 +52,6 @@ export default function waste() {
   const [wasteModal, setWasteModal] = useState(false);
   const [dateList, setDateList] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [wasteAmount, setWasteAmount] = useState<number>(0);
 
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
@@ -76,14 +75,6 @@ export default function waste() {
     setChosenWaste(null); // Close modal
   };
 
-  const initialWasteList = [
-    { id: "Bio", yksikkö: "g", määrä: 0 },
-    { id: "Muovi", yksikkö: "g", määrä: 0 },
-    { id: "Pahvi", yksikkö: "g", määrä: 0 },
-    { id: "Seka", yksikkö: "g", määrä: 0 },
-    { id: "Metalli", yksikkö: "g", määrä: 0 },
-    { id: "Lasi", yksikkö: "g", määrä: 0 },
-  ];
   useEffect(() => {
     setIsLoading(true);
     const getCurrentDate = () => {
@@ -104,118 +95,103 @@ export default function waste() {
     setIsLoading(false);
   }, []);
 
-  const fetchAndSetWasteData = async () => {
-    setIsFetching(true);
+const fetchAndSetWasteData = async (wasteName: string) => {
 
-    // First fetch existing data
-    const mixedWaste = await WasteFunctions.FetchMixedWaste(month, year, date);
-    const plasticWaste = await WasteFunctions.FetchPlasticWaste(
-      month,
-      year,
-      date
-    );
-    const cardboardWaste = await WasteFunctions.FetchCardboardWaste(
-      month,
-      year,
-      date
-    );
-    const metalWaste = await WasteFunctions.FetchMetalWaste(month, year, date);
-    const glassWaste = await WasteFunctions.FetchGlassWaste(month, year, date);
-    const bioWaste = await WasteFunctions.FetchBioWaste(month, year, date);
-
-    const totals = {
-      Bio: await WasteFunctions.getMonthTotal(month, year, "Bio"),
-      Muovi: await WasteFunctions.getMonthTotal(month, year, "Muovi"),
-      Pahvi: await WasteFunctions.getMonthTotal(month, year, "Pahvi"),
-      Seka: await WasteFunctions.getMonthTotal(month, year, "Seka"),
-      Metalli: await WasteFunctions.getMonthTotal(month, year, "Metalli"),
-      Lasi: await WasteFunctions.getMonthTotal(month, year, "Lasi"),
-    };
-
-    // Check for missing data and insert defaults if necessary
-    let shouldRefetch = false;
-
-    if (bioWaste === null) {
-      await WasteFunctions.AddWaste("Bio", month, year, date, 0);
-      shouldRefetch = true;
+  // Fetch specific waste data based on wasteName
+  const fetchWasteData = async (type: string) => {
+    switch (type) {
+      case "Bio":
+        return WasteFunctions.FetchBioWaste(month, year, date);
+      case "Muovi":
+        return WasteFunctions.FetchPlasticWaste(month, year, date);
+      case "Pahvi":
+        return WasteFunctions.FetchCardboardWaste(month, year, date);
+      case "Seka":
+        return WasteFunctions.FetchMixedWaste(month, year, date);
+      case "Metalli":
+        return WasteFunctions.FetchMetalWaste(month, year, date);
+      case "Lasi":
+        return WasteFunctions.FetchGlassWaste(month, year, date);
+      default:
+        throw new Error(`Unknown waste type: ${type}`);
     }
-    if (mixedWaste === null) {
-      await WasteFunctions.AddWaste("Seka", month, year, date, 0);
-      shouldRefetch = true;
-    }
-    if (plasticWaste === null) {
-      await WasteFunctions.AddWaste("Muovi", month, year, date, 0);
-      shouldRefetch = true;
-    }
-    if (cardboardWaste === null) {
-      await WasteFunctions.AddWaste("Pahvi", month, year, date, 0);
-      shouldRefetch = true;
-    }
-    if (metalWaste === null) {
-      await WasteFunctions.AddWaste("Metalli", month, year, date, 0);
-      shouldRefetch = true;
-    }
-    if (glassWaste === null) {
-      await WasteFunctions.AddWaste("Lasi", month, year, date, 0);
-      shouldRefetch = true;
-    }
-
-    // Re-fetch data if defaults were added
-    if (shouldRefetch) {
-      setIsFetching(true); 
-      const updatedMixedWaste = await WasteFunctions.FetchMixedWaste(
-        month,
-        year,
-        date
-      );
-      const updatedPlasticWaste = await WasteFunctions.FetchPlasticWaste(
-        month,
-        year,
-        date
-      );
-      const updatedCardboardWaste = await WasteFunctions.FetchCardboardWaste(
-        month,
-        year,
-        date
-      );
-      const updatedMetalWaste = await WasteFunctions.FetchMetalWaste(
-        month,
-        year,
-        date
-      );
-      const updatedGlassWaste = await WasteFunctions.FetchGlassWaste(
-        month,
-        year,
-        date
-      );
-      const updatedBioWaste = await WasteFunctions.FetchBioWaste(
-        month,
-        year,
-        date
-      );
-
-      setBioData(updatedBioWaste ? [updatedBioWaste] : []);
-      setMixedData(updatedMixedWaste ? [updatedMixedWaste] : []);
-      setPlasticData(updatedPlasticWaste ? [updatedPlasticWaste] : []);
-      setCardboardData(updatedCardboardWaste ? [updatedCardboardWaste] : []);
-      setMetalData(updatedMetalWaste ? [updatedMetalWaste] : []);
-      setGlassData(updatedGlassWaste ? [updatedGlassWaste] : []);
-    } else {
-      // Update state if no re-fetch is necessary
-      setBioData(bioWaste ? [bioWaste] : []);
-      setMixedData(mixedWaste ? [mixedWaste] : []);
-      setPlasticData(plasticWaste ? [plasticWaste] : []);
-      setCardboardData(cardboardWaste ? [cardboardWaste] : []);
-      setMetalData(metalWaste ? [metalWaste] : []);
-      setGlassData(glassWaste ? [glassWaste] : []);
-    }
-    setMonthTotals(totals);
-    setIsFetching(false); 
   };
 
-  useEffect(() => {
-    fetchAndSetWasteData();
-  }, [month, year, date]);
+  const addDefaultWasteIfMissing = async (type: string) => {
+    const wasteData = await fetchWasteData(type);
+    if (wasteData === null) {
+      await WasteFunctions.AddWaste(type, month, year, date, 0);
+
+      // Immediately update state with the newly added default data
+      const newWasteData = await fetchWasteData(type);
+      const setWasteData = {
+        Bio: setBioData,
+        Muovi: setPlasticData,
+        Pahvi: setCardboardData,
+        Seka: setMixedData,
+        Metalli: setMetalData,
+        Lasi: setGlassData,
+      }[type];
+
+      if (setWasteData) {
+        setWasteData(newWasteData ? [newWasteData] : []);
+      }
+
+      return true; // Indicates that a default value was added
+    }
+    return false; // No default needed
+  };
+
+  const fetchAndSetSpecificWasteData = async (type: string) => {
+    const wasteData = await fetchWasteData(type);
+    const setWasteData = {
+      Bio: setBioData,
+      Muovi: setPlasticData,
+      Pahvi: setCardboardData,
+      Seka: setMixedData,
+      Metalli: setMetalData,
+      Lasi: setGlassData,
+    }[type];
+
+    if (setWasteData) {
+      setWasteData(wasteData ? [wasteData] : []);
+    }
+  };
+
+  // Add default if missing, then fetch updated data if necessary
+  const shouldRefetch = await addDefaultWasteIfMissing(wasteName);
+
+  if (!shouldRefetch) {
+    await fetchAndSetSpecificWasteData(wasteName);
+  }
+
+  // Fetch month total for the given waste type
+  const monthTotal = await WasteFunctions.getMonthTotal(month, year, wasteName);
+
+  setMonthTotals((prevTotals) => ({
+    ...prevTotals,
+    [wasteName]: monthTotal,
+  }));
+};
+
+
+
+useEffect(() => {
+  const fetchAllWasteData = async () => {
+    const wasteTypes = ["Bio", "Muovi", "Pahvi", "Seka", "Metalli", "Lasi"];
+
+    setIsFetching(true);
+
+    // Create promises for all fetch operations
+    await Promise.all(
+      wasteTypes.map((wasteType) => fetchAndSetWasteData(wasteType))
+    );
+
+    setIsFetching(false);
+  };
+
+  fetchAllWasteData();
+}, [month, year, date]);;
 
   useEffect(() => {
     const fetchDatesWithData = async () => {
@@ -318,7 +294,7 @@ export default function waste() {
             showModal={() => showWasteModal("Bio")}
             setWasteModal={hideWasteModal}
             addWaste={() => {
-              fetchAndSetWasteData();
+              fetchAndSetWasteData("Bio");
             }}
             styles={styles}
             ThemeColors={ThemeColors}
@@ -334,7 +310,7 @@ export default function waste() {
             showModal={() => showWasteModal("Seka")}
             setWasteModal={hideWasteModal}
             addWaste={() => {
-              fetchAndSetWasteData();
+              fetchAndSetWasteData("Seka");
             }}
             styles={styles}
             ThemeColors={ThemeColors}
@@ -350,7 +326,7 @@ export default function waste() {
             showModal={() => showWasteModal("Muovi")}
             setWasteModal={hideWasteModal}
             addWaste={() => {
-              fetchAndSetWasteData();
+              fetchAndSetWasteData("Muovi");
             }}
             styles={styles}
             ThemeColors={ThemeColors}
@@ -366,7 +342,7 @@ export default function waste() {
             showModal={() => showWasteModal("Pahvi")}
             setWasteModal={hideWasteModal}
             addWaste={() => {
-              fetchAndSetWasteData();
+              fetchAndSetWasteData("Pahvi");
             }}
             styles={styles}
             ThemeColors={ThemeColors}
@@ -382,7 +358,7 @@ export default function waste() {
             showModal={() => showWasteModal("Metalli")}
             setWasteModal={hideWasteModal}
             addWaste={() => {
-              fetchAndSetWasteData();
+              fetchAndSetWasteData("Metalli");
             }}
             styles={styles}
             ThemeColors={ThemeColors}
@@ -398,7 +374,7 @@ export default function waste() {
             showModal={() => showWasteModal("Lasi")}
             setWasteModal={hideWasteModal}
             addWaste={() => {
-              fetchAndSetWasteData();
+              fetchAndSetWasteData("Lasi");
             }}
             styles={styles}
             ThemeColors={ThemeColors}
