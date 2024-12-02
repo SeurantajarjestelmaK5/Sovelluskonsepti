@@ -2,9 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { View, Text, Modal, TouchableWithoutFeedback } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button, TextInput } from "react-native-paper";
-import { useThemeColors } from "@/constants/ThemeColors";
-import { getWasteStyles } from "@/styles/monitoring/wasteStyles";
-
+import * as WasteFunctions from "@/components/functions/WasteFunctions";
 interface WasteData {
   id: string;
   yksikkö: string;
@@ -17,9 +15,10 @@ interface WasteButtonProps {
   wasteModal: boolean;
   showModal: (wasteName: string) => void;
   setWasteModal: (visible: boolean) => void;
-  addWaste: (id: string, amount: number) => void;
-  styles: any; // Pass the styles for layout, typography, etc.
-  ThemeColors: { tint: string }; // Theme colors for consistency
+  addWaste: () => void;
+  styles: any; 
+  ThemeColors: { tint: string };
+  date: {day: string, month: string, year: string};
 }
 
 export default function WasteButton({
@@ -31,6 +30,7 @@ export default function WasteButton({
   addWaste,
   styles,
   ThemeColors,
+  date,
 }: WasteButtonProps) {
   const [wasteAmount, setWasteAmount] = useState<number>(0);
 
@@ -80,8 +80,9 @@ export default function WasteButton({
                   mode="contained"
                   buttonColor={ThemeColors.tint}
                   onPress={() => {
-                    addWaste(data.id, wasteAmount);
-                    setWasteModal(false); // Close modal
+                    WasteFunctions.AddWaste(wasteName, date.month, date.year, date.day, wasteAmount);
+                    addWaste();
+                    setWasteModal(false);
                   }}
                 />
               </View>

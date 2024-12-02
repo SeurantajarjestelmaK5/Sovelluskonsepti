@@ -1,5 +1,5 @@
 import { db } from "../../firebase/config";
-import { collection, getDocs, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, setDoc, query } from "firebase/firestore";
 
 interface WasteData {
   id: string;
@@ -232,7 +232,6 @@ export const AddWaste = async (
   amount: number
 ): Promise<void> => {
   try {
-    // Construct document reference path
     const docRef = doc(
       db,
       "omavalvonta",
@@ -240,20 +239,16 @@ export const AddWaste = async (
       wasteType,
       year,
       month,
-      date // Path now includes 'year', 'month', 'date'
+      date 
     );
 
-    // Check if document exists
     const docSnapshot = await getDoc(docRef);
-    if (!docSnapshot.exists()) {
-      console.log("Document does not exist, creating new document...");
-    }
+    const currentAmount = docSnapshot.exists() ? docSnapshot.data().määrä : 0;  
 
-    // Set the document (this will create it if it doesn't exist)
     await setDoc(
       docRef,
       {
-        määrä: amount,
+        määrä: currentAmount + amount,
         yksikkö: "g",
       },
       { merge: true }
@@ -290,3 +285,4 @@ export const AddWaste = async (
     return 0;
   }
 };
+
