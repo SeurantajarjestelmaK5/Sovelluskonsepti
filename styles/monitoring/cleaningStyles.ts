@@ -1,8 +1,8 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { ThemeColors } from "@/constants/ThemeColors";
+import { WeekCalendar } from "react-native-calendars";
 
 const windowHeight = Dimensions.get("window").height;
-
 
 export const getCleaningStyles = (ThemeColors: ThemeColors) =>
   StyleSheet.create({
@@ -22,9 +22,8 @@ export const getCleaningStyles = (ThemeColors: ThemeColors) =>
     },
     content: {
       flex: 1,
-      justifyContent: "center",
+      justifyContent: "flex-start",
       alignItems: "center",
-      padding: 16,
       backgroundColor: ThemeColors.background,
     },
     header: {
@@ -32,9 +31,38 @@ export const getCleaningStyles = (ThemeColors: ThemeColors) =>
       color: ThemeColors.tint,
       marginBottom: 15,
     },
+    selectionContainer: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      alignItems: "center",
+      width: "100%",
+      marginTop: 20,
+    },
+    sideSelection: {
+      padding: 15,
+      borderRadius: 10,
+      backgroundColor: ThemeColors.navDefault,
+      width: "40%",
+      alignItems: "center",
+    },
+    selectedSide: {
+      padding: 15,
+      borderRadius: 10,
+      backgroundColor: ThemeColors.tint,
+      width: "40%",
+      alignItems: "center",
+    },
     text: {
-      fontSize: 24,
+      fontSize: 26,
       color: ThemeColors.text,
-      marginBottom: 15,
+    },
+    weekCalendar: {
+      width: "100%",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      backgroundColor: ThemeColors.navDefault,
+      padding: 15,
+      borderRadius: 10,
     },
   });
