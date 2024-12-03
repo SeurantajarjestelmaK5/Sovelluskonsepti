@@ -203,7 +203,7 @@ useEffect(() => {
       }
     };
 
-    if (month && year) {
+    if (month && year && date) {
       fetchDatesWithData(); // Fetch only when month and year are valid
     }
   }, [month, year, date]);
@@ -272,7 +272,7 @@ useEffect(() => {
           onDismiss={() => setCalendarModal(false)}
         >
           <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}>
               <CalendarComponent
                 onDayPress={handleDatePress}
                 dataDates={dateList}

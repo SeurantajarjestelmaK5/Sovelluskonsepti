@@ -63,6 +63,7 @@ export default function CalendarComponent({
   dataDates,
   selectedDate,
 }: CalendarProps) {
+  const [initialDate, setInitialDate] = useState(new Date());
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 
@@ -99,6 +100,7 @@ export default function CalendarComponent({
       style={styles.calendar}
       hideExtraDays={true}
       markedDates={markedDates}
+      initialDate={selectedDate ? selectedDate : initialDate}
       theme={{
         calendarBackground: ThemeColors.navDefault,
         textSectionTitleColor: ThemeColors.text,
