@@ -34,6 +34,7 @@ export default function WasteButton({
 }: WasteButtonProps) {
   const [wasteAmount, setWasteAmount] = useState<number>(data.määrä);
 
+  // Sync wasteAmount with the data prop
   useEffect(() => {
     setWasteAmount(data.määrä);
   }, [data.määrä]);
@@ -43,12 +44,10 @@ export default function WasteButton({
       <View style={styles.wasteContent}>
         <Text style={styles.text}>{wasteName}</Text>
         <Text style={styles.text}>
-          {data.määrä}
-          {data.yksikkö}
+          {wasteAmount} {data.yksikkö}
         </Text>
       </View>
 
-      {/* Add waste button */}
       <MaterialCommunityIcons
         name="plus"
         size={35}
@@ -56,7 +55,6 @@ export default function WasteButton({
         onPress={() => showModal(wasteName)}
       />
 
-      {/* Waste modal */}
       <Modal
         visible={wasteModal}
         animationType="slide"
@@ -82,15 +80,15 @@ export default function WasteButton({
                   contentStyle={{ flexDirection: "row-reverse" }}
                   mode="contained"
                   buttonColor={ThemeColors.tint}
-                  onPress={() => {
-                    WasteFunctions.AddWaste(
+                  onPress={async () => {
+                    await WasteFunctions.AddWaste(
                       wasteName,
                       date.month,
                       date.year,
                       date.day,
                       wasteAmount
                     );
-                    addWaste();
+                    addWaste(); // This triggers re-fetch in the parent
                     setWasteModal(false);
                   }}
                 />

@@ -63,7 +63,7 @@ export default function CalendarComponent({
   dataDates,
   selectedDate,
 }: CalendarProps) {
-  const [initialDate, setInitialDate] = useState(new Date());
+  const [initialDate, setInitialDate] = useState<string>("");
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 

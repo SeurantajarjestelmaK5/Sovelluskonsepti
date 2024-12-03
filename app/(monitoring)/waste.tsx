@@ -95,9 +95,8 @@ export default function waste() {
     setIsLoading(false);
   }, []);
 
-const fetchAndSetWasteData = async (wasteName: string) => {
 
-  // Fetch specific waste data based on wasteName
+const fetchAndSetWasteData = async (wasteName: string) => {
   const fetchWasteData = async (type: string) => {
     switch (type) {
       case "Bio":
@@ -121,9 +120,7 @@ const fetchAndSetWasteData = async (wasteName: string) => {
     const wasteData = await fetchWasteData(type);
     if (wasteData === null) {
       await WasteFunctions.AddWaste(type, month, year, date, 0);
-
-      // Immediately update state with the newly added default data
-      const newWasteData = await fetchWasteData(type);
+      const newWasteData = await fetchWasteData(type); // Fetch updated data immediately
       const setWasteData = {
         Bio: setBioData,
         Muovi: setPlasticData,
@@ -133,47 +130,34 @@ const fetchAndSetWasteData = async (wasteName: string) => {
         Lasi: setGlassData,
       }[type];
 
-      if (setWasteData) {
-        setWasteData(newWasteData ? [newWasteData] : []);
-      }
-
-      return true; // Indicates that a default value was added
+      if (setWasteData) setWasteData(newWasteData ? [newWasteData] : []);
+      return true;
     }
-    return false; // No default needed
+    return false;
   };
 
-  const fetchAndSetSpecificWasteData = async (type: string) => {
-    const wasteData = await fetchWasteData(type);
-    const setWasteData = {
-      Bio: setBioData,
-      Muovi: setPlasticData,
-      Pahvi: setCardboardData,
-      Seka: setMixedData,
-      Metalli: setMetalData,
-      Lasi: setGlassData,
-    }[type];
+  await addDefaultWasteIfMissing(wasteName);
+  const updatedWasteData = await fetchWasteData(wasteName);
 
-    if (setWasteData) {
-      setWasteData(wasteData ? [wasteData] : []);
-    }
-  };
+  // Update the specific waste data immediately
+  const setWasteData = {
+    Bio: setBioData,
+    Muovi: setPlasticData,
+    Pahvi: setCardboardData,
+    Seka: setMixedData,
+    Metalli: setMetalData,
+    Lasi: setGlassData,
+  }[wasteName];
 
-  // Add default if missing, then fetch updated data if necessary
-  const shouldRefetch = await addDefaultWasteIfMissing(wasteName);
+  if (setWasteData) setWasteData(updatedWasteData ? [updatedWasteData] : []);
 
-  if (!shouldRefetch) {
-    await fetchAndSetSpecificWasteData(wasteName);
-  }
-
-  // Fetch month total for the given waste type
+  // Update monthly totals
   const monthTotal = await WasteFunctions.getMonthTotal(month, year, wasteName);
-
   setMonthTotals((prevTotals) => ({
     ...prevTotals,
     [wasteName]: monthTotal,
   }));
 };
-
 
 
 useEffect(() => {
@@ -191,7 +175,7 @@ useEffect(() => {
   };
 
   fetchAllWasteData();
-}, [month, year, date]);;
+}, [month, year, date, bioData.length, ]);;
 
   useEffect(() => {
     const fetchDatesWithData = async () => {
@@ -292,7 +276,10 @@ useEffect(() => {
             date={{ day: date, month: month, year: year }}
             wasteModal={chosenWaste?.name === "Bio" && chosenWaste?.visible}
             showModal={() => showWasteModal("Bio")}
-            setWasteModal={hideWasteModal}
+            setWasteModal={() => {
+              fetchAndSetWasteData("Bio");
+              hideWasteModal();
+            }}
             addWaste={() => {
               fetchAndSetWasteData("Bio");
             }}
