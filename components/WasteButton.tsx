@@ -32,11 +32,12 @@ export default function WasteButton({
   ThemeColors,
   date,
 }: WasteButtonProps) {
-  const [wasteAmount, setWasteAmount] = useState<number>(data.määrä);
+  const [displayedAmount, setDisplayedAmount] = useState<number>(data.määrä);
+  const [wasteAmount, setWasteAmount] = useState<number>(0);
 
   // Sync wasteAmount with the data prop
   useEffect(() => {
-    setWasteAmount(data.määrä);
+    setDisplayedAmount(data.määrä);
   }, [data.määrä]);
 
   return (
@@ -44,7 +45,7 @@ export default function WasteButton({
       <View style={styles.wasteContent}>
         <Text style={styles.text}>{wasteName}</Text>
         <Text style={styles.text}>
-          {wasteAmount} {data.yksikkö}
+          {displayedAmount} {data.yksikkö}
         </Text>
       </View>
 
