@@ -121,7 +121,6 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       borderBottomWidth: 1,
       borderColor: "#e0e0e0",
       width: "100%",
-      backgroundColor: ThemeColors.navSelected,
     },
     columnHeader: {
       flex: 1,
@@ -140,7 +139,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       fontSize: 16,
       textAlign: "center",
-      backgroundColor: ThemeColors.text,
+      backgroundColor: ThemeColors.editableField,
       color: ThemeColors.background,
       height: 25,
     },
