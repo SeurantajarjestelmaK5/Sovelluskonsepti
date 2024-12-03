@@ -109,7 +109,6 @@ export default function Diningroom() {
         onEndEditing={() => handleEditingEnd(item, "Määrä", index)}
         keyboardType="numeric"
       />
-      <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
       <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
       <TextInput
         removeClippedSubviews={false}  
