@@ -7,6 +7,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getCleaningStyles } from "@/styles/monitoring/cleaningStyles";
+import WeekView from "@/components/WeekView";
 
 export default function cleaning() {
   const [week, setWeek] = useState(1);
@@ -19,11 +20,12 @@ export default function cleaning() {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.header}>Viikkosiivous</Text>
-        <View style={styles.weekCalendar}>
+        {/* <View style={styles.weekCalendar}>
           <AntDesign name="caretleft" size={24} color={ThemeColors.tint} />
           <Text style={styles.text}>Viikko 1 6. - 12.1.2025 </Text>
           <AntDesign name="caretright" size={24} color={ThemeColors.tint} />
-        </View>
+        </View> */}
+        <WeekView />
         <View style={styles.selectionContainer}>
           <Pressable
             onPress={() => {
