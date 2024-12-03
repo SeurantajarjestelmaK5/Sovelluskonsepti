@@ -140,10 +140,12 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       fontSize: 16,
       textAlign: "center",
       backgroundColor: ThemeColors.editableField,
-      color: ThemeColors.background,
-      height: 25,
+      color: "black",
+      height: "auto",
+      borderRadius: 5,
+      marginLeft: 5,
     },
-    bottomButtons: {
+    bottomButtons: { 
       flex: 0.1,
       width: "100%",
       flexDirection: "row-reverse",
