@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Appearance, Switch } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
+import { ThemedText } from "@/components/themes/ThemedText";
 import { Text, View, useColorScheme } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { Colors } from "@/constants/Colors";

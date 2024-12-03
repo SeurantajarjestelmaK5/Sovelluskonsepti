@@ -2,7 +2,7 @@ import React, {useMemo} from "react";
 import { Link } from "expo-router";
 import { Text, View } from "react-native";
 import { Button } from "react-native-paper";
-import BackButton from "@/components/BackButton";
+import BackButton from "@/components/buttons/BackButton";
 
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getTempStyles } from "@/styles/monitoring/tempStyles";

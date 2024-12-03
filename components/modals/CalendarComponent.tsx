@@ -6,7 +6,7 @@ import {
   LocaleConfig,
   DateData,
 } from "react-native-calendars";
-import { useThemeColors } from "../constants/ThemeColors";
+import { useThemeColors } from "../../constants/ThemeColors";
 import { getCalendarStyles } from "@/styles/components/calendarStyle";
 
 LocaleConfig.locales["fi"] = {

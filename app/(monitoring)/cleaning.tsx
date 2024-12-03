@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "react-native-paper";
-import BackButton from "@/components/BackButton";
+import BackButton from "@/components/buttons/BackButton";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 import { useThemeColors } from "@/constants/ThemeColors";
