@@ -1,19 +1,19 @@
-import YearMonthPickerModal from "@/components/YearPicker";
+import YearMonthPickerModal from "@/components/modals/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { Alert, FlatList, Pressable, Text, TextInput, View, KeyboardAvoidingView } from "react-native";
 import { db } from "@/firebase/config";
-import AddItemModal from "@/components/AddItemModal";
+import AddItemModal from "@/components/modals/AddItemModal";
 import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
-import BackButton from "@/components/BackButton";
-import LoadingScreen from "@/components/LoadingScreen";
+import BackButton from "@/components/buttons/BackButton";
+import LoadingScreen from "@/components/misc/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
-import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
+import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
 import { exportAndSendData } from "@/scripts/mailSender";
-import AddItemButton from "@/components/AddItemButton";
-import SendInventoryButton from "@/components/SendInventoryButton";
+import AddItemButton from "@/components/buttons/AddItemButton";
+import SendInventoryButton from "@/components/buttons/SendInventoryButton";
 
 
 export interface InventoryItem {

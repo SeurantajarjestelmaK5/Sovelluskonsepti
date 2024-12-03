@@ -9,13 +9,13 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
-import CalendarComponent from "@/components/CalendarComponent";
+import CalendarComponent from "@/components/modals/CalendarComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import BackButton from "@/components/BackButton";
+import BackButton from "@/components/buttons/BackButton";
 import WasteButton from "@/components/WasteButton";
 import * as WasteFunctions from "@/components/functions/WasteFunctions";
-import LoadingScreen from "@/components/LoadingScreen";
-import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
+import LoadingScreen from "@/components/misc/LoadingScreen";
+import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useColorScheme } from "react-native";
 import { getWasteStyles } from "@/styles/monitoring/wasteStyles";
