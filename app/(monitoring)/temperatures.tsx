@@ -1,134 +1,219 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Modal, Pressable, Text, View } from "react-native";
 import BackButton from "@/components/buttons/BackButton";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getTempStyles } from "@/styles/monitoring/tempStyles";
 import { db } from "@/firebase/config";
-import { collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextInput } from "react-native-paper";
 import YearMonthPickerModal from "@/components/modals/YearPicker";
+import { Calendar } from "react-native-calendars";
 
 export default function Temperatures() {
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getTempStyles(ThemeColors), [ThemeColors]);
   const categories = ["Tiskikone", "Liha", "Jäähdytys"];
   const [selectedCategory, setSelectedCategory] = useState(categories[0]); // Default to the first category
-  const [selectedDateMMYY, setSelectedDateMMYY] = useState<string | null>(null);
+  const [selectedDateMMYY, setSelectedDateMMYY] = useState<string>(() => {
+    const currentDate = new Date();
+    const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+    const currentYear = currentDate.getFullYear();
+    return `${currentMonth}-${currentYear}`;
+  });
   const [modalVisible, setModalVisible] = useState(false);
+  const [categoryData, setCategoryData] = useState<any[]>([]); // To store data fetched from Firebase
+  const [isCalendarVisible, setCalendarVisible] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<string>("Päivämäärä"); // Default placeholder
 
+  /** Function to Fetch Data from Firebase Based on Category and Date */
+  const fetchCategoryData = async () => {
+   
+    try {
+      const [month, year] = selectedDateMMYY.split("-");
+      const collectionRef = collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month);
+      const snapshot = await getDocs(collectionRef);
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      console.log(data);
+      
+      setCategoryData(data);
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    }
+  };
 
-  /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
+  /** Trigger Data Fetching when Category or Date Changes */
+  useEffect(() => {
+    fetchCategoryData();
+  }, [selectedCategory, selectedDateMMYY]);
 
-
+  /** Date Formatting for Display */
   const getFormattedDate = () => {
     const finnishMonths = [
       "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kesäkuu",
-      "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"
+      "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu",
     ];
-
     if (!selectedDateMMYY) return "";
     const [month, year] = selectedDateMMYY.split("-");
     const monthName = finnishMonths[parseInt(month) - 1];
     return `${monthName} ${year}`;
   };
 
-  useEffect(() => {    
-    if (!selectedDateMMYY) {
-      const currentDate = new Date();
-      const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
-      const currentYear = currentDate.getFullYear();
-      setSelectedDateMMYY(`${currentMonth}-${currentYear}`);
-      console.log("date selected", selectedDateMMYY);
-    }
-  }, [selectedDateMMYY]);
 
-/** PÄÄ CONTENTIN RENDERÖINTI */
+/** JÄÄHDYTYS TIETOKANTA HELPPERIT */
 
+const [product, setProduct] = useState("");
+const [initialTemp, setInitialTemp] = useState("");
+const [finalTemp, setFinalTemp] = useState("");
+const [time, setTime] = useState("");
+const [date, setDate] = useState("");
+
+
+const handleAdd = async () => {
+  if (!product || !initialTemp || !finalTemp || !time || !date) {
+    alert("Täytä kaikki kentät!"); // "Fill in all fields!"
+    return;
+  }
+  try {
+    const [month, year] = selectedDateMMYY.split("-");
+    const currentDay = new Date().getDate().toString(); // Get current day as a string
+    const collectionRef = doc(collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month), `${currentDay}-${month}-${product}` );
+
+    await setDoc(collectionRef, {
+      Tuote: product,
+      Alkulämpö: parseFloat(initialTemp),
+      Loppulämpö: parseFloat(finalTemp),
+      Aika: parseFloat(time),
+      Pvm: date,
+    });
+
+    setProduct("");
+    setInitialTemp("");
+    setFinalTemp("");
+    setTime("");
+    setDate("");
+
+    alert("Data tallennettu onnistuneesti!"); // "Data saved successfully!"
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    alert("Virhe tietojen tallennuksessa."); // "Error saving data."
+  }
+};
+
+/** JÄÄHDYTYS HELPPERIT LOPPUU */
+
+  /** Content Rendering Based on Selected Category */
   const renderContent = () => {
     switch (selectedCategory) {
       case "Tiskikone":
         return (
           <View>
-           
+            {categoryData.map((item) => (
+              <View key={item.id} style={styles.tableRow}>
+                <Text style={styles.text}>{item.name}</Text>
+                <Text style={styles.text}>{item.temperature}°C</Text>
+              </View>
+            ))}
           </View>
         );
       case "Liha":
         return (
           <View>
             <Text style={styles.text}>Liha lämpötilat:</Text>
-            <Text style={styles.text}>+4°C</Text>
+            {categoryData.map((item) => (
+              <View key={item.id} style={styles.tableRow}>
+                <Text style={styles.text}>{item.product}</Text>
+                <Text style={styles.text}>{item.temperature}°C</Text>
+              </View>
+            ))}
           </View>
         );
-      case "Jäähdytys":
-        return (
-          <View style={[styles.container, {backgroundColor: "#fff"}]}>
-            <View style={[styles.content, {maxHeight: "35%"}]}>
-            <View style={styles.tableRow}>
-              <Text style={styles.text}>Tuote</Text>
-            <MaterialCommunityIcons
-            name="thermometer-plus"
-            size={43}/>
-            <MaterialCommunityIcons
-            name="thermometer-minus"
-            size={43}/>
-            <MaterialCommunityIcons
-            name="clock"
-            size={43}/>
-            <MaterialCommunityIcons
-            name="calendar"
-            size={43}/>
-           </View>
-           <View style={styles.tableRow}>
-            <TextInput/>
-            <TextInput
-            keyboardType="numeric"
-            />
-            <TextInput
-            keyboardType="numeric"
-            />
-            <TextInput
-            keyboardType="numeric"
-            />
-            <TextInput
-            keyboardType="numeric"
-            />
-           </View>
-           <Pressable style={styles.button}>
-            <Text>Lisää</Text>
-           </Pressable>
-           </View>
-
-           <View style={styles.content}>
-           <Pressable
-            style={styles.calendarButton}
-            onPress={() => setModalVisible(true)}>
-        <Text style={styles.text}>{getFormattedDate()}</Text>
-        <MaterialCommunityIcons
-          name="calendar"
-          size={43}
-        />
-      </Pressable>
-        <View style={styles.tableRow} key={``}>
-          <Text>
-
-          </Text>
-        </View>  
-      </View>
-           
-          </View>
-        );
+        case "Jäähdytys":
+          return (
+            <View style={[styles.container, { backgroundColor: "#fff" }]}>
+              {/* Input Fields Section */}
+              <View style={[styles.content, { maxHeight: "35%" }]}>
+                <View style={styles.tableRow}>
+                  <Text style={styles.text}>Tuote</Text>
+                  <MaterialCommunityIcons name="thermometer-plus" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="thermometer-minus" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="clock" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
+                </View>
+                <View style={styles.tableRow}>
+                  <TextInput
+                    placeholder="Tuote"
+                    value={product}
+                    onChangeText={setProduct}
+                  />
+                  <TextInput
+                    placeholder="Alkulämpö"
+                    value={initialTemp}
+                    onChangeText={setInitialTemp}
+                    keyboardType="numeric"
+                  />
+                  <TextInput
+                    placeholder="Loppulämpö"
+                    value={finalTemp}
+                    onChangeText={setFinalTemp}
+                    keyboardType="numeric"
+                  />
+                  <TextInput
+                    placeholder="Aika"
+                    value={time}
+                    onChangeText={setTime}
+                    keyboardType="numeric"
+                  />
+                   <Pressable style={styles.button} onPress={openCalendar}>
+                  <Text>{selectedDay}</Text>
+                </Pressable>
+                </View>
+                <Pressable style={styles.button} onPress={handleAdd}>
+                  <Text>Lisää</Text>
+                </Pressable>
+              </View>
+        
+              {/* Data Display Section */}
+              <View style={styles.content}>
+                <Pressable
+                  style={styles.calendarButton}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text style={styles.text}>{getFormattedDate()}</Text>
+                  <MaterialCommunityIcons name="calendar" size={43} />
+                </Pressable>
+                {categoryData.map((item) => (
+                  <View style={styles.tableRow} key={item.id}>
+                    <Text style={styles.text}>{item.Tuote}</Text>
+                    <Text style={styles.text}>{item.Alkulämpö}</Text>
+                    <Text style={styles.text}>{item.Loppulämpö}</Text>
+                    <Text style={styles.text}>{item.Pvm}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          );
       default:
         return null;
     }
   };
-  /** PÄÄCONTENTIN RENDERÖINTI LOPPUU */
-  /** MODAALIEN HELPPERIT ALKAA */
 
+  /** Modal Confirmation Handler */
   const handleConfirm = (formattedDate: string) => {
     setSelectedDateMMYY(formattedDate);
     setModalVisible(false);
   };
+  /** Calendar Modal Handlers */
+  const openCalendar = () => setCalendarVisible(true);
+  const closeCalendar = () => setCalendarVisible(false);
+  const onDateSelected = (day: any) => {
+    setSelectedDay(day.dateString.split('-').slice(1).reverse().join('.')); // Save selected date (YYYY-MM-DD)
+    console.log("closing");
+    
+    closeCalendar();
+  };
+  /** Main Component Return */
+ 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Lämpötilat</Text>
@@ -139,13 +224,13 @@ export default function Temperatures() {
           flexDirection: "row",
           marginVertical: 10,
           backgroundColor: "#fff",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <FlatList
           contentContainerStyle={styles.scrollList}
           data={categories}
-          horizontal={true}
+          horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
             <Pressable
@@ -175,11 +260,45 @@ export default function Temperatures() {
       {/* Footer Section */}
       <View style={styles.buttonContainer}>
         <YearMonthPickerModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onConfirm={handleConfirm}
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          onConfirm={handleConfirm}
         />
         <BackButton />
+        <Modal
+      visible={isCalendarVisible}
+      transparent={true} // Makes the modal background transparent
+      animationType="slide" // Optional: Add slide animation
+      onRequestClose={closeCalendar} // Android back button closes modal
+    >
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)", // Dim background
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: ThemeColors.background,
+            borderRadius: 10,
+            padding: 20,
+            width: "90%",
+          }}
+        >
+          <Calendar
+            onDayPress={onDateSelected} // Handle date selection
+            markedDates={{
+              [selectedDay]: { selected: true }, // Highlight selected date
+            }}
+          />
+          <Pressable onPress={closeCalendar} style={styles.closeButton}>
+            <Text style={styles.text}>Sulje</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>
       </View>
     </View>
   );

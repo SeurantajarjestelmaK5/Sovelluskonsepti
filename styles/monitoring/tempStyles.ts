@@ -81,4 +81,16 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
       paddingHorizontal: 10,
       justifyContent: "space-between",
     },
+    closeButton: {
+      height: 50,
+      width: "50%",
+      backgroundColor: ThemeColors.navSelected,
+      borderRadius: 20,
+      marginTop: 20,
+      paddingHorizontal: 10,
+      alignItems: "center",
+      alignSelf: "center",
+      paddingLeft: 30,
+      paddingTop: 5
+    }
   });

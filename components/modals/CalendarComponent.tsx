@@ -93,6 +93,7 @@ export default function CalendarComponent({
     return marks;
   }, [transformedDates, selectedDate, ThemeColors]);
 
+
   return (
     <Calendar
       onDayPress={onDayPress}
