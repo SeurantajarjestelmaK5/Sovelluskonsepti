@@ -7,9 +7,11 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getCleaningStyles } from "@/styles/monitoring/cleaningStyles";
+import * as CleaningFunctions from "@/components/functions/CleaningFunctions";
 
 export default function Cleaning() {
   const [year, setYear] = useState<string>("");
+  const [month, setMonth] = useState<string>("");
   const [startOfWeek, setStartOfWeek] = useState<string>("");
   const [endOfWeek, setEndOfWeek] = useState<string>("");
   const [currentDate, setCurrentDate] = useState<Date>(new Date()); 
@@ -18,10 +20,19 @@ export default function Cleaning() {
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCleaningStyles(ThemeColors), [ThemeColors]);
 
+  const propWeek = startOfWeek + "-" + endOfWeek;
+
+
   useEffect(() => {
     updateWeekRange(currentDate); 
-  }, [currentDate]);
 
+    // CleaningFunctions.FetchCleaning(year, month, currWeek, day, side).then((data) => {
+    //   if (data) {
+    //     console.log(data);
+    //   }
+    // });
+  }, [currentDate]);
+    console.log(startOfWeek + "-" + endOfWeek, month, year, selectedSide);
   function updateWeekRange(date: Date) {
     const { startOfWeek, endOfWeek } = getWeekRange(date);
 
@@ -34,6 +45,7 @@ export default function Cleaning() {
 
     // Format dates and update state
     setYear(startOfWeek.getFullYear().toString());
+    setMonth((startOfWeek.getMonth() + 1).toString());
     setStartOfWeek(formatDate(startOfWeek));
     setEndOfWeek(formatDate(endOfWeek));
   }
@@ -58,7 +70,11 @@ export default function Cleaning() {
         <Text style={styles.header}>Viikkosiivous</Text>
         <View style={styles.weekCalendar}>
           <Pressable
-            onPress={() => handleWeekChange(-7)}
+            onPress={() => {
+              handleWeekChange(-7)
+              CleaningFunctions.initializeWeekCleaning(year, month, propWeek, "Tiistai", selectedSide);
+            }
+            }
             hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
           >
             <AntDesign
