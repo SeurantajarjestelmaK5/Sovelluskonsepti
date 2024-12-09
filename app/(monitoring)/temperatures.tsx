@@ -30,14 +30,11 @@ export default function Temperatures() {
 
   /** Function to Fetch Data from Firebase Based on Category and Date */
   const fetchCategoryData = async () => {
-   
     try {
       const [month, year] = selectedDateMMYY.split("-");
       const collectionRef = collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month);
       const snapshot = await getDocs(collectionRef);
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      console.log(data);
-      
+      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));      
       setCategoryData(data);
     } catch (error) {
       console.error("Error fetching category data:", error);
@@ -68,20 +65,22 @@ export default function Temperatures() {
       const currentYear = currentDate.getFullYear();
       setSelectedDateMMYY(`${currentMonth}-${currentYear}`);
       console.log("date selected");
-      
     }
   }, [selectedDateMMYY]);
 
 /** JÄÄHDYTYS TIETOKANTA HELPPERIT */
 
 const [product, setProduct] = useState("");
+const [temp1, setTemp1] = useState("");
+const [temp2, setTemp2] = useState("");
 const [initialTemp, setInitialTemp] = useState("");
 const [finalTemp, setFinalTemp] = useState("");
 const [time, setTime] = useState("");
 const [date, setDate] = useState("");
 
 
-const handleAdd = async () => {
+const handleAdd = async (category : string, meatType? : string) => {
+  if (category == "Jäähdytys ") {
   if (!product || !initialTemp || !finalTemp || !time || !date) {
     alert("Täytä kaikki kentät!"); // "Fill in all fields!"
     return;
@@ -104,13 +103,42 @@ const handleAdd = async () => {
     setFinalTemp("");
     setTime("");
     fetchCategoryData()
-    alert("Data tallennettu onnistuneesti!"); // "Data saved successfully!"
+    alert("Tiedot tallennettu onnistuneesti!"); // "Data saved successfully!"
     
   } catch (error) {
     console.error("Error adding document: ", error);
     alert("Virhe tietojen tallennuksessa."); // "Error saving data."
   }
-};
+} else if (category == "Liha") {
+
+  if (!date || (meatType === "Nauta" && !temp1) || (meatType === "Porsas" && !temp2)) {
+    alert("Täytä kaikki kentät!"); // "Fill in all fields!"
+    return;
+  }
+  try {
+
+    const [month, year] = selectedDateMMYY.split("-");
+    const reFormat = date.split('.').join('-')
+    const collectionRef = doc(collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month), `${reFormat}-${meatType}` );
+    const tempToSave = meatType === "Nauta" ? temp1 : temp2; // Determine which temp to save
+
+    await setDoc(collectionRef, {
+      Tuote: meatType,
+      Lämpötila: parseFloat(tempToSave),
+      Pvm: date,
+    });
+
+    if (meatType === "Nauta") setTemp1("");
+    if (meatType === "Porsas") setTemp2("");
+
+    alert("Tiedot tallennettu onnistuneesti!"); // "Data saved successfully!"
+
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        alert("Virhe tietojen tallennuksessa."); // "Error saving data."
+      }
+   }
+}
 
 const confirmDeleteItem = (item: any) => {
   Alert.alert(
@@ -127,14 +155,9 @@ const confirmDeleteItem = (item: any) => {
 const removeInventoryItem = async (item: any) => {
   try {
     const [month, year] = selectedDateMMYY.split("-");
-    const reFormat = item.Pvm.split('.').join('-')
-    console.log(reFormat, month, year);
-  
-    const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}-${item.Tuote}`);
-    console.log(itemRef);
-    
+    const reFormat = item.Pvm.split('.').join('-')  
+    const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}-${item.Tuote}`);    
     await deleteDoc(itemRef); // Remove from Firebase
-    console.log("deleted");
     setItemAdded(true)
     updateData()
   } catch (error) {
@@ -166,14 +189,71 @@ const updateData = () => {
         );
       case "Liha":
         return (
-          <View>
-            <Text style={styles.text}>Liha lämpötilat:</Text>
-            {categoryData.map((item) => (
-              <View key={item.id} style={styles.tableRow}>
-                <Text style={styles.text}>{item.product}</Text>
-                <Text style={styles.text}>{item.temperature}°C</Text>
+          <View style={[styles.container,  ]}>
+              <View style={[styles.content, { maxHeight: "40%",  marginBottom: 50}]}>
+              <View style={[styles.tableRow, {marginTop: 50, }]}>
+                <Text></Text>
+                <Text style={styles.text}>Nauta</Text>
+                <Text style={styles.text}> Porsas</Text>
               </View>
-            ))}
+              <View style={styles.tableRow}>
+              <MaterialCommunityIcons name="thermometer" size={43} color={ThemeColors.text} />
+              <TextInput
+                placeholder="Lämpötila"
+                keyboardType="numeric"
+                value={temp1}
+                onChangeText={setTemp1}
+              />
+              <TextInput
+                placeholder="Lämpötila"
+                keyboardType="numeric"
+                value={temp2}
+                onChangeText={setTemp2}
+              />
+              </View>
+              <View style={styles.tableRow}>
+              <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
+              <Pressable style={styles.button} onPress={openCalendar}>
+                  <Text>{selectedDay}</Text>
+                </Pressable>
+              <Pressable style={styles.button} onPress={openCalendar}>
+                  <Text>{selectedDay}</Text>
+                </Pressable>
+              </View>
+              <View style={styles.tableRow}>
+                <Text></Text>
+                <Pressable style={[styles.button]}
+                  onPress={()=>{handleAdd(selectedCategory, "Nauta")}}
+                >
+                  <Text >Lisää</Text>
+                </Pressable>
+                <Pressable style={styles.button}
+                  onPress={()=>{handleAdd(selectedCategory, "Porsas")}}
+                >
+                  <Text >Lisää</Text>
+                </Pressable>
+              
+              </View>
+            </View>
+            <View style={styles.content}>
+              <Pressable
+                  style={[styles.calendarButton]}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text style={styles.text}>{getFormattedDate()}</Text>
+                  <MaterialCommunityIcons name="calendar" size={43} />
+                </Pressable>
+                {categoryData.map((item) => (
+                  <View style={styles.tableRow} key={item.id}>
+                    <Text style={styles.text}>{item.Tuote}</Text>
+                    <Text style={styles.text}>+{item.Lämpötila}C</Text>
+                    <Text style={styles.text}>{item.Pvm}</Text>
+                    <Pressable onPress={() => confirmDeleteItem(item)}>
+                        <MaterialCommunityIcons name="trash-can-outline" size={43} />
+                    </Pressable>
+                  </View>
+                ))}
+            </View>
           </View>
         );
         case "Jäähdytys":
@@ -216,7 +296,7 @@ const updateData = () => {
                   <Text>{selectedDay}</Text>
                 </Pressable>
                 </View>
-                <Pressable style={styles.button} onPress={handleAdd}>
+                <Pressable style={styles.button} onPress={() =>{handleAdd(selectedCategory)}}>
                   <Text>Lisää</Text>
                 </Pressable>
               </View>
@@ -224,7 +304,7 @@ const updateData = () => {
               {/* Data Display Section */}
               <View style={styles.content}>
                 <Pressable
-                  style={styles.calendarButton}
+                  style={[styles.calendarButton]}
                   onPress={() => setModalVisible(true)}
                 >
                   <Text style={styles.text}>{getFormattedDate()}</Text>
