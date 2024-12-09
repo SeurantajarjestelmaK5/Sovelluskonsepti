@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { FlatList, Modal, Pressable, Text, View } from "react-native";
+import { Alert, FlatList, Modal, Pressable, Text, View } from "react-native";
 import BackButton from "@/components/buttons/BackButton";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getTempStyles } from "@/styles/monitoring/tempStyles";
 import { db } from "@/firebase/config";
-import { addDoc, collection, doc, getDocs, setDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextInput } from "react-native-paper";
 import YearMonthPickerModal from "@/components/modals/YearPicker";
@@ -25,6 +25,8 @@ export default function Temperatures() {
   const [categoryData, setCategoryData] = useState<any[]>([]); // To store data fetched from Firebase
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>("Päivämäärä"); // Default placeholder
+  const [itemAdded, setItemAdded] = useState(false);
+
 
   /** Function to Fetch Data from Firebase Based on Category and Date */
   const fetchCategoryData = async () => {
@@ -59,6 +61,16 @@ export default function Temperatures() {
     return `${monthName} ${year}`;
   };
 
+  useEffect(() => {
+    if (!selectedDateMMYY) {
+      const currentDate = new Date();
+      const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const currentYear = currentDate.getFullYear();
+      setSelectedDateMMYY(`${currentMonth}-${currentYear}`);
+      console.log("date selected");
+      
+    }
+  }, [selectedDateMMYY]);
 
 /** JÄÄHDYTYS TIETOKANTA HELPPERIT */
 
@@ -76,8 +88,8 @@ const handleAdd = async () => {
   }
   try {
     const [month, year] = selectedDateMMYY.split("-");
-    const currentDay = new Date().getDate().toString(); // Get current day as a string
-    const collectionRef = doc(collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month), `${currentDay}-${month}-${product}` );
+    const reFormat = date.split('.').join('-')
+    const collectionRef = doc(collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month), `${reFormat}-${product}` );
 
     await setDoc(collectionRef, {
       Tuote: product,
@@ -91,12 +103,48 @@ const handleAdd = async () => {
     setInitialTemp("");
     setFinalTemp("");
     setTime("");
-    setDate("");
-
+    fetchCategoryData()
     alert("Data tallennettu onnistuneesti!"); // "Data saved successfully!"
+    
   } catch (error) {
     console.error("Error adding document: ", error);
     alert("Virhe tietojen tallennuksessa."); // "Error saving data."
+  }
+};
+
+const confirmDeleteItem = (item: any) => {
+  Alert.alert(
+    "Poista tuote",
+    `Haluatko varmasti poistaa tuotteen ${item.Tuote} päiväyksellä ${item.Pvm}?`,
+    [
+      { text: "Peruuta", style: "cancel" },
+      { text: "Poista", style: "destructive", onPress: () => removeInventoryItem(item) }
+    ],
+    { cancelable: true }
+  );
+};
+
+const removeInventoryItem = async (item: any) => {
+  try {
+    const [month, year] = selectedDateMMYY.split("-");
+    const reFormat = item.Pvm.split('.').join('-')
+    console.log(reFormat, month, year);
+  
+    const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}-${item.Tuote}`);
+    console.log(itemRef);
+    
+    await deleteDoc(itemRef); // Remove from Firebase
+    console.log("deleted");
+    setItemAdded(true)
+    updateData()
+  } catch (error) {
+    console.error("Error deleting inventory item:", error);
+  }
+};
+const updateData = () => {
+  if (itemAdded) {
+    fetchCategoryData()
+    setItemAdded(false)
   }
 };
 
@@ -188,6 +236,9 @@ const handleAdd = async () => {
                     <Text style={styles.text}>{item.Alkulämpö}</Text>
                     <Text style={styles.text}>{item.Loppulämpö}</Text>
                     <Text style={styles.text}>{item.Pvm}</Text>
+                    <Pressable onPress={() => confirmDeleteItem(item)}>
+                        <MaterialCommunityIcons name="trash-can-outline" size={43} />
+                    </Pressable>
                   </View>
                 ))}
               </View>
@@ -206,11 +257,14 @@ const handleAdd = async () => {
   /** Calendar Modal Handlers */
   const openCalendar = () => setCalendarVisible(true);
   const closeCalendar = () => setCalendarVisible(false);
-  const onDateSelected = (day: any) => {
-    setSelectedDay(day.dateString.split('-').slice(1).reverse().join('.')); // Save selected date (YYYY-MM-DD)
-    console.log("closing");
-    
-    closeCalendar();
+  const onDateSelected = (day: any) => {    
+    const [year, month, dayOfMonth] = day.dateString.split('-'); // Split YYYY-MM-DD
+    const formattedDate = `${parseInt(dayOfMonth, 10)}.${parseInt(month, 10)}`; // Format as D.M
+    setSelectedDay(formattedDate);
+    setDate(formattedDate);
+
+  console.log(formattedDate);
+  closeCalendar();
   };
   /** Main Component Return */
  
