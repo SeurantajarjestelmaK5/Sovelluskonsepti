@@ -47,8 +47,12 @@ export default function Temperatures() {
 
   /** Trigger Data Fetching when Category or Date Changes */
   useEffect(() => {
+    if (itemAdded) {
+      fetchCategoryData().then(() => setItemAdded(false));
+      return;
+    }
     fetchCategoryData();
-  }, [selectedCategory, selectedDateMMYY]);
+  }, [selectedCategory, selectedDateMMYY, itemAdded]);
 
   /** Date Formatting for Display */
   const getFormattedDate = () => {
@@ -107,9 +111,8 @@ const handleAdd = async (category : string, meatType? : string) => {
     setInitialTemp("");
     setFinalTemp("");
     setTime("");
-    fetchCategoryData()
     alert("Tiedot tallennettu onnistuneesti!"); // "Data saved successfully!"
-    
+    setItemAdded(true)
   } catch (error) {
     console.error("Error adding document: ", error);
     alert("Virhe tietojen tallennuksessa."); // "Error saving data."
@@ -137,7 +140,7 @@ const handleAdd = async (category : string, meatType? : string) => {
     if (meatType === "Porsas") setTemp2("");
 
     alert("Tiedot tallennettu onnistuneesti!"); // "Data saved successfully!"
-
+    setItemAdded(true)
     } catch (error) {
         console.error("Error adding document: ", error);
         alert("Virhe tietojen tallennuksessa."); // "Error saving data."
@@ -159,6 +162,7 @@ const handleAdd = async (category : string, meatType? : string) => {
   setWashingTemp("");
   setRinsingTemp("");
   alert("Tiedot tallennettu onnistuneesti!"); // "Data saved successfully!"
+  setItemAdded(true)
   } catch (error) {
     console.error("Error adding document: ", error);
     alert("Virhe tietojen tallennuksessa."); // "Error saving data."
@@ -172,7 +176,9 @@ const confirmDeleteItem = (item: any) => {
     item.Tuote ? `Haluatko varmasti poistaa tuotteen ${item.Tuote} päiväyksellä ${item.Pvm}?` : `Haluatko varmasti poistaa kirjauksen päiväyksellä ${item.Pvm}?` ,
     [
       { text: "Peruuta", style: "cancel" },
-      { text: "Poista", style: "destructive", onPress: () => removeInventoryItem(item) }
+      { text: "Poista", style: "destructive", onPress: async () => {await removeInventoryItem(item);
+        setItemAdded(true);
+      }}
     ],
     { cancelable: true }
   );
@@ -186,12 +192,10 @@ const removeInventoryItem = async (item: any) => {
     const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}-${item.Tuote}`);    
     await deleteDoc(itemRef); // Remove from Firebase
     setItemAdded(true)
-    updateData()
   } else {
     const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}`);    
     await deleteDoc(itemRef); // Remove from Firebase
     setItemAdded(true)
-    updateData()
     console.log("hit");
     
   }
@@ -199,12 +203,8 @@ const removeInventoryItem = async (item: any) => {
     console.error("Error deleting inventory item:", error);
   }
 };
-const updateData = () => {
-  if (itemAdded) {
-    fetchCategoryData()
-    setItemAdded(false)
-  }
-};
+
+
 
 /** JÄÄHDYTYS HELPPERIT LOPPUU */
 
