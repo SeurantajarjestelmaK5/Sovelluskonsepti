@@ -9,6 +9,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextInput } from "react-native-paper";
 import YearMonthPickerModal from "@/components/modals/YearPicker";
 import { Calendar } from "react-native-calendars";
+import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
 
 export default function Temperatures() {
   const ThemeColors = useThemeColors();
@@ -26,6 +27,7 @@ export default function Temperatures() {
   const [isCalendarVisible, setCalendarVisible] = useState(false);
   const [selectedDay, setSelectedDay] = useState<string>("Päivämäärä"); // Default placeholder
   const [itemAdded, setItemAdded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
 
   /** Function to Fetch Data from Firebase Based on Category and Date */
@@ -68,16 +70,17 @@ export default function Temperatures() {
     }
   }, [selectedDateMMYY]);
 
-/** JÄÄHDYTYS TIETOKANTA HELPPERIT */
+/** TIETOKANTA HELPPERIT */
 
 const [product, setProduct] = useState("");
 const [temp1, setTemp1] = useState("");
+const [washingTemp, setWashingTemp] = useState("");
+const [rinsingTemp, setRinsingTemp] = useState("");
 const [temp2, setTemp2] = useState("");
 const [initialTemp, setInitialTemp] = useState("");
 const [finalTemp, setFinalTemp] = useState("");
 const [time, setTime] = useState("");
 const [date, setDate] = useState("");
-
 
 const handleAdd = async (category : string, meatType? : string) => {
   if (category == "Jäähdytys ") {
@@ -178,13 +181,63 @@ const updateData = () => {
     switch (selectedCategory) {
       case "Tiskikone":
         return (
-          <View>
-            {categoryData.map((item) => (
-              <View key={item.id} style={styles.tableRow}>
-                <Text style={styles.text}>{item.name}</Text>
-                <Text style={styles.text}>{item.temperature}°C</Text>
-              </View>
-            ))}
+          <View style={styles.container}>
+          <View style={[styles.content, { maxHeight: "40%"}]}>
+            <View style={styles.tableRow}>
+              <MaterialCommunityIcons
+              name="chart-bubble"
+              size={43}
+              />
+              <MaterialCommunityIcons
+              name="tank"
+              size={43}
+              />
+              <MaterialCommunityIcons
+              name="calendar"
+              size={43}
+              />
+            </View>
+            <View style={styles.tableRow}>
+               <TextInput
+                placeholder="Pesuvesi"
+                keyboardType="numeric"
+                value={washingTemp}
+                onChangeText={setWashingTemp}
+              />
+              <TextInput
+                placeholder="Huuhteluvesi"
+                keyboardType="numeric"
+                value={rinsingTemp}
+                onChangeText={setRinsingTemp}
+              />
+              <Pressable style={styles.button} onPress={openCalendar}>
+                  <Text>{selectedDay}</Text>
+                </Pressable>
+            </View>
+             <Pressable style={[styles.button]} onPress={()=>{handleAdd(selectedCategory)}}>
+                  <Text >Lisää</Text>
+              </Pressable>
+            </View>
+
+          <View style={[styles.content]}>
+                 <Pressable
+                  style={[styles.calendarButton]}
+                  onPress={() => setModalVisible(true)}
+                >
+                  <Text style={styles.text}>{getFormattedDate()}</Text>
+                  <MaterialCommunityIcons name="calendar" size={43} />
+                </Pressable>
+                {categoryData.map((item) => (
+                  <View style={styles.tableRow} key={item.id}>
+                    <Text style={styles.text}>+{item.Huuhteluvesi}C</Text>
+                    <Text style={styles.text}>+{item.Pesuvesi}C</Text>
+                    <Text style={styles.text}>{item.Pvm}</Text> 
+                    <Pressable onPress={() => confirmDeleteItem(item)}>
+                        <MaterialCommunityIcons name="trash-can-outline" size={43} />
+                    </Pressable>
+                  </View>
+                ))}
+            </View>
           </View>
         );
       case "Liha":
