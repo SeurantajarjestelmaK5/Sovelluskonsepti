@@ -85,7 +85,7 @@ const [time, setTime] = useState("");
 const [date, setDate] = useState("");
 
 const handleAdd = async (category : string, meatType? : string) => {
-  if (category == "Jäähdytys ") {
+  if (category == "Jäähdytys") {
   if (!product || !initialTemp || !finalTemp || !time || !date) {
     alert("Täytä kaikki kentät!"); // "Fill in all fields!"
     return;
@@ -217,14 +217,17 @@ const updateData = () => {
           <View style={[styles.content, { maxHeight: "40%"}]}>
             <View style={styles.tableRow}>
               <MaterialCommunityIcons
+              color={ThemeColors.text}
               name="chart-bubble"
               size={43}
               />
               <MaterialCommunityIcons
+              color={ThemeColors.text}
               name="tank"
               size={43}
               />
               <MaterialCommunityIcons
+              color={ThemeColors.text}
               name="calendar"
               size={43}
               />
@@ -259,13 +262,31 @@ const updateData = () => {
                   <Text style={styles.text}>{getFormattedDate()}</Text>
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
+                <View style={styles.tableRow}>
+                <MaterialCommunityIcons
+              color={ThemeColors.text}
+              name="chart-bubble"
+              size={43}
+              />
+              <MaterialCommunityIcons
+              color={ThemeColors.text}
+              name="tank"
+              size={43}
+              />
+              <MaterialCommunityIcons
+              color={ThemeColors.text}
+              name="calendar"
+              size={43}
+              />
+              <Text></Text>
+                </View>
                 { isLoading? <SmallLoadingIndicator/> : categoryData.map((item) => ( 
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>+{item.Huuhteluvesi}C</Text>
                     <Text style={styles.text}>+{item.Pesuvesi}C</Text>
                     <Text style={styles.text}>{item.Pvm}</Text> 
                     <Pressable onPress={() => confirmDeleteItem(item)}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={43} />
+                        <MaterialCommunityIcons name="trash-can-outline" size={43}  color={"#FF0000"}/>
                     </Pressable>
                   </View>
                 ))}
@@ -328,13 +349,19 @@ const updateData = () => {
                   <Text style={styles.text}>{getFormattedDate()}</Text>
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
+                <View style={styles.tableRow}>
+                  <Text></Text>
+                  <MaterialCommunityIcons name="thermometer" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
+                  <Text></Text>
+                </View>
                 { isLoading? <SmallLoadingIndicator/> : categoryData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>{item.Tuote}</Text>
                     <Text style={styles.text}>+{item.Lämpötila}C</Text>
                     <Text style={styles.text}>{item.Pvm}</Text>
                     <Pressable onPress={() => confirmDeleteItem(item)}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={43} />
+                        <MaterialCommunityIcons name="trash-can-outline" size={43} color={"#FF0000"} />
                     </Pressable>
                   </View>
                 ))}
@@ -343,7 +370,7 @@ const updateData = () => {
         );
         case "Jäähdytys":
           return ( 
-            <View style={[styles.container, { backgroundColor: "#fff" }]}>
+            <View style={[styles.container,]}>
               {/* Input Fields Section */}
               <View style={[styles.content, { maxHeight: "35%" }]}>
                 <View style={styles.tableRow}>
@@ -395,15 +422,23 @@ const updateData = () => {
                   <Text style={styles.text}>{getFormattedDate()}</Text>
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
-                
+                <View style={styles.tableRow}>
+                  <MaterialCommunityIcons name="label-outline" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="thermometer-plus" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="thermometer-minus" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="clock" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons/>
+                </View>
                 {  isLoading? <SmallLoadingIndicator/> :categoryData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>{item.Tuote}</Text>
                     <Text style={styles.text}>{item.Alkulämpö}</Text>
                     <Text style={styles.text}>{item.Loppulämpö}</Text>
+                    <Text style={styles.text}>{item.Aika}</Text>
                     <Text style={styles.text}>{item.Pvm}</Text>
                     <Pressable onPress={() => confirmDeleteItem(item)}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={43} />
+                        <MaterialCommunityIcons name="trash-can-outline" size={43} color={"#FF0000"} />
                     </Pressable>
                   </View>
                 ))}
