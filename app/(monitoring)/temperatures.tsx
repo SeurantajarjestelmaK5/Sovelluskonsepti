@@ -32,12 +32,14 @@ export default function Temperatures() {
 
   /** Function to Fetch Data from Firebase Based on Category and Date */
   const fetchCategoryData = async () => {
+    setIsLoading(true)
     try {
       const [month, year] = selectedDateMMYY.split("-");
       const collectionRef = collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month);
       const snapshot = await getDocs(collectionRef);
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));      
       setCategoryData(data);
+      setIsLoading(false)
     } catch (error) {
       console.error("Error fetching category data:", error);
     }
@@ -68,7 +70,7 @@ export default function Temperatures() {
       setSelectedDateMMYY(`${currentMonth}-${currentYear}`);
       console.log("date selected");
     }
-  }, [selectedDateMMYY]);
+  }, [selectedDateMMYY, ]);
 
 /** TIETOKANTA HELPPERIT */
 
@@ -140,13 +142,34 @@ const handleAdd = async (category : string, meatType? : string) => {
         console.error("Error adding document: ", error);
         alert("Virhe tietojen tallennuksessa."); // "Error saving data."
       }
-   }
+} else if (category == "Tiskikone") {
+  if (!washingTemp || !rinsingTemp || !date) {
+    alert("Täytä kaikki kentät!"); // "Fill in all fields!"
+    return;
+  }
+  try {
+  const [month, year] = selectedDateMMYY.split("-");
+  const reFormat = date.split('.').join('-')
+  const collectionRef = doc(collection(db, "omavalvonta", "lämpötilat", selectedCategory, year, month), reFormat);
+  await setDoc(collectionRef, {
+    Huuhteluvesi : parseFloat(rinsingTemp),
+    Pesuvesi : parseFloat(washingTemp),
+    Pvm: date,
+  });
+  setWashingTemp("");
+  setRinsingTemp("");
+  alert("Tiedot tallennettu onnistuneesti!"); // "Data saved successfully!"
+  } catch (error) {
+    console.error("Error adding document: ", error);
+    alert("Virhe tietojen tallennuksessa."); // "Error saving data."
+  }
+}
 }
 
 const confirmDeleteItem = (item: any) => {
   Alert.alert(
-    "Poista tuote",
-    `Haluatko varmasti poistaa tuotteen ${item.Tuote} päiväyksellä ${item.Pvm}?`,
+    item.Tuote ?"Poista tuote" : "Poista",
+    item.Tuote ? `Haluatko varmasti poistaa tuotteen ${item.Tuote} päiväyksellä ${item.Pvm}?` : `Haluatko varmasti poistaa kirjauksen päiväyksellä ${item.Pvm}?` ,
     [
       { text: "Peruuta", style: "cancel" },
       { text: "Poista", style: "destructive", onPress: () => removeInventoryItem(item) }
@@ -159,10 +182,19 @@ const removeInventoryItem = async (item: any) => {
   try {
     const [month, year] = selectedDateMMYY.split("-");
     const reFormat = item.Pvm.split('.').join('-')  
+    if (item.Tuote) {
     const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}-${item.Tuote}`);    
     await deleteDoc(itemRef); // Remove from Firebase
     setItemAdded(true)
     updateData()
+  } else {
+    const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}`);    
+    await deleteDoc(itemRef); // Remove from Firebase
+    setItemAdded(true)
+    updateData()
+    console.log("hit");
+    
+  }
   } catch (error) {
     console.error("Error deleting inventory item:", error);
   }
@@ -227,7 +259,7 @@ const updateData = () => {
                   <Text style={styles.text}>{getFormattedDate()}</Text>
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
-                {categoryData.map((item) => (
+                { isLoading? <SmallLoadingIndicator/> : categoryData.map((item) => ( 
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>+{item.Huuhteluvesi}C</Text>
                     <Text style={styles.text}>+{item.Pesuvesi}C</Text>
@@ -296,7 +328,7 @@ const updateData = () => {
                   <Text style={styles.text}>{getFormattedDate()}</Text>
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
-                {categoryData.map((item) => (
+                { isLoading? <SmallLoadingIndicator/> : categoryData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>{item.Tuote}</Text>
                     <Text style={styles.text}>+{item.Lämpötila}C</Text>
@@ -310,7 +342,7 @@ const updateData = () => {
           </View>
         );
         case "Jäähdytys":
-          return (
+          return ( 
             <View style={[styles.container, { backgroundColor: "#fff" }]}>
               {/* Input Fields Section */}
               <View style={[styles.content, { maxHeight: "35%" }]}>
@@ -363,7 +395,8 @@ const updateData = () => {
                   <Text style={styles.text}>{getFormattedDate()}</Text>
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
-                {categoryData.map((item) => (
+                
+                {  isLoading? <SmallLoadingIndicator/> :categoryData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>{item.Tuote}</Text>
                     <Text style={styles.text}>{item.Alkulämpö}</Text>
