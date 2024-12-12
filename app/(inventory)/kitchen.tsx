@@ -1,4 +1,4 @@
-import YearMonthPickerModal from "@/components/modals/YearPicker";
+import YearMonthPickerModal from "@/components/modals/YearMonthPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

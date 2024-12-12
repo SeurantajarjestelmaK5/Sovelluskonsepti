@@ -7,7 +7,7 @@ import { db } from "@/firebase/config";
 import { addDoc, collection, deleteDoc, doc, getDocs, setDoc } from "firebase/firestore";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { TextInput } from "react-native-paper";
-import YearMonthPickerModal from "@/components/modals/YearPicker";
+import YearMonthPickerModal from "@/components/modals/YearMonthPicker";
 import { Calendar } from "react-native-calendars";
 import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
 

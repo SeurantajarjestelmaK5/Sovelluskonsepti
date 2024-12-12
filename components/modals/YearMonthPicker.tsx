@@ -14,22 +14,19 @@ import { MaterialIcons } from '@expo/vector-icons';
 interface YearMonthPickerModalProps {
   visible: boolean;
   onClose: () => void;
-  onConfirm: (formattedDate: string) => void; // Update type to reflect formatted string
+  onConfirm: (formattedDate: string) => void;
+  yearOnly?: boolean; // New prop to toggle year-only mode
 }
 
 const YearMonthPickerModal: React.FC<YearMonthPickerModalProps> = ({
   visible,
   onClose,
   onConfirm,
+  yearOnly = false,
 }) => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
-
-  const months = [
-    'Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu', 'Toukokuu', 'Kesäkuu',
-    'Heinäkuu', 'Elokuu', 'Syyskuu', 'Lokakuu', 'Marraskuu', 'Joulukuu'
-  ];
 
   const animationValue = useRef(new Animated.Value(0)).current;
 
@@ -51,12 +48,25 @@ const YearMonthPickerModal: React.FC<YearMonthPickerModalProps> = ({
     });
   };
 
+  const handleYearSelect = (year: number) => {
+    setSelectedYear(year);
+    onConfirm(year.toString());
+    onClose();
+  };
+
   const handleMonthSelect = (monthIndex: number) => {
     setSelectedMonth(monthIndex + 1);
     const formattedDate = `${String(monthIndex + 1).padStart(2, '0')}-${selectedYear}`;
     onConfirm(formattedDate);
     onClose();
   };
+
+  const years = Array.from({ length: 12 }, (_, index) => selectedYear - 6 + index); // Generate a range of 12 years
+
+  const months = [
+    'Tammikuu', 'Helmikuu', 'Maaliskuu', 'Huhtikuu', 'Toukokuu', 'Kesäkuu',
+    'Heinäkuu', 'Elokuu', 'Syyskuu', 'Lokakuu', 'Marraskuu', 'Joulukuu',
+  ];
 
   return (
     <Modal
@@ -83,7 +93,7 @@ const YearMonthPickerModal: React.FC<YearMonthPickerModalProps> = ({
 
               <Animated.View
                 style={[
-                  styles.monthGrid,
+                  styles.grid,
                   {
                     transform: [
                       {
@@ -100,25 +110,35 @@ const YearMonthPickerModal: React.FC<YearMonthPickerModalProps> = ({
                   },
                 ]}
               >
-                {months.map((month, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={[
-                      styles.monthItem,
-                      selectedMonth === index + 1 && styles.selectedItem,
-                    ]}
-                    onPress={() => handleMonthSelect(index)}
-                  >
-                    <Text
-                      style={[
-                        styles.monthText,
-                        selectedMonth === index + 1 && styles.selectedText,
-                      ]}
-                    >
-                      {month}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {yearOnly
+                  ? years.map((year) => (
+                      <TouchableOpacity
+                        key={year}
+                        style={styles.gridItem}
+                        onPress={() => handleYearSelect(year)}
+                      >
+                        <Text style={styles.gridText}>{year}</Text>
+                      </TouchableOpacity>
+                    ))
+                  : months.map((month, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        style={[
+                          styles.gridItem,
+                          selectedMonth === index + 1 && styles.selectedItem,
+                        ]}
+                        onPress={() => handleMonthSelect(index)}
+                      >
+                        <Text
+                          style={[
+                            styles.gridText,
+                            selectedMonth === index + 1 && styles.selectedText,
+                          ]}
+                        >
+                          {month}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
               </Animated.View>
             </Animated.View>
           </TouchableWithoutFeedback>
@@ -142,11 +162,6 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   yearContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -157,20 +172,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginHorizontal: 15,
   },
-  monthGrid: {
+  grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
     marginBottom: 20,
   },
-  monthItem: {
+  gridItem: {
     width: '28%',
     padding: 12,
     margin: 5,
     alignItems: 'center',
     borderRadius: 5,
   },
-  monthText: {
+  gridText: {
     fontSize: 16,
   },
   selectedItem: {
