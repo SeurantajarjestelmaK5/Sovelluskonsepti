@@ -9,13 +9,14 @@ import {
 import { TextInput, Button } from "react-native-paper";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getModalStyles } from "@/styles/components/itemModalStyle";
+import { addSample } from "@/scripts/addSample";
+import { Picker } from "@react-native-picker/picker";
 
 interface AddSampleModalProps {
   visible: boolean;
   onClose: () => void;
-  onSampleAdded: (sample: SampleItem) => void;
+  onConfirm : () => void;
 }
-
 interface SampleItem {
   date: string;
   nayte: string;
@@ -27,7 +28,6 @@ interface SampleItem {
 const AddSampleModal: React.FC<AddSampleModalProps> = ({
   visible,
   onClose,
-  onSampleAdded,
 }) => {
   const [nayte, setNayte] = useState("");
   const [tulos, setTulos] = useState<number | "">("");
@@ -44,6 +44,7 @@ const AddSampleModal: React.FC<AddSampleModalProps> = ({
       date.getMonth() + 1
     ).padStart(2, "0")}.${date.getFullYear()}`;
     setCurrentDate(formattedDate);
+    console.log(currentDate);
   }, []);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const AddSampleModal: React.FC<AddSampleModalProps> = ({
       toimenpiteet,
     };
 
-    onSampleAdded(newSample);
+    addSample(currentDate, newSample);
     onClose();
 
     setNayte("");
@@ -81,68 +82,73 @@ const AddSampleModal: React.FC<AddSampleModalProps> = ({
 
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable style={styles.modalContent} onPress={() => {}}>
-          <Text style={styles.header}>Lisää Näyte</Text>
+    <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable
+        style={styles.modalContent}
+        onPress={() => {}}
+        pointerEvents="box-none"
+      >
+        <Text style={styles.header}>Lisää Näyte</Text>
+        <Text style={styles.label}>Näytepinta</Text>
+        <View style={styles.modalContent}>
+          <Picker
+            selectedValue={nayte}
+            onValueChange={(itemValue) => setNayte(itemValue)}
+            mode="dropdown"
+            style={styles.dropdownButton}
+          >
+            <Picker.Item style={styles.text} label="Pihvikone" value="Pihvikone" />
+            <Picker.Item style={styles.text} label="Nostopöytä" value="Nostopöytä" />
+            <Picker.Item style={styles.text} label="Lämpökaappi" value="Lämpökaappi" />
+          </Picker>
+        </View>
+        <TextInput
+          placeholder="Tulos - CFU"
+          value={tulos.toString()}
+          onChangeText={(text) => setTulos(text === "" ? "" : Number(text))}
+          keyboardType="numeric"
+          style={styles.input}
+          mode="outlined"
+          activeOutlineColor={ThemeColors.tint}
+        />
+        <TextInput
+          placeholder="Toimenpiteet"
+          value={toimenpiteet}
+          onChangeText={setToimenpiteet}
+          style={styles.input}
+          mode="outlined"
+          activeOutlineColor={ThemeColors.tint}
+        />
 
-          <TextInput
-            placeholder="Näyte"
-            value={nayte}
-            onChangeText={setNayte}
-            style={styles.input}
-            mode="outlined"
-            activeOutlineColor={ThemeColors.tint}
-          />
-          <TextInput
-            placeholder="Tulos"
-            value={tulos.toString()}
-            onChangeText={(text) => setTulos(text === "" ? "" : Number(text))}
-            keyboardType="numeric"
-            style={styles.input}
-            mode="outlined"
-            activeOutlineColor={ThemeColors.tint}
-          />
-          <TextInput
-            placeholder="Arvio"
-            value={arvio}
-            editable={false}
-            style={[styles.input, { backgroundColor: ThemeColors.navSelected }]}
-            mode="outlined"
-          />
-          <TextInput
-            placeholder="Toimenpiteet"
-            value={toimenpiteet}
-            onChangeText={setToimenpiteet}
-            style={styles.input}
-            mode="outlined"
-            activeOutlineColor={ThemeColors.tint}
-          />
-
-          <Button
-            children="Lisää Näyte"
-            onPress={handleAddSample}
-            mode="contained"
-            disabled={!isFormValid}
-            theme={{
-              colors: {
-                onSurfaceDisabled: ThemeColors.text,
-                surfaceDisabled: ThemeColors.navDefault,
-                primary: ThemeColors.tint,
-              },
-            }}
-            style={{ marginBottom: 10, marginTop: 10 }}
-            contentStyle={{ padding: 10 }}
-          />
-          <Button
-            children="Peruuta"
-            onPress={onClose}
-            mode="text"
-            textColor={ThemeColors.text}
-          />
-        </Pressable>
+        <Button
+          children="Lisää Näyte"
+          onPress={() => {
+            handleAddSample();
+            onClose(); // Ensure modal closes after adding the item
+          }}
+          mode="contained"
+          disabled={!isFormValid}
+          theme={{
+            colors: {
+              onSurfaceDisabled: ThemeColors.text,
+              surfaceDisabled: ThemeColors.navDefault,
+              primary: ThemeColors.tint,
+            },
+          }}
+          style={{ marginBottom: 10, marginTop: 10 }}
+          contentStyle={{ padding: 10 }}
+        />
+        <Button
+          children="Peruuta"
+          onPress={() => {
+            onClose(); // Close the modal on cancel
+          }}
+          mode="text"
+          textColor={ThemeColors.text}
+        />
       </Pressable>
-    </Modal>
+    </Pressable>
+  </Modal>
   );
 };
-
 export default AddSampleModal;

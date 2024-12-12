@@ -68,4 +68,9 @@ export const getModalStyles = (ThemeColors: ThemeColors) =>
       borderRadius: 5,
       backgroundColor: ThemeColors.tint,
     },
+    text: {
+      fontSize: 24,
+      color: ThemeColors.tint,
+      marginBottom: 15,
+    },
   });
