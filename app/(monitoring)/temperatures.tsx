@@ -214,205 +214,302 @@ const removeInventoryItem = async (item: any) => {
       case "Tiskikone":
         return (
           <View style={styles.container}>
-          <View style={[styles.content, { maxHeight: "40%"}]}>
-            <View style={styles.tableRow}>
-              <MaterialCommunityIcons
-              color={ThemeColors.text}
-              name="chart-bubble"
-              size={43}
-              />
-              <MaterialCommunityIcons
-              color={ThemeColors.text}
-              name="tank"
-              size={43}
-              />
-              <MaterialCommunityIcons
-              color={ThemeColors.text}
-              name="calendar"
-              size={43}
-              />
-            </View>
-            <View style={styles.tableRow}>
-               <TextInput
-                placeholder="Pesuvesi"
-                keyboardType="numeric"
-                value={washingTemp}
-                onChangeText={setWashingTemp}
-              />
-              <TextInput
-                placeholder="Huuhteluvesi"
-                keyboardType="numeric"
-                value={rinsingTemp}
-                onChangeText={setRinsingTemp}
-              />
-              <Pressable style={styles.button} onPress={openCalendar}>
+            <View style={[styles.content, { maxHeight: "40%" }]}>
+              <View style={styles.tableRow}>
+                <MaterialCommunityIcons
+                  color={ThemeColors.text}
+                  name="chart-bubble"
+                  size={43}
+                />
+                <MaterialCommunityIcons
+                  color={ThemeColors.text}
+                  name="water"
+                  size={43}
+                />
+                <MaterialCommunityIcons
+                  color={ThemeColors.text}
+                  name="calendar"
+                  size={43}
+                />
+              </View>
+              <View style={styles.textInputsRow}>
+                <TextInput
+                  placeholder="Pesuvesi"
+                  keyboardType="numeric"
+                  value={washingTemp}
+                  onChangeText={setWashingTemp}
+                  mode="outlined"
+                  activeOutlineColor={ThemeColors.tint}
+                  style={styles.textInput}
+                />
+                <TextInput
+                  placeholder="Huuhteluvesi"
+                  keyboardType="numeric"
+                  value={rinsingTemp}
+                  onChangeText={setRinsingTemp}
+                  mode="outlined"
+                  activeOutlineColor={ThemeColors.tint}
+                  style={styles.textInput}
+                />
+                <Pressable style={styles.calendarDisplayButton} onPress={openCalendar}>
                   <Text>{selectedDay}</Text>
                 </Pressable>
-            </View>
-             <Pressable style={[styles.button]} onPress={()=>{handleAdd(selectedCategory)}}>
-                  <Text >Lisää</Text>
+              </View>
+              <Pressable
+                style={[styles.button]}
+                onPress={() => {
+                  handleAdd(selectedCategory);
+                }}
+              >
+                <Text>Lisää</Text>
               </Pressable>
             </View>
 
-          <View style={[styles.content]}>
-                 <Pressable
-                  style={[styles.calendarButton]}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <Text style={styles.text}>{getFormattedDate()}</Text>
-                  <MaterialCommunityIcons name="calendar" size={43} />
-                </Pressable>
-                <View style={styles.tableRow}>
+            <View style={[styles.content]}>
+              <Pressable
+                style={[styles.calendarButton]}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text style={styles.text}>{getFormattedDate()}</Text>
+                <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.tint} />
+              </Pressable>
+              <View style={styles.tableRow}>
                 <MaterialCommunityIcons
-              color={ThemeColors.text}
-              name="chart-bubble"
-              size={43}
-              />
-              <MaterialCommunityIcons
-              color={ThemeColors.text}
-              name="tank"
-              size={43}
-              />
-              <MaterialCommunityIcons
-              color={ThemeColors.text}
-              name="calendar"
-              size={43}
-              />
-              <Text></Text>
-                </View>
-                { isLoading? <SmallLoadingIndicator/> : categoryData.map((item) => ( 
+                  color={ThemeColors.text}
+                  name="chart-bubble"
+                  size={43}
+                />
+                <MaterialCommunityIcons
+                  color={ThemeColors.text}
+                  name="water"
+                  size={43}
+                />
+                <MaterialCommunityIcons
+                  color={ThemeColors.text}
+                  name="calendar"
+                  size={43}
+                />
+                <Text></Text>
+              </View>
+              {isLoading ? (
+                <SmallLoadingIndicator />
+              ) : (
+                categoryData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>+{item.Huuhteluvesi}C</Text>
                     <Text style={styles.text}>+{item.Pesuvesi}C</Text>
-                    <Text style={styles.text}>{item.Pvm}</Text> 
+                    <Text style={styles.text}>{item.Pvm}</Text>
                     <Pressable onPress={() => confirmDeleteItem(item)}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={43}  color={"#FF0000"}/>
+                      <MaterialCommunityIcons
+                        name="trash-can-outline"
+                        size={43}
+                        color={"#FF0000"}
+                      />
                     </Pressable>
                   </View>
-                ))}
+                ))
+              )}
             </View>
           </View>
         );
       case "Liha":
         return (
-          <View style={[styles.container,  ]}>
-              <View style={[styles.content, { maxHeight: "40%",  marginBottom: 50}]}>
-              <View style={[styles.tableRow, {marginTop: 50, }]}>
+          <View style={[styles.container]}>
+            <View
+              style={[styles.content, { maxHeight: "40%", marginBottom: 50 }]}
+            >
+              <View style={[styles.tableRow, { marginTop: 50 }]}>
                 <Text></Text>
                 <Text style={styles.text}>Nauta</Text>
                 <Text style={styles.text}> Porsas</Text>
               </View>
               <View style={styles.tableRow}>
-              <MaterialCommunityIcons name="thermometer" size={43} color={ThemeColors.text} />
-              <TextInput
-                placeholder="Lämpötila"
-                keyboardType="numeric"
-                value={temp1}
-                onChangeText={setTemp1}
-              />
-              <TextInput
-                placeholder="Lämpötila"
-                keyboardType="numeric"
-                value={temp2}
-                onChangeText={setTemp2}
-              />
+                <MaterialCommunityIcons
+                  name="thermometer"
+                  size={43}
+                  color={ThemeColors.text}
+                />
+                <TextInput
+                  placeholder="Lämpötila"
+                  keyboardType="numeric"
+                  value={temp1}
+                  onChangeText={setTemp1}
+                  mode="outlined"
+                  activeOutlineColor={ThemeColors.tint}
+                />
+                <TextInput
+                  placeholder="Lämpötila"
+                  keyboardType="numeric"
+                  value={temp2}
+                  onChangeText={setTemp2}
+                  mode="outlined"
+                  activeOutlineColor={ThemeColors.tint}
+                />
               </View>
               <View style={styles.tableRow}>
-              <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
-              <Pressable style={styles.button} onPress={openCalendar}>
+                <MaterialCommunityIcons
+                  name="calendar"
+                  size={43}
+                  color={ThemeColors.text}
+                />
+                <Pressable
+                  style={{
+                    ...styles.calendarDisplayButton,
+                    height: 60,
+                    marginTop: 10,
+                  }}
+                  onPress={openCalendar}
+                >
                   <Text>{selectedDay}</Text>
                 </Pressable>
-              <Pressable style={styles.button} onPress={openCalendar}>
+                <Pressable
+                  style={{
+                    ...styles.calendarDisplayButton,
+                    height: 60,
+                    marginTop: 10,
+                  }}
+                  onPress={openCalendar}
+                >
                   <Text>{selectedDay}</Text>
                 </Pressable>
               </View>
               <View style={styles.tableRow}>
                 <Text></Text>
-                <Pressable style={[styles.button]}
-                  onPress={()=>{handleAdd(selectedCategory, "Nauta")}}
+                <Pressable
+                  style={[styles.button]}
+                  onPress={() => {
+                    handleAdd(selectedCategory, "Nauta");
+                  }}
                 >
-                  <Text >Lisää</Text>
+                  <Text>Lisää</Text>
                 </Pressable>
-                <Pressable style={styles.button}
-                  onPress={()=>{handleAdd(selectedCategory, "Porsas")}}
+                <Pressable
+                  style={styles.button}
+                  onPress={() => {
+                    handleAdd(selectedCategory, "Porsas");
+                  }}
                 >
-                  <Text >Lisää</Text>
+                  <Text>Lisää</Text>
                 </Pressable>
-              
               </View>
             </View>
             <View style={styles.content}>
               <Pressable
-                  style={[styles.calendarButton]}
-                  onPress={() => setModalVisible(true)}
-                >
-                  <Text style={styles.text}>{getFormattedDate()}</Text>
-                  <MaterialCommunityIcons name="calendar" size={43} />
-                </Pressable>
-                <View style={styles.tableRow}>
-                  <Text></Text>
-                  <MaterialCommunityIcons name="thermometer" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
-                  <Text></Text>
-                </View>
-                { isLoading? <SmallLoadingIndicator/> : categoryData.map((item) => (
+                style={[styles.calendarButton]}
+                onPress={() => setModalVisible(true)}
+              >
+                <Text style={styles.text}>{getFormattedDate()}</Text>
+                <MaterialCommunityIcons name="calendar" size={43} />
+              </Pressable>
+              <View style={styles.tableRow}>
+                <Text></Text>
+                <MaterialCommunityIcons
+                  name="thermometer"
+                  size={43}
+                  color={ThemeColors.text}
+                />
+                <MaterialCommunityIcons
+                  name="calendar"
+                  size={43}
+                  color={ThemeColors.text}
+                />
+                <Text></Text>
+              </View>
+              {isLoading ? (
+                <SmallLoadingIndicator />
+              ) : (
+                categoryData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>{item.Tuote}</Text>
                     <Text style={styles.text}>+{item.Lämpötila}C</Text>
                     <Text style={styles.text}>{item.Pvm}</Text>
                     <Pressable onPress={() => confirmDeleteItem(item)}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={43} color={"#FF0000"} />
+                      <MaterialCommunityIcons
+                        name="trash-can-outline"
+                        size={43}
+                        color={"#FF0000"}
+                      />
                     </Pressable>
                   </View>
-                ))}
+                ))
+              )}
             </View>
           </View>
         );
         case "Jäähdytys":
-          return ( 
-            <View style={[styles.container,]}>
+          return (
+            <View style={[styles.container]}>
               {/* Input Fields Section */}
               <View style={[styles.content, { maxHeight: "35%" }]}>
                 <View style={styles.tableRow}>
                   <Text style={styles.text}>Tuote</Text>
-                  <MaterialCommunityIcons name="thermometer-plus" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="thermometer-minus" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="clock" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
+                  <MaterialCommunityIcons
+                    name="thermometer-plus"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="thermometer-minus"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="clock"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="calendar"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
                 </View>
                 <View style={styles.tableRow}>
                   <TextInput
                     placeholder="Tuote"
                     value={product}
                     onChangeText={setProduct}
+                    mode="outlined"
+                    activeOutlineColor={ThemeColors.tint}
                   />
                   <TextInput
                     placeholder="Alkulämpö"
                     value={initialTemp}
                     onChangeText={setInitialTemp}
                     keyboardType="numeric"
+                    mode="outlined"
+                    activeOutlineColor={ThemeColors.tint}
                   />
                   <TextInput
                     placeholder="Loppulämpö"
                     value={finalTemp}
                     onChangeText={setFinalTemp}
                     keyboardType="numeric"
+                    mode="outlined"
+                    activeOutlineColor={ThemeColors.tint}
                   />
                   <TextInput
                     placeholder="Aika"
                     value={time}
                     onChangeText={setTime}
                     keyboardType="numeric"
+                    mode="outlined"
+                    activeOutlineColor={ThemeColors.tint}
                   />
-                   <Pressable style={styles.button} onPress={openCalendar}>
-                  <Text>{selectedDay}</Text>
-                </Pressable>
+                  <Pressable style={styles.calendarDisplayButton} onPress={openCalendar}>
+                    <Text>{selectedDay}</Text>
+                  </Pressable>
                 </View>
-                <Pressable style={styles.button} onPress={() =>{handleAdd(selectedCategory)}}>
+                <Pressable
+                  style={styles.button}
+                  onPress={() => {
+                    handleAdd(selectedCategory);
+                  }}
+                >
                   <Text>Lisää</Text>
                 </Pressable>
               </View>
-        
+
               {/* Data Display Section */}
               <View style={styles.content}>
                 <Pressable
@@ -423,25 +520,53 @@ const removeInventoryItem = async (item: any) => {
                   <MaterialCommunityIcons name="calendar" size={43} />
                 </Pressable>
                 <View style={styles.tableRow}>
-                  <MaterialCommunityIcons name="label-outline" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="thermometer-plus" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="thermometer-minus" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="clock" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons name="calendar" size={43} color={ThemeColors.text} />
-                  <MaterialCommunityIcons/>
+                  <MaterialCommunityIcons
+                    name="label-outline"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="thermometer-plus"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="thermometer-minus"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="clock"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons
+                    name="calendar"
+                    size={43}
+                    color={ThemeColors.text}
+                  />
+                  <MaterialCommunityIcons />
                 </View>
-                {  isLoading? <SmallLoadingIndicator/> :categoryData.map((item) => (
-                  <View style={styles.tableRow} key={item.id}>
-                    <Text style={styles.text}>{item.Tuote}</Text>
-                    <Text style={styles.text}>{item.Alkulämpö}</Text>
-                    <Text style={styles.text}>{item.Loppulämpö}</Text>
-                    <Text style={styles.text}>{item.Aika}</Text>
-                    <Text style={styles.text}>{item.Pvm}</Text>
-                    <Pressable onPress={() => confirmDeleteItem(item)}>
-                        <MaterialCommunityIcons name="trash-can-outline" size={43} color={"#FF0000"} />
-                    </Pressable>
-                  </View>
-                ))}
+                {isLoading ? (
+                  <SmallLoadingIndicator />
+                ) : (
+                  categoryData.map((item) => (
+                    <View style={styles.tableRow} key={item.id}>
+                      <Text style={styles.text}>{item.Tuote}</Text>
+                      <Text style={styles.text}>{item.Alkulämpö}</Text>
+                      <Text style={styles.text}>{item.Loppulämpö}</Text>
+                      <Text style={styles.text}>{item.Aika}</Text>
+                      <Text style={styles.text}>{item.Pvm}</Text>
+                      <Pressable onPress={() => confirmDeleteItem(item)}>
+                        <MaterialCommunityIcons
+                          name="trash-can-outline"
+                          size={43}
+                          color={"#FF0000"}
+                        />
+                      </Pressable>
+                    </View>
+                  ))
+                )}
               </View>
             </View>
           );
@@ -478,7 +603,6 @@ const removeInventoryItem = async (item: any) => {
         style={{
           flexDirection: "row",
           marginVertical: 10,
-          backgroundColor: "#fff",
           alignItems: "center",
         }}
       >

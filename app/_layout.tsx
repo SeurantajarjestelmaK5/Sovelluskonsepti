@@ -1,10 +1,28 @@
+import { useState } from "react";
 import { Tabs, useRouter } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
+import { useNavigationState } from "@react-navigation/native";
 
 export default function TabsLayout() {
   const router = useRouter();
   const ThemeColors = useThemeColors();
+  const navigationState = useNavigationState((state) => state);
+  const [isInSettings, setIsInSettings] = useState(false);
+
+    const handleCogPress = () => {
+      if (isInSettings) {
+        // Navigate back to the previous screen
+        if (navigationState.routes.length > 1) {
+          router.back(); // Or use router.pop() for stack-based navigation
+        }
+        setIsInSettings(false);
+      } else {
+        // Navigate to the settings screen
+        router.push("/(settings)");
+        setIsInSettings(true);
+      }
+    };
 
   return (
     <Tabs
@@ -15,7 +33,7 @@ export default function TabsLayout() {
             size={40}
             style={{ marginRight: 20 }}
             color={ThemeColors.tint}
-            onPress={() => router.push("/(settings)")}
+            onPress={() => handleCogPress()}
           />
         ),
         headerLeft: () => (

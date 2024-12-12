@@ -396,7 +396,7 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       </View>
       <View style={diningroomStyle.inventoryTable}>
         {isLoading ? (
-        <SmallLoadingIndicator/>
+          <SmallLoadingIndicator />
         ) : (
           <KeyboardAvoidingView>
             <FlatList
@@ -405,24 +405,19 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
               renderItem={renderInventoryItem}
               keyExtractor={(item, index) => `${item.Nimi}-${index}`}
               ListEmptyComponent={
-                <Text style={diningroomStyle.cellText}
-                >Tyhjältä näyttää!</Text>
+                <Text style={diningroomStyle.cellText}>Tyhjältä näyttää!</Text>
               }
             />
           </KeyboardAvoidingView>
         )}
       </View>
 
-      <View style={diningroomStyle.bottomButtons}>
-      <SendInventoryButton
-        onClick={() => handleInventorySend(selectedDate)}
-    />
-        <AddItemButton
-          onClick={handleModalToggle}
-        />
-      </View>
       <View style={diningroomStyle.backButton}>
         <BackButton />
+        <AddItemButton onClick={handleModalToggle} />
+        <SendInventoryButton
+          onClick={() => handleInventorySend(selectedDate)}
+        />
       </View>
       <YearMonthPickerModal
         visible={modalVisible}

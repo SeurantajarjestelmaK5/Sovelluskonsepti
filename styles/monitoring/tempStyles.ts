@@ -16,7 +16,7 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
-      padding: 16,
+      padding: 10,
       backgroundColor: ThemeColors.background,
     },
     content: {
@@ -25,7 +25,7 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
       padding: 16,
       backgroundColor: ThemeColors.background,
-      width: "100%"
+      width: "100%",
     },
     header: {
       fontSize: 36,
@@ -40,6 +40,7 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
     scrollList: {
       alignSelf: "center",
       paddingLeft: 120,
+      backgroundColor: ThemeColors.background,
     },
     button: {
       paddingVertical: 20,
@@ -65,10 +66,7 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
     tableRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderColor: "#e0e0e0",
-      width: "100%",
+      width: "85%",
     },
     calendarButton: {
       flexDirection: "row",
@@ -76,10 +74,18 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
       width: "60%",
       height: 60,
       backgroundColor: ThemeColors.navSelected,
-      borderRadius: 20,
-      marginTop: 20,
+      borderRadius: 15,
+      marginBottom: 30,
       paddingHorizontal: 10,
       justifyContent: "space-between",
+    },
+    calendarDisplayButton: {
+      paddingVertical: 20,
+      paddingHorizontal: 45,
+      borderRadius: 5,
+      backgroundColor: ThemeColors.text,
+      justifyContent: "center",
+      alignItems: "center",
     },
     closeButton: {
       height: 50,
@@ -91,6 +97,17 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
       alignSelf: "center",
       paddingLeft: 30,
-      paddingTop: 5
-    }
+      paddingTop: 5,
+    },
+    textInputsRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+      marginTop: 20,
+      marginBottom: 20,
+    },
+    textInput: {
+      width: "30%",
+      alignSelf: "center",
+    },
   });

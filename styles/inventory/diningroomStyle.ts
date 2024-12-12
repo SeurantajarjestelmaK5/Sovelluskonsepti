@@ -145,10 +145,10 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       borderRadius: 5,
       marginLeft: 5,
     },
-    bottomButtons: { 
-      flex: 0.1,
+    bottomButtons: {
+      flex: 0.4,
       width: "100%",
-      flexDirection: "row-reverse",
+      flexDirection: "column",
       justifyContent: "space-evenly",
       alignItems: "center",
     },
@@ -156,9 +156,9 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignContent: "flex-start",
-      width: "100%",
-      marginBottom: 10,
-      marginLeft: 10,
+      width: "98%",
+      marginBottom: 20,
+      marginTop: 20,
     },
     trashIcon: {
       fontSize: 24,
