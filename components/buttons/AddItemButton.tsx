@@ -14,14 +14,14 @@ const AddItemButton: React.FC<AddItemButtonProps> = ({ onClick }) => {
     return (
         <Pressable
             onPress={onClick} 
-            style={[buttonStyles.button, {flexDirection: "row", alignItems: "center"}]} // Apply flex styling
+            style={[buttonStyles.button, {flexDirection: "row", alignItems: "center", padding: 10}]} // Apply flex styling
         >
             <MaterialCommunityIcons
                 name="plus-thick"
                 size={46}
                 color={ThemeColors.tint}
             />
-                <Text style={[buttonStyles.label, {paddingRight : 15, paddingLeft: 8} ]}>Uusi Tuote</Text>
+                <Text style={[buttonStyles.label, {paddingRight : 15, paddingLeft: 8} ]}>Uusi tuote</Text>
         </Pressable>
     );
 };

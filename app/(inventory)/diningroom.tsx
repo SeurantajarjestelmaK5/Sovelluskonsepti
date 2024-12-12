@@ -399,38 +399,30 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         <Text style={diningroomStyle.columnHeader}>Kpl. €</Text>
         <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
         <Text style={diningroomStyle.columnHeader}>Yht. ALV 0%</Text>
-
       </View>
       <View style={diningroomStyle.inventoryTable}>
-      {isLoading ? (
-       <SmallLoadingIndicator/>
-) : (
-    <KeyboardAvoidingView>
-        <FlatList
-          removeClippedSubviews={false}
-          data={inventoryData[selectedCategory] || []}
-          renderItem={renderInventoryItem}
-          keyExtractor={(item, index) => `${item.Nimi}-${index}`}
-          ListEmptyComponent={
-            <Text style={diningroomStyle.cellText}>
-              Tyhjältä näyttää!
-            </Text>
-          }
-        />
-    </KeyboardAvoidingView>
-      )}
-    </View>
-
-      <View style={diningroomStyle.bottomButtons}>
-      <AddItemButton
-        onClick={handleModalToggle}
-      />
-      <SendInventoryButton
-        onClick={() => handleInventorySend(selectedDate)}
-    />
+        {isLoading ? (
+          <SmallLoadingIndicator />
+        ) : (
+          <KeyboardAvoidingView>
+            <FlatList
+              removeClippedSubviews={false}
+              data={inventoryData[selectedCategory] || []}
+              renderItem={renderInventoryItem}
+              keyExtractor={(item, index) => `${item.Nimi}-${index}`}
+              ListEmptyComponent={
+                <Text style={diningroomStyle.cellText}>Tyhjältä näyttää!</Text>
+              }
+            />
+          </KeyboardAvoidingView>
+        )}
       </View>
       <View style={diningroomStyle.backButton}>
         <BackButton />
+        <AddItemButton onClick={handleModalToggle} />
+        <SendInventoryButton
+          onClick={() => handleInventorySend(selectedDate)}
+        />
       </View>
       <YearMonthPickerModal
         visible={modalVisible}

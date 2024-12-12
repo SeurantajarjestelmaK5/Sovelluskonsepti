@@ -412,11 +412,9 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         )}
       </View>
 
-      <View style={diningroomStyle.bottomButtons}>
-        <AddItemButton onClick={handleModalToggle} />
-      </View>
       <View style={diningroomStyle.backButton}>
         <BackButton />
+        <AddItemButton onClick={handleModalToggle} />
         <SendInventoryButton
           onClick={() => handleInventorySend(selectedDate)}
         />

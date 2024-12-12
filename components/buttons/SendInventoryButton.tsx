@@ -15,10 +15,10 @@ const SendInventoryButton: React.FC<SendInventoryButtonProps> = ({ onClick }) =>
     return (
         <Pressable
             onPress={onClick}
-            style={[buttonStyles.button, {flexDirection: "row", alignItems: "center"}]} // Apply flex styling
+            style={[buttonStyles.button, {flexDirection: "row", alignItems: "center", padding: 10}]} // Apply flex styling
         >
             <MaterialCommunityIcons name="email-send" size={46} color={ThemeColors.tint}/>
-            <Text style={[buttonStyles.label, {paddingRight : 15, paddingLeft: 8} ]}>Lähetä Invis</Text>
+            <Text style={[buttonStyles.label, {paddingRight : 15, paddingLeft: 8} ]}>Lähetä</Text>
         </Pressable>
     );
 };
