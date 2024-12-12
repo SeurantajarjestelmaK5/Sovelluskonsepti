@@ -1,17 +1,19 @@
-import YearMonthPickerModal from "@/components/YearPicker";
+import YearMonthPickerModal from "@/components/modals/YearPicker";
 import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { ActivityIndicator } from "react-native-paper";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Alert, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { Alert, FlatList, Pressable, Text, TextInput, View, KeyboardAvoidingView } from "react-native";
 import { db } from "@/firebase/config";
-import AddItemModal from "@/components/AddItemModal";
+import AddItemModal from "@/components/modals/AddItemModal";
 import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
-import BackButton from "@/components/BackButton";
-import LoadingScreen from "@/components/LoadingScreen";
+import BackButton from "@/components/buttons/BackButton";
+import LoadingScreen from "@/components/misc/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
-import SmallLoadingIndicator from "@/components/SmallLoadingIncidator";
+import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
+import { exportAndSendData } from "@/scripts/mailSender";
+import AddItemButton from "@/components/buttons/AddItemButton";
+import SendInventoryButton from "@/components/buttons/SendInventoryButton";
 
 
 export interface InventoryItem {
@@ -81,16 +83,27 @@ export default function Diningroom() {
     setModalVisible(false);
   };
 
+  const handleModalToggle = () => {
+    setAddItemModalVisible(true)
+  }
   const handleItemAdded = () => {
     setAddItemModalVisible(false);
     setItemAdded(true)
   };
 
 
-  const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => (
-    <View style={diningroomStyle.tableRow} key={`${item.Nimi}-${index}`}>
+  const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => {
+    const isEven = index % 2 === 0;
+    const rowStyle = [
+      diningroomStyle.tableRow,
+      { backgroundColor: isEven ? ThemeColors.navSelected : ThemeColors.navDefault }, // Alternate colors
+    ];
+    
+    return (
+    <View style={rowStyle} key={`${item.Nimi}-${index}`}>
       <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
       <TextInput
+        removeClippedSubviews={false}           
         style={diningroomStyle.editableCell}
         value={tempValues[item.Nimi]?.Määrä ?? item.Määrä.toString()}
         onChangeText={(text) => handleChange(item.Nimi, "Määrä", text)}
@@ -100,6 +113,7 @@ export default function Diningroom() {
       <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
       <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
       <TextInput
+        removeClippedSubviews={false}  
         style={diningroomStyle.editableCell}
         value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
         onChangeText={(text) => {
@@ -111,12 +125,12 @@ export default function Diningroom() {
         keyboardType="decimal-pad"
       />
       <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Alv0?.toFixed(2)}</Text>
+      <Text style={diningroomStyle.cellText}>{item.Alv0}</Text>
       <Pressable onPress={() => confirmDeleteItem(item)}>
         <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
       </Pressable>
     </View>
-  );
+  );}
   
 /** MODAALIEN HELPPERIT LOPPUU */
 
@@ -243,10 +257,10 @@ const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta
         let newALV0 = 0;
         if (field === "Määrä") {
           newYhteishinta = parsedValue * item.Hinta;
-          newALV0 = item.Hinta / (1 + item.Alv / 100) * parsedValue;
+          newALV0 = +(item.Hinta / (1 + item.Alv / 100) * parsedValue).toFixed(2);
         } else if (field === "Hinta") {
           newYhteishinta = item.Määrä * parsedValue;
-          newALV0 = parsedValue / (1 + item.Alv / 100) * item.Määrä;
+          newALV0 = +(parsedValue / (1 + item.Alv / 100) * item.Määrä).toFixed(2);
         }
 
         // Update Firestore with the new value and Yhteishinta
@@ -312,6 +326,9 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       console.error("Error deleting inventory item:", error);
     }
   };
+  const handleInventorySend = async (selectedDate : any) => {
+    exportAndSendData(selectedDate, "keittiö")
+}
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
 
   /** INVENTAARION FUNKTIOT LOPPUU */
@@ -381,31 +398,28 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         {isLoading ? (
         <SmallLoadingIndicator/>
         ) : (
-          <View>
+          <KeyboardAvoidingView>
             <FlatList
+              removeClippedSubviews={false}
               data={inventoryData[selectedCategory] || []}
               renderItem={renderInventoryItem}
               keyExtractor={(item, index) => `${item.Nimi}-${index}`}
               ListEmptyComponent={
-                <Text style={diningroomStyle.cellText}>Tyhjältä näyttää!</Text>
+                <Text style={diningroomStyle.cellText}
+                >Tyhjältä näyttää!</Text>
               }
             />
-          </View>
+          </KeyboardAvoidingView>
         )}
       </View>
 
       <View style={diningroomStyle.bottomButtons}>
-        <Pressable
-          onPress={() => {
-            setAddItemModalVisible(true);
-          }}
-        >
-          <MaterialCommunityIcons
-            name="plus-thick"
-            size={46}
-            style={diningroomStyle.backIcon}
-          />
-        </Pressable>
+      <SendInventoryButton
+        onClick={() => handleInventorySend(selectedDate)}
+    />
+        <AddItemButton
+          onClick={handleModalToggle}
+        />
       </View>
       <View style={diningroomStyle.backButton}>
         <BackButton />

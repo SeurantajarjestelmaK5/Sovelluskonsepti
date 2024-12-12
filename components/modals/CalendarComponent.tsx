@@ -6,7 +6,7 @@ import {
   LocaleConfig,
   DateData,
 } from "react-native-calendars";
-import { useThemeColors } from "../constants/ThemeColors";
+import { useThemeColors } from "../../constants/ThemeColors";
 import { getCalendarStyles } from "@/styles/components/calendarStyle";
 
 LocaleConfig.locales["fi"] = {
@@ -63,6 +63,7 @@ export default function CalendarComponent({
   dataDates,
   selectedDate,
 }: CalendarProps) {
+  const [initialDate, setInitialDate] = useState<string>("");
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCalendarStyles(ThemeColors), [ThemeColors]);
 
@@ -92,6 +93,7 @@ export default function CalendarComponent({
     return marks;
   }, [transformedDates, selectedDate, ThemeColors]);
 
+
   return (
     <Calendar
       onDayPress={onDayPress}
@@ -99,6 +101,7 @@ export default function CalendarComponent({
       style={styles.calendar}
       hideExtraDays={true}
       markedDates={markedDates}
+      initialDate={selectedDate ? selectedDate : initialDate}
       theme={{
         calendarBackground: ThemeColors.navDefault,
         textSectionTitleColor: ThemeColors.text,

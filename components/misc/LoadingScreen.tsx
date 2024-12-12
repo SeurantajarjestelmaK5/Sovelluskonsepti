@@ -18,8 +18,8 @@ export default function LoadingScreen() {
       <Image
         source={
           colorScheme === "light"
-            ? require("../assets/images/k5light.png")
-            : require("../assets/images/k5dark.jpg")
+            ? require("../../assets/images/k5light.png")
+            : require("../../assets/images/k5dark.jpg")
         }
         style={styles.logo}
       />

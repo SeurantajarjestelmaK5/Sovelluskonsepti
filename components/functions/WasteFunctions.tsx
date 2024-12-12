@@ -1,5 +1,5 @@
 import { db } from "../../firebase/config";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs, doc, getDoc, setDoc, query } from "firebase/firestore";
 
 interface WasteData {
   id: string;
@@ -223,3 +223,66 @@ export const FetchDatesWithData = async (
     return [];
   }
 };
+
+export const AddWaste = async (
+  wasteType: string,
+  month: string,
+  year: string,
+  date: string,
+  amount: number
+): Promise<void> => {
+  try {
+    const docRef = doc(
+      db,
+      "omavalvonta",
+      "jätteet2",
+      wasteType,
+      year,
+      month,
+      date 
+    );
+
+    const docSnapshot = await getDoc(docRef);
+    const currentAmount = docSnapshot.exists() ? docSnapshot.data().määrä : 0;  
+
+    await setDoc(
+      docRef,
+      {
+        määrä: currentAmount + amount,
+        yksikkö: "g",
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Error adding waste data:", error);
+  }
+};
+
+ export const getMonthTotal = async (
+  month: string,
+  year: string,
+  wasteType: string
+): Promise<number> => {
+  try {
+    const monthRef = collection(
+      db,
+      "omavalvonta",
+      "jätteet2",
+      wasteType,
+      year,
+      month
+    );
+    const querySnapshot = await getDocs(monthRef);
+    let total = 0;
+
+    querySnapshot.forEach((doc) => {
+      total += doc.data().määrä;
+    });
+
+    return total;
+  } catch (error) {
+    console.error("Error fetching month total:", error);
+    return 0;
+  }
+};
+

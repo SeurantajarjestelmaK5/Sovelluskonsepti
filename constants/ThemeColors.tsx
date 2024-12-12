@@ -11,6 +11,7 @@ export interface ThemeColors {
   navDefault: string;
   navSelected: string;
   button: string;
+  editableField: string;
 };
 
 export const useThemeColors = () => {
@@ -33,6 +34,10 @@ export const useThemeColors = () => {
       colorScheme === "light"
         ? Colors.light.background
         : Colors.dark.background,
+    editableField:
+      colorScheme === "light"
+        ? Colors.dark.background
+        : Colors.light.background,
     navDefault:
       colorScheme === "light"
         ? Colors.light.navDefault
