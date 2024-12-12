@@ -17,7 +17,7 @@ const SendInventoryButton: React.FC<SendInventoryButtonProps> = ({ onClick }) =>
             onPress={onClick}
             style={[buttonStyles.button, {flexDirection: "row", alignItems: "center"}]} // Apply flex styling
         >
-            <MaterialCommunityIcons name="plus-thick" size={46} />
+            <MaterialCommunityIcons name="email-send" size={46} color={ThemeColors.tint}/>
             <Text style={[buttonStyles.label, {paddingRight : 15, paddingLeft: 8} ]}>Lähetä Invis</Text>
         </Pressable>
     );

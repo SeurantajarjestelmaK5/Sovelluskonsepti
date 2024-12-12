@@ -19,6 +19,7 @@ const AddItemButton: React.FC<AddItemButtonProps> = ({ onClick }) => {
             <MaterialCommunityIcons
                 name="plus-thick"
                 size={46}
+                color={ThemeColors.tint}
             />
                 <Text style={[buttonStyles.label, {paddingRight : 15, paddingLeft: 8} ]}>Uusi Tuote</Text>
         </Pressable>
