@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
-import { Button } from "react-native-paper";
+import { Alert, Pressable, Text, View } from "react-native";
 import BackButton from "@/components/buttons/BackButton";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getSampleStyles } from "@/styles/monitoring/sampleStyles";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import YearMonthPickerModal from "@/components/modals/YearMonthPicker";
 import AddSampleModal from "@/components/modals/CreateSampleModal";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import { collection,  deleteDoc,  doc,  getDocs } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
 export default function samples() {
@@ -16,6 +14,7 @@ export default function samples() {
   const [sampleModalVisible, setSampleModalVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [samplesData, setSamplesData] = useState<any[]>([])
+  const [itemAdded, setItemAdded] = useState(false)
   const [selectedYear, setSelectedYear] = useState(() => {
     const currentDate = new Date()
     const currentYear = currentDate.getFullYear()
@@ -39,8 +38,8 @@ export default function samples() {
 useEffect(() => {
   fetchData()
   console.log(samplesData);
-  
-}, [selectedYear])
+  setItemAdded(false)
+}, [selectedYear, itemAdded])
 
   const handleConfirm = (formattedDate: string) => {
     setSelectedYear(formattedDate);
@@ -51,7 +50,30 @@ useEffect(() => {
   const handleSampleSend = () => {
     setSampleModalVisible(false);
   }
+const removeInventoryItem = async (item: any) => {
+  try {
+    const itemRef = doc(db, "omavalvonta", "näytteenotto", selectedYear, item.id);    
 
+    await deleteDoc(itemRef); // Remove from Firebase
+    setItemAdded(true)
+  } catch (error) {
+    console.error("Error deleting inventory item:", error);
+  }
+};
+
+  const confirmDeleteItem = (item: any) => {
+    Alert.alert(
+      "Poista kirjaus",
+      `Haluatko varmasti poistaa kirjauksen päiväyksellä ${item.date}?`,
+      [
+        { text: "Peruuta", style: "cancel" },
+        { text: "Poista", style: "destructive", onPress: async () => {await removeInventoryItem(item);
+          setItemAdded(true);
+        }}
+      ],
+      { cancelable: true }
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -89,7 +111,7 @@ useEffect(() => {
                     <Text style={styles.text}>{item.tulos}</Text>
                     <Text style={styles.text}>{item.arvio}</Text>
                     <Text style={styles.text}>{item.toimenpiteet}</Text>
-                    <Pressable onPress={() => {}}>
+                    <Pressable onPress={() => {confirmDeleteItem(item)}}>
                       <MaterialCommunityIcons
                         name="trash-can-outline"
                         size={43}

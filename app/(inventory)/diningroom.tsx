@@ -65,9 +65,7 @@ export default function Diningroom() {
       const currentDate = new Date();
       const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
       const currentYear = currentDate.getFullYear();
-      setSelectedDate(`${currentMonth}-${currentYear}`);
-      console.log("date selected");
-      
+      setSelectedDate(`${currentMonth}-${currentYear}`);      
     }
   }, [selectedDate]);
 
@@ -81,6 +79,7 @@ export default function Diningroom() {
     setModalVisible(false);
   };
 
+   /** TÄÄ ON TUOTTEEN LISÄYS MODAALILLE */
   const handleModalToggle = () => {
     setAddItemModalVisible(true)
   }
@@ -90,6 +89,10 @@ export default function Diningroom() {
     setItemAdded(true)
   };
 
+  /** MODAALIEN HELPPERIT LOPPUU */
+
+
+  /** TUOTTEIDEN PÄÄ RENDERI */
 
   const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => {
     const isEven = index % 2 === 0;
@@ -129,10 +132,9 @@ export default function Diningroom() {
       </Pressable>
     </View>
   );}
-/** MODAALIEN HELPPERIT LOPPUU */
 
 
-/** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
+/** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE  */
   const getPreviousMonthDate = (dateString: string): string => {
     const [month, year] = dateString.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1, 1);
@@ -186,7 +188,7 @@ export default function Diningroom() {
     try {
       setIsLoading(true);
       await checkOrCreateMonth(date);
-  
+
       const inventoryRef = collection(db, "inventaario", date, "sali");
       const querySnapshot = await getDocs(inventoryRef);
   
@@ -225,7 +227,6 @@ export default function Diningroom() {
         fetchInventory(selectedDate).then((data) => {
           cachedData.current[selectedDate] = data;
           setInventoryData(data);          
-          console.log('item added');
           setItemAdded(false)
           return
         });
@@ -234,7 +235,6 @@ export default function Diningroom() {
         // If data for the selected date is already cached, use it
         setInventoryData(cachedData.current[selectedDate]);
         setIsLoading(false);
-
       } else {
         // Fetch data if not cached
         fetchInventory(selectedDate).then((data) => {

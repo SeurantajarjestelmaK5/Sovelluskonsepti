@@ -4,7 +4,6 @@ import {
   View,
   Text,
   Pressable,
-  StyleSheet,
 } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import { useThemeColors } from "@/constants/ThemeColors";
