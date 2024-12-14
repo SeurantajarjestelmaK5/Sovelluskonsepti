@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, Pressable, Text, View } from "react-native";
+import { Alert, FlatList, KeyboardAvoidingView, Pressable, Text, View } from "react-native";
 import BackButton from "@/components/buttons/BackButton";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getSampleStyles } from "@/styles/monitoring/sampleStyles";
@@ -77,6 +77,25 @@ const removeInventoryItem = async (item: any) => {
     );
   };
 
+  const renderSampleItem = ({item, index} : {item : any, index: number}) => {
+    return (
+    <View style={styles.tableRow} key={`${item.nayte}-${index}`}>
+    <Text style={styles.text}>{item.date}</Text>
+    <Text style={styles.text}>{item.nayte}</Text>
+    <Text style={styles.text}>{item.tulos}</Text>
+    <Text style={styles.text}>{item.arvio}</Text>
+    <Text style={styles.text}>{item.toimenpiteet}</Text>
+    <Pressable onPress={() => {confirmDeleteItem(item)}}>
+      <MaterialCommunityIcons
+        name="trash-can-outline"
+        size={43}
+        color={"#FF0000"}
+      />
+    </Pressable>
+  </View>
+  )
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Pintapuhtausnäyte</Text>
@@ -106,23 +125,19 @@ const removeInventoryItem = async (item: any) => {
       {isLoading ? (
                 <SmallLoadingIndicator />
               ) : (
-                samplesData.map((item) => (
-                  <View style={styles.tableRow} key={item.id}>
-                    <Text style={styles.text}>{item.date}</Text>
-                    <Text style={styles.text}>{item.nayte}</Text>
-                    <Text style={styles.text}>{item.tulos}</Text>
-                    <Text style={styles.text}>{item.arvio}</Text>
-                    <Text style={styles.text}>{item.toimenpiteet}</Text>
-                    <Pressable onPress={() => {confirmDeleteItem(item)}}>
-                      <MaterialCommunityIcons
-                        name="trash-can-outline"
-                        size={43}
-                        color={"#FF0000"}
-                      />
-                    </Pressable>
-                  </View>
-                ))
-              )}
+                <KeyboardAvoidingView>
+                  <FlatList
+                  removeClippedSubviews={false}
+                  data={samplesData}
+                  renderItem={renderSampleItem}
+                  keyExtractor={(item, index) => `${item.nayte}${index}`}
+                  ListEmptyComponent={
+                    <Text style={styles.text}>Tyhjältä näyttää!</Text>
+                  }
+                  />
+                </KeyboardAvoidingView>
+                )
+              }
       
       </View>
       <View style={styles.buttonContainer}>
