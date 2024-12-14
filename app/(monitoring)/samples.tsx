@@ -9,9 +9,11 @@ import AddSampleModal from "@/components/modals/CreateSampleModal";
 import { collection,  deleteDoc,  doc,  getDocs } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
+import SampleInfoModal from "@/components/modals/SampleInfoModal";
 export default function samples() {
   const [modalVisible, setModalVisible] = useState(false)
   const [sampleModalVisible, setSampleModalVisible] = useState(false)
+  const [sampleInfoModalVisible, setSampleInfoModalVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [samplesData, setSamplesData] = useState<any[]>([])
   const [itemAdded, setItemAdded] = useState(false);
@@ -153,8 +155,19 @@ const removeInventoryItem = async (item: any) => {
           onClose={() => setSampleModalVisible(false)}
           onConfirm={handleSampleSend}
         />
+        <Pressable
+        onPress={() => setSampleInfoModalVisible(true)}
+        >
+          <MaterialCommunityIcons
+          name="progress-question"
+          size={43}
+          />
+        </Pressable>
+        <SampleInfoModal
+        visible={sampleInfoModalVisible}
+        onClose={() => setSampleInfoModalVisible(false)}
+        />
       </View>
     </View>
   );
 }
-

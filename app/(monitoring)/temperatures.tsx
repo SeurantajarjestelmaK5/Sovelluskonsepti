@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, FlatList, Modal, Pressable, Text, View } from "react-native";
+import { Alert, FlatList, Keyboard, KeyboardAvoidingView, Modal, Pressable, Text, TouchableWithoutFeedback, View } from "react-native";
 import BackButton from "@/components/buttons/BackButton";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getTempStyles } from "@/styles/monitoring/tempStyles";
@@ -210,9 +210,15 @@ const removeInventoryItem = async (item: any) => {
 
   /** Content Rendering Based on Selected Category */
   const renderContent = () => {
+    const dismissKeyboard = () => {
+      Keyboard.dismiss();
+    };
+
     switch (selectedCategory) {
       case "Tiskikone":
         return (
+          <KeyboardAvoidingView>
+              <TouchableWithoutFeedback onPress={dismissKeyboard}>
           <View style={styles.container}>
             <View style={[styles.content, { maxHeight: "40%" }]}>
               <View style={styles.tableRow}>
@@ -232,6 +238,7 @@ const removeInventoryItem = async (item: any) => {
                   size={43}
                 />
               </View>
+              
               <View style={styles.textInputsRow}>
                 <TextInput
                   placeholder="Pesuvesi"
@@ -255,6 +262,7 @@ const removeInventoryItem = async (item: any) => {
                   <Text>{selectedDay}</Text>
                 </Pressable>
               </View>
+              
               <Pressable
                 style={[styles.button]}
                 onPress={() => {
@@ -264,6 +272,7 @@ const removeInventoryItem = async (item: any) => {
                 <Text>Lisää</Text>
               </Pressable>
             </View>
+           
 
             <View style={[styles.content]}>
               <Pressable
@@ -311,8 +320,11 @@ const removeInventoryItem = async (item: any) => {
               )}
             </View>
           </View>
+          </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
+              
         );
-      case "Liha":
+        case "Liha":
         return (
           <View style={[styles.container]}>
             <View
