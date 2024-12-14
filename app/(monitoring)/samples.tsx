@@ -14,7 +14,7 @@ export default function samples() {
   const [sampleModalVisible, setSampleModalVisible] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [samplesData, setSamplesData] = useState<any[]>([])
-  const [itemAdded, setItemAdded] = useState(false)
+  const [itemAdded, setItemAdded] = useState(false);
   const [selectedYear, setSelectedYear] = useState(() => {
     const currentDate = new Date()
     const currentYear = currentDate.getFullYear()
@@ -36,26 +36,29 @@ export default function samples() {
   }
 }
 useEffect(() => {
+  if (itemAdded) {
+    fetchData().then(() => setItemAdded(false));
+    return;
+  }
   fetchData()
-  console.log(samplesData);
-  setItemAdded(false)
 }, [selectedYear, itemAdded])
 
   const handleConfirm = (formattedDate: string) => {
     setSelectedYear(formattedDate);
+    
     setModalVisible(false);
     setSampleModalVisible(false);
   };
 
-  const handleSampleSend = () => {
+  const handleSampleSend = async () => {
     setSampleModalVisible(false);
+    setItemAdded(true)    
   }
 const removeInventoryItem = async (item: any) => {
   try {
     const itemRef = doc(db, "omavalvonta", "näytteenotto", selectedYear, item.id);    
-
     await deleteDoc(itemRef); // Remove from Firebase
-    setItemAdded(true)
+    await fetchData()
   } catch (error) {
     console.error("Error deleting inventory item:", error);
   }
@@ -64,11 +67,10 @@ const removeInventoryItem = async (item: any) => {
   const confirmDeleteItem = (item: any) => {
     Alert.alert(
       "Poista kirjaus",
-      `Haluatko varmasti poistaa kirjauksen päiväyksellä ${item.date}?`,
+      `Haluatko varmasti poistaa kirjauksen kohteelle ${item.nayte} päiväyksellä ${item.date}?`,
       [
         { text: "Peruuta", style: "cancel" },
         { text: "Poista", style: "destructive", onPress: async () => {await removeInventoryItem(item);
-          setItemAdded(true);
         }}
       ],
       { cancelable: true }
@@ -107,7 +109,7 @@ const removeInventoryItem = async (item: any) => {
                 samplesData.map((item) => (
                   <View style={styles.tableRow} key={item.id}>
                     <Text style={styles.text}>{item.date}</Text>
-                    <Text style={styles.text}>+{item.nayte}C</Text>
+                    <Text style={styles.text}>{item.nayte}</Text>
                     <Text style={styles.text}>{item.tulos}</Text>
                     <Text style={styles.text}>{item.arvio}</Text>
                     <Text style={styles.text}>{item.toimenpiteet}</Text>

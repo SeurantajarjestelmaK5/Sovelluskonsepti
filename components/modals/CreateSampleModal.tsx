@@ -27,8 +27,9 @@ interface SampleItem {
 const AddSampleModal: React.FC<AddSampleModalProps> = ({
   visible,
   onClose,
+  onConfirm
 }) => {
-  const [nayte, setNayte] = useState("");
+  const [nayte, setNayte] = useState("Pihvikone");
   const [tulos, setTulos] = useState<number | "">("");
   const [arvio, setArvio] = useState("");
   const [toimenpiteet, setToimenpiteet] = useState("");
@@ -59,7 +60,7 @@ const AddSampleModal: React.FC<AddSampleModalProps> = ({
   }, [tulos]);
 
   const handleAddSample = () => {
-    if (!nayte || tulos === "" || !toimenpiteet) return;
+    if (!nayte || tulos === "") return;
 
     const newSample: SampleItem = {
       date: currentDate,
@@ -70,14 +71,13 @@ const AddSampleModal: React.FC<AddSampleModalProps> = ({
     };
 
     addSample(currentDate, newSample);
-    onClose();
-
-    setNayte("");
+    setNayte("Pihvikone");
     setTulos("");
     setToimenpiteet("");
+    onConfirm()
   };
 
-  const isFormValid = nayte && tulos !== "" && toimenpiteet;
+  const isFormValid = nayte && tulos !== "";
 
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
@@ -123,7 +123,6 @@ const AddSampleModal: React.FC<AddSampleModalProps> = ({
           children="Lisää Näyte"
           onPress={() => {
             handleAddSample();
-            onClose(); // Ensure modal closes after adding the item
           }}
           mode="contained"
           disabled={!isFormValid}
