@@ -106,7 +106,6 @@ export const exportAndSendData = async (selectedDate : any, location : string) =
 
     // Step 3: Send Email with Attachment
     const sendEmail = async (fileUri : string) => {
-      const fileExists = await FileSystem.getInfoAsync(fileUri);
       const available = await MailComposer.isAvailableAsync();
       if (available) {
         const options = {
