@@ -86,17 +86,13 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
 
       // KP-1530 and KP-4400 calculations
       const previousMonthValue = await getPreviousMonthValue(selectedDate, location);
-      console.log('Previous Month Value:', previousMonthValue);
 
       const kp1530 = overallTotal - previousMonthValue
       const kp4400 = kp1530 * -1
-
-      console.log(kp1530);
-      console.log(kp4400);
       
-      worksheetData.push(['', '', '', '', '', '', '', 'Tili','Brutto','ALV-%','ALV-tyyppi','ALV-status','Tase-erä tunniste','Vientiselite',]);
-      worksheetData.push(['', '', '','Edellisen kuukauden alv 0%:',formatNumber(previousMonthValue),'','', 'KP-1530:', formatNumber(kp1530), '0','100','P','vat_12',`Inventaario ${location} ${selectedDate} `,]);
-      worksheetData.push(['', '', '','','','','', 'KP-4400:', formatNumber(kp4400), '0','100','P','vat_12',`Inventaario ${location} ${selectedDate} `,]);
+      worksheetData.push(['', '', '', '', '', '', '', 'Tili','Brutto','ALV-%','ALV-väh-%','ALV-tyyppi','ALV-status','Tase-erä tunniste','Vientiselite',]);
+      worksheetData.push(['', '', '','Edellisen kuukauden alv 0%:',formatNumber(previousMonthValue),'','', 'KP-1530:', formatNumber(kp1530), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
+      worksheetData.push(['', '', '','','','','', 'KP-4400:', formatNumber(kp4400), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
 
       // Create workbook and write to file
       const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -111,17 +107,13 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
 
     const getPreviousMonthValue = async (selectedDate: string, location: string): Promise<number> => {
       const [month, year] = selectedDate.split('-').map(Number);
-      console.log(year);
-      console.log(month);
-      
+    
       // Adjust year only if the month is January
       const previousYear = month === 1 ? year - 1 : year;
       const previousMonth = month === 1 ? 12 : month - 1;
-      console.log("prev year:" + previousYear);
-      console.log("prev month:" + previousMonth);
+   
       
       const formattedPreviousMonth = `${String(previousMonth).padStart(2, '0')}-${previousYear}`;
-      console.log('Fetching data for previous month:', formattedPreviousMonth);
     
       const docRef = doc(firestore, `inventaario/${formattedPreviousMonth}`);
       const docSnap = await getDoc(docRef);
@@ -149,7 +141,6 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
           const fieldName = location === 'sali' ? 'SaliAlv0' : 'KeittiöAlv0';
           const docRef = doc(firestore, `inventaario/${selectedDate}`);
           await setDoc(docRef, { [fieldName]: overallTotal.toFixed(2) }, { merge: true });
-          console.log(`Saved ${fieldName} to Firestore:`, overallTotal);
         }
       }
     };
