@@ -33,7 +33,20 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
         ['Kategoria', 'Tuotenimi', 'Määrä', 'Hinta (per yksikkö)', 'Kokonaishinta', 'ALV %'],
       ];
 
-      const formatNumber = (num: number) => num.toFixed(2).replace('.', ',');
+      const formatNumber = (num: number | string) => {
+        if (typeof num === "string") {
+          num = parseFloat(num);
+      }
+  
+      // Check if the value is now a valid number
+      if (isNaN(num)) {
+          console.error("Invalid number:", num);
+          return "Invalid number";
+      }
+  
+      // Format the number
+      return num.toFixed(2).replace('.', ',');
+  };
 
       const groupedData: Record<string, any[]> = {
         '25.5': [],
@@ -45,19 +58,19 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
         groupedData[vatRate]?.push(item);
       });
 
-      let overallTotal = 0;
+      let overallTotal : number = 0;
       Object.keys(groupedData).forEach((vatRate) => {
         worksheetData.push([`ALV ${vatRate}%`, '', '', '', '', '']);
-        let vatTotal = 0;
+        let vatTotal : number = 0;
 
         groupedData[vatRate].forEach((item) => {
-          const totalPrice = (item.Määrä || 0) * (item.Hinta || 0);
+          const totalPrice : number = (item.Määrä || 0) * (item.Hinta || 0);
           vatTotal += totalPrice;
           worksheetData.push([
             item.Kategoria || 'Uncategorized',
             item.Nimi || 'Unnamed Item',
             item.Määrä || 0,
-            formatNumber(item.Hinta || 0),
+            item.Hinta || 0,
             formatNumber(totalPrice),
             item.Alv,
           ]);
@@ -70,25 +83,25 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
       worksheetData.push(['', '', '', 'Inventaario Alv 0%:', formatNumber(overallTotal), '']);
 
       // VAT Totals and Alv 0% calculations
-      const overallAlv25 = groupedData['25.5'].reduce(
+      const overallAlv25 : number = groupedData['25.5'].reduce(
         (sum, item) => sum + (item.Määrä || 0) * (item.Hinta || 0),
         0
       );
-      const Alv25Alv0 = overallAlv25 / 1.255;
+      const Alv25Alv0 : number = overallAlv25 / 1.255;
       worksheetData.push(['', '', '', 'Yhteensä Alv 25.5%:', formatNumber(overallAlv25), 'Alv 0%', formatNumber(Alv25Alv0)]);
 
-      const overallAlv14 = groupedData['14'].reduce(
+      const overallAlv14 : number = groupedData['14'].reduce(
         (sum, item) => sum + (item.Määrä || 0) * (item.Hinta || 0),
         0
       );
-      const Alv14Alv0 = overallAlv14 / 1.14;
+      const Alv14Alv0 : number = overallAlv14 / 1.14;
       worksheetData.push(['', '', '', 'Yhteensä Alv 14%:', formatNumber(overallAlv14), 'Alv 0%', formatNumber(Alv14Alv0)]);
 
       // KP-1530 and KP-4400 calculations
-      const previousMonthValue = await getPreviousMonthValue(selectedDate, location);
+      const previousMonthValue : number = await getPreviousMonthValue(selectedDate, location);
 
-      const kp1530 = overallTotal - previousMonthValue
-      const kp4400 = kp1530 * -1
+      const kp1530 : number = overallTotal - previousMonthValue
+      const kp4400 : number = kp1530 * -1
       
       worksheetData.push(['', '', '', '', '', '', '', 'Tili','Brutto','ALV-%','ALV-väh-%','ALV-tyyppi','ALV-status','Tase-erä tunniste','Vientiselite',]);
       worksheetData.push(['', '', '','Edellisen kuukauden alv 0%:',formatNumber(previousMonthValue),'','', 'KP-1530:', formatNumber(kp1530), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
