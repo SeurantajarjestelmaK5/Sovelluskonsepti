@@ -8,6 +8,14 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getCleaningStyles } from "@/styles/monitoring/cleaningStyles";
 import * as CleaningFunctions from "@/components/functions/CleaningFunctions";
+import DisplayTasks from "@/components/misc/CleaningList";
+import LoadingScreen from "@/components/misc/LoadingScreen";
+
+interface Task {
+  name: string;
+  completed: boolean;
+  date: string;
+}
 
 export default function Cleaning() {
   const [year, setYear] = useState<string>("");
@@ -16,10 +24,13 @@ export default function Cleaning() {
   const [endOfWeek, setEndOfWeek] = useState<string>("");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [selectedSide, setSelectedSide] = useState("Keittiö");
-  const [diningRoomTasks, setDiningRoomTasks] = useState<string[]>([]);
-  const [kitchenTasksSunday, setKitchenTasksSunday] = useState<string[]>([]);
-  const [kitchenTasksTuesday, setKitchenTasksTuesday] = useState<string[]>([]);
-  const [kitchenTasksWednesday, setKitchenTasksWednesday] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [diningRoomTasks, setDiningRoomTasks] = useState<Task[]>([]);
+  const [kitchenTasksSunday, setKitchenTasksSunday] = useState<Task[]>([]);
+  const [kitchenTasksTuesday, setKitchenTasksTuesday] = useState<Task[]>([]);
+  const [kitchenTasksWednesday, setKitchenTasksWednesday] = useState<Task[]>(
+    []
+  );
 
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCleaningStyles(ThemeColors), [ThemeColors]);
@@ -28,12 +39,6 @@ export default function Cleaning() {
 
   useEffect(() => {
     updateWeekRange(currentDate);
-
-    // CleaningFunctions.FetchCleaning(year, month, currWeek, day, side).then((data) => {
-    //   if (data) {
-    //     console.log(data);
-    //   }
-    // });
   }, [currentDate]);
   function updateWeekRange(date: Date) {
     const { startOfWeek, endOfWeek } = getWeekRange(date);
@@ -60,38 +65,53 @@ export default function Cleaning() {
     }
   }
 
-useEffect(() => {
-  CleaningFunctions.CheckIfCleaningExists(
-    selectedSide === "Keittiö" ? "keittiö" : "sali",
-    year,
-    month,
-    propWeek
-  ).then((data) => {
-    if (data) {
-      console.log("Cleaning exists");
-    } else {
-      console.log("Cleaning does not exist");
 
-      // Fetch default tasks based on the selected side
-      if (selectedSide === "Keittiö") {
-        CleaningFunctions.FetchKitchenDefaults().then((defaults) => {
-          console.log("Kitchen defaults: ", defaults);
 
-          // Set state for kitchen tasks (days: sunday, tuesday, wednesday)
-          setKitchenTasksSunday(defaults.sunday || []);
-          setKitchenTasksTuesday(defaults.tuesday || []);
-          setKitchenTasksWednesday(defaults.wednesday || []);
-        });
-      } else if (selectedSide === "Sali") {
-        CleaningFunctions.FetchDiningRoomDefaults().then((defaults) => {
-          console.log("Dining room defaults: ", defaults);
-
-          // Assuming you have a single array for all tasks in the dining room
-          setDiningRoomTasks(defaults || []);
-        });
+  useEffect(() => {
+    const checkAndPopulateDefaults = async () => {
+      const dataExists = await CleaningFunctions.checkAndPopulateDefaults(
+        selectedSide === "Keittiö" ? "keittiö" : "sali",
+        year,
+        month,
+        propWeek
+      );
+      if (dataExists) {
+        console.log("Data exists, no need to populate defaults.");
+      } else {
+        console.log("Populating defaults...");
       }
+    };
+    checkAndPopulateDefaults();
+  }, [year, month, propWeek, selectedSide]);
+
+useEffect(() => {
+  const fetchTasks = async () => {
+    try {
+      const tasks = await CleaningFunctions.fetchTasksBySideAndWeek(
+        selectedSide === "Keittiö" ? "keittiö" : "sali",
+        year,
+        month,
+        propWeek
+      );
+      console.log("Fetched tasks:", tasks);
+
+      if (selectedSide === "Keittiö") {
+        setKitchenTasksSunday(Array.isArray(tasks?.sunday) ? tasks.sunday : []);
+        setKitchenTasksTuesday(
+          Array.isArray(tasks?.tuesday) ? tasks.tuesday : []
+        );
+        setKitchenTasksWednesday(
+          Array.isArray(tasks?.wednesday) ? tasks.wednesday : []
+        );
+      } else if (selectedSide === "sali") {
+        setDiningRoomTasks(Array.isArray(tasks?.dining) ? tasks.dining : []);
+      }
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
     }
-  });
+  };
+
+  fetchTasks();
 }, [selectedSide, year, month, propWeek]);
 
   function getWeekRange(date: Date) {
@@ -164,51 +184,14 @@ useEffect(() => {
             <Text style={styles.text}>Sali</Text>
           </Pressable>
         </View>
-        <View style={styles.container}>
-          {selectedSide === "Keittiö" ? (
-            <>
-              {/* Kitchen Tasks */}
-              <Text style={styles.header}>Sunday Tasks</Text>
-              <FlatList
-                data={kitchenTasksSunday}
-                keyExtractor={(item, index) => `sunday-${index}`}
-                renderItem={({ item }) => (
-                  <Text >{item}</Text>
-                )}
-              />
-
-              <Text style={styles.header}>Tuesday Tasks</Text>
-              <FlatList
-                data={kitchenTasksTuesday}
-                keyExtractor={(item, index) => `tuesday-${index}`}
-                renderItem={({ item }) => (
-                  <Text>{item}</Text>
-                )}
-              />
-
-              <Text style={styles.header}>Wednesday Tasks</Text>
-              <FlatList
-                data={kitchenTasksWednesday}
-                keyExtractor={(item, index) => `wednesday-${index}`}
-                renderItem={({ item }) => (
-                  <Text >{item}</Text>
-                )}
-              />
-            </>
-          ) : (
-            <>
-              {/* Dining Room Tasks */}
-              <Text style={styles.header}>Dining Room Tasks</Text>
-              <FlatList
-                data={diningRoomTasks}
-                keyExtractor={(item, index) => `dining-${index}`}
-                renderItem={({ item }) => (
-                  <Text >{item}</Text>
-                )}
-              />
-            </>
-          )}
-        </View>
+        <DisplayTasks
+          kitchenTasksSunday={kitchenTasksSunday}
+          kitchenTasksTuesday={kitchenTasksTuesday}
+          kitchenTasksWednesday={kitchenTasksWednesday}
+          diningRoomTasks={diningRoomTasks}
+          selectedSide={selectedSide}
+          toggleTaskCompletion={() => {}}
+        />
       </View>
       <View style={styles.buttonContainer}>
         <BackButton />
