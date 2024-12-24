@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -6,11 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { useThemeColors } from "@/constants/ThemeColors";
+import { getCleaningListStyles } from "@/styles/monitoring/cleaningListStyles";
+import SmallLoadingIndicator from "./SmallLoadingIncidator";
 
 interface Task {
   name: string;
   completed: boolean;
   date: string;
+  id: string;
 }
 
 interface DisplayTasksProps {
@@ -19,6 +23,7 @@ interface DisplayTasksProps {
   kitchenTasksWednesday: Task[];
   diningRoomTasks: Task[];
   selectedSide: string;
+  isLoading: boolean;
   toggleTaskCompletion: (day: string, taskName: string) => void; // Callback to toggle completion
 }
 
@@ -28,11 +33,20 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
   kitchenTasksWednesday,
   diningRoomTasks,
   selectedSide,
+  isLoading,
   toggleTaskCompletion,
 }) => {
+  const ThemeColors = useThemeColors();
+  const styles = useMemo(
+    () => getCleaningListStyles(ThemeColors),
+    [ThemeColors]
+  );
+
+  console.log("kitchenTasksSunday", kitchenTasksSunday);
+  console.log("diningroomtasks", diningRoomTasks)
   const renderTask = (task: Task, day: string) => (
     <TouchableOpacity
-      onPress={() => toggleTaskCompletion(day, task.name)}
+      onPress={() => toggleTaskCompletion(day, task.id)} // Use task.id instead of task.name
       style={[
         styles.taskItem,
         task.completed && styles.taskCompleted, // Highlight if completed
@@ -44,38 +58,42 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       </Text>
     </TouchableOpacity>
   );
+  
+  if (isLoading) {
+    return <SmallLoadingIndicator />;
+  }
 
   return (
     <View style={styles.container}>
       {selectedSide === "Keittiö" ? (
         <>
-          <Text style={styles.header}>Sunday Tasks</Text>
+          <Text style={styles.header}>Sunnuntai</Text>
           <FlatList
             data={kitchenTasksSunday}
-            keyExtractor={(item, index) => `sunday-${index}`}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderTask(item, "sunday")}
           />
 
-          <Text style={styles.header}>Tuesday Tasks</Text>
+          <Text style={styles.header}>Tiistai</Text>
           <FlatList
             data={kitchenTasksTuesday}
-            keyExtractor={(item, index) => `tuesday-${index}`}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderTask(item, "tuesday")}
           />
 
-          <Text style={styles.header}>Wednesday Tasks</Text>
+          <Text style={styles.header}>Keskiviikko</Text>
           <FlatList
             data={kitchenTasksWednesday}
-            keyExtractor={(item, index) => `wednesday-${index}`}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderTask(item, "wednesday")}
           />
         </>
       ) : (
         <>
-          <Text style={styles.header}>Dining Room Tasks</Text>
+          <Text style={styles.header}>Siivoukset</Text>
           <FlatList
             data={diningRoomTasks}
-            keyExtractor={(item, index) => `dining-${index}`}
+            keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderTask(item, "all")}
           />
         </>
@@ -85,34 +103,3 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
 };
 
 export default DisplayTasks;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  taskItem: {
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-    backgroundColor: "#f5f5f5",
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  taskCompleted: {
-    backgroundColor: "#d4edda",
-    borderColor: "#c3e6cb",
-  },
-  taskName: {
-    fontSize: 16,
-  },
-  taskDate: {
-    fontSize: 12,
-    color: "#555",
-  },
-});

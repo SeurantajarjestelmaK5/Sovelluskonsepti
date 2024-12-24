@@ -8,6 +8,7 @@ import {
   query,
   writeBatch,
   Firestore,
+  updateDoc,
 } from "firebase/firestore";
 import * as Cleaning from "../../constants/CleaningTasks";
 
@@ -140,7 +141,7 @@ export const fetchTasksBySideAndWeek = async (
         db,
         "omavalvonta",
         "siivous",
-        side,
+        "sali",
         year,
         month,
         week,
@@ -159,6 +160,7 @@ export const fetchTasksBySideAndWeek = async (
       tasksSnapshot.forEach((taskDoc) => {
         const task = taskDoc.data();
         tasks.push({
+          id: taskDoc.id, // Include Firestore document ID
           name: task.name,
           completed: task.completed || false,
           date: task.date || "",
@@ -171,13 +173,13 @@ export const fetchTasksBySideAndWeek = async (
       throw error;
     }
   } else if (side === "keittiö") {
-    // Adjusted Kitchen Logic
+    // Kitchen Logic
     try {
       const weekRef = doc(
         db,
         "omavalvonta",
         "siivous",
-        side,
+        "keittiö",
         year,
         month,
         week
@@ -198,6 +200,7 @@ export const fetchTasksBySideAndWeek = async (
           const dayTasks = dayTasksSnapshot.docs.map((taskDoc) => {
             const task = taskDoc.data();
             return {
+              id: taskDoc.id, // Include Firestore document ID
               name: task.name,
               completed: task.completed || false,
               date: task.date || "",
@@ -216,64 +219,70 @@ export const fetchTasksBySideAndWeek = async (
   }
 };
 
-// const toggleTaskCompletion = async (day: string, taskName: string) => {
-//   try {
-//     const isKitchen = selectedSide === "Keittiö";
-//     const updatedTasks = isKitchen
-//       ? { ...kitchenTasks }
-//       : { ...diningRoomTasks };
+export const toggleTaskCompletionInFirestore = async (
+  side: string,
+  year: string,
+  month: string,
+  week: string,
+  day: string | null, // `day` is optional for sali
+  taskId: string, // Firestore document ID
+  completed: boolean
+) => {
+  try {
+    if (side === "keittiö") {
+      // Kitchen tasks: include day in the path
+      const taskDocRef = doc(
+        db,
+        "omavalvonta",
+        "siivous",
+        "keittiö",
+        year,
+        month,
+        week,
+        day!, // Ensure `day` is provided for kitchen tasks
+        taskId
+      );
 
-//     // Find and toggle the specific task
-//     if (updatedTasks[day]) {
-//       const taskIndex = updatedTasks[day].findIndex(
-//         (task) => task.name === taskName
-//       );
-//       if (taskIndex > -1) {
-//         const task = updatedTasks[day][taskIndex];
-//         const newCompletedState = !task.completed;
+      await updateDoc(taskDocRef, {
+        completed,
+        date: completed ? new Date().toISOString() : "",
+      });
 
-//         // Update Firestore
-//         const taskRef = isKitchen
-//           ? doc(
-//               db,
-//               "omavalvonta",
-//               "siivous",
-//               "keittiö",
-//               year,
-//               month,
-//               propWeek,
-//               day,
-//               taskName
-//             )
-//           : doc(
-//               db,
-//               "omavalvonta",
-//               "siivous",
-//               "sali",
-//               year,
-//               month,
-//               propWeek,
-//               "all",
-//               taskName
-//             );
+      console.log(
+        `Kitchen task "${taskId}" on ${day} marked as ${
+          completed ? "completed" : "incomplete"
+        }`
+      );
+    } else if (side === "sali") {
+      // Dining room tasks: no `day`, tasks are under "all"
+      const taskDocRef = doc(
+        db,
+        "omavalvonta",
+        "siivous",
+        "sali",
+        year,
+        month,
+        week,
+        "all",
+        taskId // Firestore document ID under "all"
+      );
 
-//         await updateDoc(taskRef, {
-//           completed: newCompletedState,
-//           date: newCompletedState ? new Date().toISOString() : "",
-//         });
+      await updateDoc(taskDocRef, {
+        completed,
+        date: completed ? new Date().toISOString() : "",
+      });
 
-//         // Update the state
-//         updatedTasks[day][taskIndex] = {
-//           ...task,
-//           completed: newCompletedState,
-//           date: newCompletedState ? new Date().toISOString() : "",
-//         };
-//         isKitchen
-//           ? setKitchenTasks({ ...updatedTasks })
-//           : setDiningRoomTasks({ ...updatedTasks });
-//       }
-//     }
-//   } catch (error) {
-//     console.error("Error toggling task completion:", error);
-//   }
-// };
+      console.log(
+        `Dining room task "${taskId}" marked as ${
+          completed ? "completed" : "incomplete"
+        }`
+      );
+    } else {
+      console.error(`Invalid side: "${side}".`);
+      throw new Error("Side must be either 'keittiö' or 'sali'.");
+    }
+  } catch (error) {
+    console.error("Error updating task completion in Firestore:", error);
+    throw error;
+  }
+};

@@ -15,6 +15,7 @@ interface Task {
   name: string;
   completed: boolean;
   date: string;
+  id: string;
 }
 
 export default function Cleaning() {
@@ -65,7 +66,49 @@ export default function Cleaning() {
     }
   }
 
+ const toggleTaskCompletion = async (day: string, taskId: string) => {
+   try {
+     const tasks = {
+       sunday: kitchenTasksSunday,
+       tuesday: kitchenTasksTuesday,
+       wednesday: kitchenTasksWednesday,
+       all: diningRoomTasks, // Use "all" for dining room
+     }[day];
 
+     if (!tasks) return;
+     const taskIndex = tasks.findIndex((task) => task.id === taskId);
+     if (taskIndex === -1) return;
+
+     const task = tasks[taskIndex];
+     const newCompletionStatus = !task.completed;
+
+     // Update in Firestore
+     await CleaningFunctions.toggleTaskCompletionInFirestore(
+       selectedSide === "Keittiö" ? "keittiö" : "sali",
+       year,
+       month,
+       propWeek,
+       day === "all" ? null : day, // Pass null for "all" (dining room)
+       taskId,
+       newCompletionStatus
+     );
+
+     // Update state locally for immediate feedback
+     const updatedTasks = [...tasks];
+     updatedTasks[taskIndex] = {
+       ...task,
+       completed: newCompletionStatus,
+       date: new Date().toISOString(),
+     };
+
+     if (day === "sunday") setKitchenTasksSunday(updatedTasks);
+     else if (day === "tuesday") setKitchenTasksTuesday(updatedTasks);
+     else if (day === "wednesday") setKitchenTasksWednesday(updatedTasks);
+     else if (day === "all") setDiningRoomTasks(updatedTasks); // Ensure "all" updates diningRoomTasks
+   } catch (error) {
+     console.error("Error toggling task completion:", error);
+   }
+ };
 
   useEffect(() => {
     const checkAndPopulateDefaults = async () => {
@@ -75,44 +118,43 @@ export default function Cleaning() {
         month,
         propWeek
       );
-      if (dataExists) {
-        console.log("Data exists, no need to populate defaults.");
-      } else {
-        console.log("Populating defaults...");
-      }
     };
     checkAndPopulateDefaults();
   }, [year, month, propWeek, selectedSide]);
 
-useEffect(() => {
-  const fetchTasks = async () => {
-    try {
-      const tasks = await CleaningFunctions.fetchTasksBySideAndWeek(
-        selectedSide === "Keittiö" ? "keittiö" : "sali",
-        year,
-        month,
-        propWeek
-      );
-      console.log("Fetched tasks:", tasks);
+  useEffect(() => {
+    const fetchTasks = async () => {
+      setLoading(true);
+      try {
+        const tasks = await CleaningFunctions.fetchTasksBySideAndWeek(
+          selectedSide === "Keittiö" ? "keittiö" : "sali",
+          year,
+          month,
+          propWeek
+        );
 
-      if (selectedSide === "Keittiö") {
-        setKitchenTasksSunday(Array.isArray(tasks?.sunday) ? tasks.sunday : []);
-        setKitchenTasksTuesday(
-          Array.isArray(tasks?.tuesday) ? tasks.tuesday : []
-        );
-        setKitchenTasksWednesday(
-          Array.isArray(tasks?.wednesday) ? tasks.wednesday : []
-        );
-      } else if (selectedSide === "sali") {
-        setDiningRoomTasks(Array.isArray(tasks?.dining) ? tasks.dining : []);
+        if (selectedSide === "Keittiö") {
+          setKitchenTasksSunday(
+            Array.isArray(tasks?.sunday) ? tasks.sunday : []
+          );
+          setKitchenTasksTuesday(
+            Array.isArray(tasks?.tuesday) ? tasks.tuesday : []
+          );
+          setKitchenTasksWednesday(
+            Array.isArray(tasks?.wednesday) ? tasks.wednesday : []
+          );
+        } else if (selectedSide === "Sali") {
+          setDiningRoomTasks(Array.isArray(tasks?.dining) ? tasks.dining : []);
+        }
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-    }
-  };
+    };
 
-  fetchTasks();
-}, [selectedSide, year, month, propWeek]);
+    fetchTasks();
+  }, [selectedSide, year, month, propWeek]);
 
   function getWeekRange(date: Date) {
     const startOfWeek = new Date(date);
@@ -190,7 +232,8 @@ useEffect(() => {
           kitchenTasksWednesday={kitchenTasksWednesday}
           diningRoomTasks={diningRoomTasks}
           selectedSide={selectedSide}
-          toggleTaskCompletion={() => {}}
+          toggleTaskCompletion={toggleTaskCompletion}
+          isLoading={loading}
         />
       </View>
       <View style={styles.buttonContainer}>
