@@ -97,7 +97,6 @@ export default function waste() {
   }, []);
 
   const fetchAndSetWasteData = async (wasteName: string) => {
-    setIsFetching(true);
     const fetchWasteData = async (type: string) => {
       switch (type) {
         case "Bio":
@@ -163,7 +162,7 @@ export default function waste() {
       [wasteName]: monthTotal,
     }));
     
-    setIsFetching(false);
+
   };
 
   useEffect(() => {

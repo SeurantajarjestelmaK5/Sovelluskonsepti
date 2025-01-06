@@ -104,8 +104,8 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
       const kp4400 : number = kp1530 * -1
       
       worksheetData.push(['', '', '', '', '', '', '', 'Tili','Brutto','ALV-%','ALV-väh-%','ALV-tyyppi','ALV-status','Tase-erä tunniste','Vientiselite',]);
-      worksheetData.push(['', '', '','Edellisen kuukauden alv 0%:',formatNumber(previousMonthValue),'','', 'KP-1530:', formatNumber(kp1530), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
-      worksheetData.push(['', '', '','','','','', 'KP-4400:', formatNumber(kp4400), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
+      worksheetData.push(['', '', '','Edellisen kuukauden alv 0%:',formatNumber(previousMonthValue),'','', '1530:', formatNumber(kp1530), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
+      worksheetData.push(['', '', '','','','','', '4400:', formatNumber(kp4400), '0','100','P','vat_12','',`Inventaario ${location} ${selectedDate} `,]);
 
       // Create workbook and write to file
       const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
@@ -142,7 +142,7 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
       const available = await MailComposer.isAvailableAsync();
       if (available) {
         const options = {
-          recipients: ['ruotsalainen.samuli@gmail.com'],
+          recipients: ['olli.vainio@tekodo.fi'],
           subject: `Inventaario Kauppuri 5 - ${selectedDate} - ${location}`,
           body: `Liitteenä inventaario ${location} - ${selectedDate}`,
           attachments: [fileUri],

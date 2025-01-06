@@ -18,19 +18,20 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       marginVertical: 5,
       borderRadius: 5,
       width: Dimensions.get("window").width - 100,
-      backgroundColor: "#f5f5f5",
+      backgroundColor: ThemeColors.navDefault,
       borderWidth: 1,
       borderColor: "#ccc",
     },
     taskCompleted: {
-      backgroundColor: "#10cd3c",
+      backgroundColor: "#05b82e",
       borderColor: "#c3e6cb",
     },
     taskName: {
       fontSize: 16,
+      color: ThemeColors.text,
     },
     taskDate: {
       fontSize: 12,
-      color: "#555",
+      color: "#b60505",
     },
   });

@@ -51,7 +51,7 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       ]}
     >
       <Text style={styles.taskName}>{task.name}</Text>
-      <Text style={styles.taskDate}>
+      <Text style={[styles.taskDate, task.completed && { color: "black" }]}>
         {task.completed ? `Siivottu: ${task.date}` : "Ei siivottu"}
       </Text>
     </TouchableOpacity>
