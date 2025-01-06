@@ -50,6 +50,16 @@ export default function SettingsScreen() {
           value={colorScheme === "dark" ? true : false}
         />
       </View>
+      <View
+        style={{
+          justifyContent: "space-between",
+          flexDirection: "row",
+          alignItems: "center",
+          width: "80%",
+        }}
+      >
+        <Text style={{color: ThemeColors.text}}>Tähän tulis sitte palautelaatikko!</Text>
+      </View>
     </View>
   );
 }
