@@ -41,9 +41,7 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
     () => getCleaningListStyles(ThemeColors),
     [ThemeColors]
   );
-
-  console.log("kitchenTasksSunday", kitchenTasksSunday);
-  console.log("diningroomtasks", diningRoomTasks)
+  
   const renderTask = (task: Task, day: string) => (
     <TouchableOpacity
       onPress={() => toggleTaskCompletion(day, task.id)} // Use task.id instead of task.name

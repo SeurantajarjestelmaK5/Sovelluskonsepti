@@ -72,7 +72,7 @@ export default function Cleaning() {
        sunday: kitchenTasksSunday,
        tuesday: kitchenTasksTuesday,
        wednesday: kitchenTasksWednesday,
-       all: diningRoomTasks, // Use "all" for dining room
+       all: diningRoomTasks,
      }[day];
 
      if (!tasks) return;
@@ -82,13 +82,12 @@ export default function Cleaning() {
      const task = tasks[taskIndex];
      const newCompletionStatus = !task.completed;
 
-     // Update in Firestore
      await CleaningFunctions.toggleTaskCompletionInFirestore(
        selectedSide === "Keittiö" ? "keittiö" : "sali",
        year,
        month,
        propWeek,
-       day === "all" ? null : day, // Pass null for "all" (dining room)
+       day === "all" ? null : day, 
        taskId,
        newCompletionStatus
      );
@@ -104,7 +103,7 @@ export default function Cleaning() {
      if (day === "sunday") setKitchenTasksSunday(updatedTasks);
      else if (day === "tuesday") setKitchenTasksTuesday(updatedTasks);
      else if (day === "wednesday") setKitchenTasksWednesday(updatedTasks);
-     else if (day === "all") setDiningRoomTasks(updatedTasks); // Ensure "all" updates diningRoomTasks
+     else if (day === "all") setDiningRoomTasks(updatedTasks); 
    } catch (error) {
      console.error("Error toggling task completion:", error);
    }
@@ -120,19 +119,31 @@ export default function Cleaning() {
       );
     };
     checkAndPopulateDefaults();
-  }, [year, month, propWeek, selectedSide]);
+  }, [propWeek, selectedSide]);
 
   useEffect(() => {
-    const fetchTasks = async () => {
+    const fetchAndPopulateTasks = async () => {
       setLoading(true);
       try {
-        const tasks = await CleaningFunctions.fetchTasksBySideAndWeek(
-          selectedSide === "Keittiö" ? "keittiö" : "sali",
+        const sideKey = selectedSide === "Keittiö" ? "keittiö" : "sali";
+
+        // Ensure defaults are populated
+        const isPopulated = await CleaningFunctions.checkAndPopulateDefaults(
+          sideKey,
           year,
           month,
           propWeek
         );
 
+        // Now fetch tasks
+        const tasks = await CleaningFunctions.fetchTasksBySideAndWeek(
+          sideKey,
+          year,
+          month,
+          propWeek
+        );
+
+        // Update state based on the side
         if (selectedSide === "Keittiö") {
           setKitchenTasksSunday(
             Array.isArray(tasks?.sunday) ? tasks.sunday : []
@@ -147,14 +158,15 @@ export default function Cleaning() {
           setDiningRoomTasks(Array.isArray(tasks?.dining) ? tasks.dining : []);
         }
       } catch (error) {
-        console.error("Error fetching tasks:", error);
+        console.error("Error fetching or populating tasks:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTasks();
-  }, [selectedSide, year, month, propWeek]);
+    fetchAndPopulateTasks();
+  }, [selectedSide, propWeek]);
+
 
   function getWeekRange(date: Date) {
     const startOfWeek = new Date(date);
@@ -178,13 +190,6 @@ export default function Cleaning() {
           <Pressable
             onPress={() => {
               handleWeekChange(-7);
-              // CleaningFunctions.initializeWeekCleaning(
-              //   year,
-              //   month,
-              //   propWeek,
-              //   "Tiistai",
-              //   selectedSide
-              // );
             }}
             hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
           >

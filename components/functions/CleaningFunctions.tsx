@@ -50,14 +50,18 @@ export const checkAndPopulateDefaults = async (
   month: string,
   week: string
 ) => {
-
   const weekRef = doc(db, "omavalvonta", "siivous", side, year, month, week);
 
-  // Check if week exists
+  // Ensure parent document exists by creating it if it doesn't
   const weekSnapshot = await getDoc(weekRef);
-  if (weekSnapshot.exists()) {
+  if (!weekSnapshot.exists()) {
+    // Create a placeholder document if it doesn't exist
+    await setDoc(weekRef, { initialized: true });
+    console.log("Created placeholder document at weekRef.");
+  } else {
+    // If week document exists, assume data is already populated
     console.log("Data already exists for the selected week.");
-    return true; // Week already exists
+    return true;
   }
 
   // Get current date for the `date` field
@@ -127,6 +131,7 @@ export const checkAndPopulateDefaults = async (
   await batch.commit();
   return false; // Indicates that defaults were populated
 };
+
 
 export const fetchTasksBySideAndWeek = async (
   side: string,
@@ -248,11 +253,7 @@ export const toggleTaskCompletionInFirestore = async (
         date: completed ? new Date().toISOString() : "",
       });
 
-      console.log(
-        `Kitchen task "${taskId}" on ${day} marked as ${
-          completed ? "completed" : "incomplete"
-        }`
-      );
+
     } else if (side === "sali") {
       // Dining room tasks: no `day`, tasks are under "all"
       const taskDocRef = doc(
@@ -272,11 +273,6 @@ export const toggleTaskCompletionInFirestore = async (
         date: completed ? new Date().toISOString() : "",
       });
 
-      console.log(
-        `Dining room task "${taskId}" marked as ${
-          completed ? "completed" : "incomplete"
-        }`
-      );
     } else {
       console.error(`Invalid side: "${side}".`);
       throw new Error("Side must be either 'keittiö' or 'sali'.");
