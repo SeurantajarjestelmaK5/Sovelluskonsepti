@@ -134,6 +134,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       fontSize: 16,
       textAlign: "center",
       color: ThemeColors.text,
+      paddingRight: 15,
     },
     editableCell: {
       flex: 1,

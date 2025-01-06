@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "k5_app",
+    "name": "Omavalvonta",
     "slug": "k5_app",
     "newArchEnabled": true,
     "version": "1.0.0",
@@ -22,6 +22,8 @@
         "backgroundColor": "#5e5e5e"
       },
       "permissions": [
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE"
       ],
@@ -47,7 +49,8 @@
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 0,
-      "checkAutomatically": "ON_LOAD"
+      "checkAutomatically": "ON_LOAD",
+      "url": "https://u.expo.dev/cffa5f1b-61da-4872-ba71-2933814b47a4"
     },
     "extra": {
       "router": {
@@ -56,6 +59,9 @@
       "eas": {
         "projectId": "cffa5f1b-61da-4872-ba71-2933814b47a4"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

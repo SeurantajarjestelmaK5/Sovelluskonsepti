@@ -41,7 +41,7 @@ export default function SettingsScreen() {
           width: "80%",
         }}
       >
-        <ThemedText>Dark mode</ThemedText>
+        <ThemedText>Tumma teema</ThemedText>
         <Switch
           trackColor={{ false: "#767577", true: "#81b0ff" }}
           thumbColor={true ? ThemeColors.tint : "#f4f3f4"}

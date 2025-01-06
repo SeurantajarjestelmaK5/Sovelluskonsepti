@@ -33,6 +33,7 @@ export default function TabsLayout() {
             await Updates.fetchUpdateAsync();
             // Reload the app to apply the update
             await Updates.reloadAsync();
+            alert("Sovellus päivitetty!");
           }
         } catch (error) {
           console.error("Error checking for updates:", error);
