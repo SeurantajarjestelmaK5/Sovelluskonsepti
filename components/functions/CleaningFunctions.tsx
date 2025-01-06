@@ -65,7 +65,7 @@ export const checkAndPopulateDefaults = async (
   }
 
   // Get current date for the `date` field
-  const currentDate = new Date().toISOString(); // ISO format for consistency
+  const currentDate = new Date().toLocaleString(); // ISO format for consistency
 
   // Determine tasks based on side
   let dayTasks: { [key: string]: string[] };
@@ -250,7 +250,7 @@ export const toggleTaskCompletionInFirestore = async (
 
       await updateDoc(taskDocRef, {
         completed,
-        date: completed ? new Date().toISOString() : "",
+        date: completed ? new Date().toLocaleString() : "",
       });
 
 
@@ -270,7 +270,7 @@ export const toggleTaskCompletionInFirestore = async (
 
       await updateDoc(taskDocRef, {
         completed,
-        date: completed ? new Date().toISOString() : "",
+        date: completed ? new Date().toLocaleString() : "",
       });
 
     } else {

@@ -41,7 +41,7 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
     () => getCleaningListStyles(ThemeColors),
     [ThemeColors]
   );
-  
+
   const renderTask = (task: Task, day: string) => (
     <TouchableOpacity
       onPress={() => toggleTaskCompletion(day, task.id)} // Use task.id instead of task.name
@@ -52,7 +52,7 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
     >
       <Text style={styles.taskName}>{task.name}</Text>
       <Text style={styles.taskDate}>
-        {task.completed ? `Completed on: ${task.date}` : "Not Completed"}
+        {task.completed ? `Siivottu: ${task.date}` : "Ei siivottu"}
       </Text>
     </TouchableOpacity>
   );

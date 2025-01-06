@@ -97,7 +97,7 @@ export default function Cleaning() {
      updatedTasks[taskIndex] = {
        ...task,
        completed: newCompletionStatus,
-       date: new Date().toISOString(),
+       date: new Date().toLocaleString(),
      };
 
      if (day === "sunday") setKitchenTasksSunday(updatedTasks);
