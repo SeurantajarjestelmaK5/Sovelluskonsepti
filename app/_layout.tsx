@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, useRouter } from "expo-router";
+import * as Updates from "expo-updates";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useNavigationState } from "@react-navigation/native";
@@ -24,6 +25,23 @@ export default function TabsLayout() {
       }
     };
 
+    useEffect(() => {
+      const checkForUpdates = async () => {
+        try {
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            await Updates.fetchUpdateAsync();
+            // Reload the app to apply the update
+            await Updates.reloadAsync();
+          }
+        } catch (error) {
+          console.error("Error checking for updates:", error);
+        }
+      };
+
+      checkForUpdates();
+    }, []);
+
   return (
     <Tabs
       screenOptions={{
@@ -36,15 +54,15 @@ export default function TabsLayout() {
             onPress={() => handleCogPress()}
           />
         ),
-        headerLeft: () => (
-          <MaterialCommunityIcons
-            name="menu"
-            size={40}
-            style={{ marginLeft: 20 }}
-            color={ThemeColors.tint}
-            onPress={() => router.push("/(menu)")}
-          />
-        ),
+        // headerLeft: () => (
+        //   <MaterialCommunityIcons
+        //     name="menu"
+        //     size={40}
+        //     style={{ marginLeft: 20 }}
+        //     color={ThemeColors.tint}
+        //     onPress={() => router.push("/(menu)")}
+        //   />
+        // ),
         tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
         tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
         tabBarActiveTintColor: ThemeColors.tabIconSelected,

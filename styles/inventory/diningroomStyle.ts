@@ -175,3 +175,4 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       marginBottom: 15,
     },
   });
+
