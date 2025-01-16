@@ -45,6 +45,7 @@ export default function TabsLayout() {
 
   return (
     <Tabs
+      initialRouteName="(monitoring)"
       screenOptions={{
         headerRight: () => (
           <MaterialCommunityIcons
@@ -73,6 +74,7 @@ export default function TabsLayout() {
         tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
         headerStyle: { backgroundColor: ThemeColors.background },
         headerTintColor: ThemeColors.tint,
+        
       }}
     >
       <Tabs.Screen
