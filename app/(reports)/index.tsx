@@ -15,7 +15,8 @@ export default function ReportsHome() {
     <View
       style={reportNavStyle.container}
     >
-      <View style={reportNavStyle.buttonContainer} >
+      <Text style={{fontSize: 30, color: ThemeColors.text}}>TBA</Text>
+      {/* <View style={reportNavStyle.buttonContainer} >
         <Link href="/cleaningReport" asChild>
         <Pressable style={reportNavStyle.button}>
           <Text style={reportNavStyle.buttonText}>Viikkosiivous - raportti</Text>
@@ -51,7 +52,7 @@ export default function ReportsHome() {
           <MaterialCommunityIcons name="clipboard-list" style={reportNavStyle.reportIcon}/>
         </Pressable>
         </Link>
-      </View>
+      </View> */}
     </View>
   );
 }

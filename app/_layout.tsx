@@ -73,18 +73,8 @@ export default function TabsLayout() {
         tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
         headerStyle: { backgroundColor: ThemeColors.background },
         headerTintColor: ThemeColors.tint,
-
       }}
     >
-      <Tabs.Screen
-        name="(monitoring)"
-        options={{
-          title: "Omavalvonta",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={35} />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="(inventory)"
         options={{
@@ -95,6 +85,15 @@ export default function TabsLayout() {
               color={color}
               size={35}
             />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="(monitoring)"
+        options={{
+          title: "Omavalvonta",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="home" color={color} size={35} />
           ),
         }}
       />
