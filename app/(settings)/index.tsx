@@ -32,6 +32,7 @@ export default function SettingsScreen() {
             ? Colors.light.background
             : Colors.dark.background,
       }}
+      
     >
       <View
         style={{
