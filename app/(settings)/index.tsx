@@ -58,7 +58,7 @@ export default function SettingsScreen() {
           width: "80%",
         }}
       >
-        <Text style={{color: ThemeColors.text}}>Tähän tulis sitte palautelaatikko!</Text>
+
       </View>
     </View>
   );

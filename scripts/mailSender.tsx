@@ -143,7 +143,7 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
       if (available) {
         const options = {
           recipients: ['olli.vainio@tekodo.fi'],
-          subject: `Inventaario Kauppuri 5 - ${selectedDate} - ${location}`,
+          subject: `Inventaario Kauppuri 5 - ${selectedDate} - ${location} (Älä vastaa tähän viestiin)`  ,
           body: `Liitteenä inventaario ${location} - ${selectedDate}`,
           attachments: [fileUri],
         };
