@@ -67,6 +67,7 @@ export default function waste() {
     setDate(dayOfMonth);
     setMonth(month);
     setSelectedDate(day.dateString);
+    console.log(date, month)
     setTimeout(() => setCalendarModal(false), 50);
   };
 
@@ -85,13 +86,14 @@ export default function waste() {
       const month = date.getMonth() + 1;
       const year = date.getFullYear();
       const fullDate = `${day}.${month}.${year}`;
-      const currDate = `0${day}`;
-      const currMonth = `${month}`;
+      const currDate = `${day}`;
+      const currMonth = month.toString().length === 1 ? `0${month}` : `${month}`;
       const currYear = `${year}`;
       setCalendarDate(fullDate);
       setDate(currDate);
       setMonth(currMonth);
       setYear(currYear);
+      console.log(currDate, currMonth);
     };
     getCurrentDate();
   }, []);
@@ -166,6 +168,12 @@ export default function waste() {
   };
 
   useEffect(() => {
+  if (!month || !year || !date || bioData.length === undefined) {
+    return;
+  }
+
+
+
     const fetchAllWasteData = async () => {
       const wasteTypes = ["Bio", "Muovi", "Pahvi", "Seka", "Metalli", "Lasi"];
 
