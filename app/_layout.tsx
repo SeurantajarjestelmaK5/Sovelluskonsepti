@@ -25,6 +25,29 @@ export default function TabsLayout() {
       }
     };
 
+useEffect(() => {
+  const checkActiveScreen = () => {
+    if (
+      navigationState &&
+      Array.isArray(navigationState.routes) &&
+      navigationState.routes[navigationState.index]
+    ) {
+      if (
+        navigationState.routes[navigationState.index].name ===
+        "(settings)/index"
+      ) {
+        setIsInSettings(true);
+      } else {
+        setIsInSettings(false);
+      }
+    } else {
+      console.warn("Navigation state is invalid:", navigationState);
+    }
+  };
+
+  checkActiveScreen();
+}, [navigationState]);
+
     useEffect(() => {
       const checkForUpdates = async () => {
         try {

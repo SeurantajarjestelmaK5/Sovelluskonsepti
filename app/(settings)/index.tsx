@@ -5,6 +5,7 @@ import { Text, View, useColorScheme } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { Colors } from "@/constants/Colors";
 import { Button } from "react-native-paper";
+import FeedBackComponent from "@/components/misc/FeedBackComponent";
 
 export default function SettingsScreen() {
   const [switchOn, setSwitchOn] = useState(false);
@@ -59,7 +60,7 @@ export default function SettingsScreen() {
           width: "80%",
         }}
       >
-
+        <FeedBackComponent />
       </View>
     </View>
   );
