@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import { Tabs, useRouter } from "expo-router";
+import { View, Text } from "react-native";
 import * as Updates from "expo-updates";
+import NetInfo from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useNavigationState } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function TabsLayout() {
   const router = useRouter();
   const ThemeColors = useThemeColors();
   const navigationState = useNavigationState((state) => state);
   const [isInSettings, setIsInSettings] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
 
     const handleCogPress = () => {
       if (isInSettings) {
@@ -48,23 +53,55 @@ useEffect(() => {
   checkActiveScreen();
 }, [navigationState]);
 
-    useEffect(() => {
-      const checkForUpdates = async () => {
-        try {
-          const update = await Updates.checkForUpdateAsync();
-          if (update.isAvailable) {
-            await Updates.fetchUpdateAsync();
-            // Reload the app to apply the update
-            await Updates.reloadAsync();
-            alert("Sovellus päivitetty uusimpaan versioon.");
-          }
-        } catch (error) {
-          console.error("Error checking for updates:", error);
-        }
-      };
+useEffect(() => {
+  const checkForUpdates = async () => {
+    try {
+      setIsCheckingUpdates(true); // Show loading modal
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
+        // Reload the app to apply the update
+        await Updates.reloadAsync();
+        alert("Sovellus päivitetty uusimpaan versioon.");
+      }
+    } catch (error) {
+      console.error("Error checking for updates:", error);
+    } finally {
+      setIsCheckingUpdates(false); // Hide loading modal
+    }
+  };
 
-      checkForUpdates();
-    }, []);
+  const checkNetworkAndUpdate = async () => {
+    const netInfo = await NetInfo.fetch();
+    if (netInfo.isConnected) {
+      setIsConnected(true);
+      await checkForUpdates();
+    } else {
+      setIsConnected(false);
+      setIsCheckingUpdates(false); // Hide modal if no connection
+    }
+  };
+
+  checkNetworkAndUpdate();
+}, []);
+
+  if (!isConnected) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: ThemeColors.background,
+        }}
+      >
+        <Text style={{ fontSize: 24, color: ThemeColors.text, marginBottom: 20 }}>
+          Haetaan verkkoyhteyttä...
+        </Text>
+        <ActivityIndicator size="large" color={ThemeColors.tint} />
+      </View>
+    );
+  }
 
   return (
     <Tabs
