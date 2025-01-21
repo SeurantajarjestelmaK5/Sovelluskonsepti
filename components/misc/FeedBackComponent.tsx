@@ -9,7 +9,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
 } from "react-native";
-import { Button, TextInput } from "react-native-paper";
+import { Button, TextInput, TouchableRipple } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 import BackButton from "@/components/buttons/BackButton";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -68,6 +68,17 @@ export default function FeedBackComponent() {
           contentStyle={{ height: 150 }}
           style={styles.textInput}
         />
+
+        <Button
+          children="Lähetä"
+          labelStyle={styles.buttonText}
+          mode="contained"
+          onPress={() => {}}
+          buttonColor={ThemeColors.tint}
+          contentStyle={{ height: 70, width: "100%" }}
+          style={styles.button}
+          rippleColor='white'
+        /> 
       </KeyboardAvoidingView>
     </View>
   );

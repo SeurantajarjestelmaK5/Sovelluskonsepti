@@ -5,6 +5,14 @@ const windowHeight = Dimensions.get("window").height;
 
 export const getFeedBackStyles = (ThemeColors: ThemeColors) =>
   StyleSheet.create({
+    button: {
+      borderRadius: 20,
+      marginBottom: 20,
+    },
+    buttonText: {
+      fontSize: 20,
+      color: "white",
+    },
     container: {
       flex: 1,
       justifyContent: "center",
