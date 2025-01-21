@@ -30,22 +30,27 @@ export const getFeedBackStyles = (ThemeColors: ThemeColors) =>
       color: "#1f81cc",
       marginBottom: 20,
     },
+    inner: {
+      width: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
     text: {
       fontSize: 23,
       color: "white",
       textAlign: "center",
     },
     textContent: {
-      width: "80%",
+      width: "90%",
       justifyContent: "center",
       alignItems: "center",
       marginBottom: 20,
     },
     textInput: {
         width: "80%",
-        height: windowHeight / 4,
         backgroundColor: "white",
         borderRadius: 20,
         marginBottom: 20,
+        paddingTop: 10,
     }
   });

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Appearance, Switch } from "react-native";
 import { ThemedText } from "@/components/themes/ThemedText";
-import { Text, View, useColorScheme } from "react-native";
+import { Text, View, useColorScheme, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { Colors } from "@/constants/Colors";
 import { Button } from "react-native-paper";
@@ -22,6 +22,7 @@ export default function SettingsScreen() {
   };
 
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <View
       style={{
         flex: 1,
@@ -63,5 +64,6 @@ export default function SettingsScreen() {
         <FeedBackComponent />
       </View>
     </View>
+    </TouchableWithoutFeedback>
   );
 }

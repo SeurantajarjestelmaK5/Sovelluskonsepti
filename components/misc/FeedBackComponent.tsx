@@ -1,6 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "expo-router";
-import { Pressable, Text, View, FlatList } from "react-native";
+import {
+  Pressable,
+  Text,
+  View,
+  FlatList,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Keyboard,
+} from "react-native";
 import { Button, TextInput } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 import BackButton from "@/components/buttons/BackButton";
@@ -11,6 +19,7 @@ import { getFeedBackStyles } from "@/styles/components/feedBackStyle";
 
 export default function FeedBackComponent() {
   const [category, setCategory] = useState("kehitysidea");
+  const [message, setMessage] = useState("");
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getFeedBackStyles(ThemeColors), [ThemeColors]);
 
@@ -21,7 +30,7 @@ export default function FeedBackComponent() {
         <Text style={styles.text}>
           {""}
           Löysitkö bugin? Onko invisnäkymä ärsyttävä? Haluatko muuten vaan
-          morjestaa kehittäjiä? Jätä vapaamuotoinen viesti alle, mikäli haluat
+          morjestaa kehittäjiä? Jätä vapaamuotoinen viesti alle. Mikäli haluat
           raportoida virheistä sovelluksesta niin kuvailethan löytämäsi bugin
           mahdollisimman tarkasti.{""}
         </Text>
@@ -32,7 +41,11 @@ export default function FeedBackComponent() {
         mode="dropdown"
         style={styles.dropdownButton}
       >
-        <Picker.Item label="Bugi/Muu virhe" value="bugi" style={styles.dropdownItem} />
+        <Picker.Item
+          label="Bugi/Muu virhe"
+          value="bugi"
+          style={styles.dropdownItem}
+        />
         <Picker.Item
           label="Kehitysidea"
           value="kehitysidea"
@@ -44,13 +57,18 @@ export default function FeedBackComponent() {
           style={styles.dropdownItem}
         />
       </Picker>
-      <TextInput
-        mode="outlined"
-        label="Viesti"
-        multiline
-        numberOfLines={6}
-        style={styles.textInput}
-      />
+      <KeyboardAvoidingView behavior="padding" style={styles.inner}>
+        <TextInput
+          mode="outlined"
+          placeholder="Kirjoita viesti"
+          activeOutlineColor={ThemeColors.tint}
+          onChangeText={(text) => setMessage(text)}
+          multiline
+          numberOfLines={6}
+          contentStyle={{ height: 150 }}
+          style={styles.textInput}
+        />
+      </KeyboardAvoidingView>
     </View>
   );
 }
