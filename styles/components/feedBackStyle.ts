@@ -59,6 +59,5 @@ export const getFeedBackStyles = (ThemeColors: ThemeColors) =>
         backgroundColor: "white",
         borderRadius: 20,
         marginBottom: 20,
-        paddingTop: 10,
     }
   });
