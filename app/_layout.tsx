@@ -16,74 +16,72 @@ export default function TabsLayout() {
   const [isConnected, setIsConnected] = useState(true);
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false);
 
-    const handleCogPress = () => {
-      if (isInSettings) {
-        // Navigate back to the previous screen
-        if (navigationState.routes.length > 1) {
-          router.back(); // Or use router.pop() for stack-based navigation
+  const handleCogPress = () => {
+    if (isInSettings) {
+      // Navigate back to the previous screen
+      if (navigationState.routes.length > 1) {
+        router.back(); // Or use router.pop() for stack-based navigation
+      }
+      setIsInSettings(false);
+    } else {
+      // Navigate to the settings screen
+      router.push("/(settings)");
+      setIsInSettings(true);
+    }
+  };
+
+  useEffect(() => {
+    const checkActiveScreen = () => {
+      if (
+        navigationState &&
+        Array.isArray(navigationState.routes) &&
+        navigationState.routes[navigationState.index]
+      ) {
+        if (
+          navigationState.routes[navigationState.index].name ===
+          "(settings)/index"
+        ) {
+          setIsInSettings(true);
+        } else {
+          setIsInSettings(false);
         }
-        setIsInSettings(false);
       } else {
-        // Navigate to the settings screen
-        router.push("/(settings)");
-        setIsInSettings(true);
+        console.warn("Navigation state is invalid:", navigationState);
       }
     };
 
-useEffect(() => {
-  const checkActiveScreen = () => {
-    if (
-      navigationState &&
-      Array.isArray(navigationState.routes) &&
-      navigationState.routes[navigationState.index]
-    ) {
-      if (
-        navigationState.routes[navigationState.index].name ===
-        "(settings)/index"
-      ) {
-        setIsInSettings(true);
+    checkActiveScreen();
+  }, [navigationState]);
+
+  useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          // Reload the app to apply the update
+          await Updates.reloadAsync();
+          alert("Sovellus päivitetty uusimpaan versioon.");
+        }
+      } catch (error) {
+        console.error("Error checking for updates:", error);
+      }
+    };
+    checkForUpdates();
+  }, []);
+
+  useEffect(() => {
+    const checkNetwork = async () => {
+      const netInfo = await NetInfo.fetch();
+      if (netInfo.isConnected) {
+        setIsConnected(true);
       } else {
-        setIsInSettings(false);
+        setIsConnected(false);
       }
-    } else {
-      console.warn("Navigation state is invalid:", navigationState);
-    }
-  };
+    };
 
-  checkActiveScreen();
-}, [navigationState]);
-
-useEffect(() => {
-  const checkForUpdates = async () => {
-    try {
-      setIsCheckingUpdates(true); // Show loading modal
-      const update = await Updates.checkForUpdateAsync();
-      if (update.isAvailable) {
-        await Updates.fetchUpdateAsync();
-        // Reload the app to apply the update
-        await Updates.reloadAsync();
-        alert("Sovellus päivitetty uusimpaan versioon.");
-      }
-    } catch (error) {
-      console.error("Error checking for updates:", error);
-    } finally {
-      setIsCheckingUpdates(false); // Hide loading modal
-    }
-  };
-
-  const checkNetworkAndUpdate = async () => {
-    const netInfo = await NetInfo.fetch();
-    if (netInfo.isConnected) {
-      setIsConnected(true);
-      await checkForUpdates();
-    } else {
-      setIsConnected(false);
-      setIsCheckingUpdates(false); // Hide modal if no connection
-    }
-  };
-
-  checkNetworkAndUpdate();
-}, []);
+    checkNetwork();
+  }, []);
 
   if (!isConnected) {
     return (
@@ -95,7 +93,9 @@ useEffect(() => {
           backgroundColor: ThemeColors.background,
         }}
       >
-        <Text style={{ fontSize: 24, color: ThemeColors.text, marginBottom: 20 }}>
+        <Text
+          style={{ fontSize: 24, color: ThemeColors.text, marginBottom: 20 }}
+        >
           Haetaan verkkoyhteyttä...
         </Text>
         <ActivityIndicator size="large" color={ThemeColors.tint} />
@@ -134,7 +134,6 @@ useEffect(() => {
         tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
         headerStyle: { backgroundColor: ThemeColors.background },
         headerTintColor: ThemeColors.tint,
-        
       }}
     >
       <Tabs.Screen
