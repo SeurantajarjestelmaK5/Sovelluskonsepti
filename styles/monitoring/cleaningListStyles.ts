@@ -8,6 +8,11 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       padding: 10,
     },
+    checkboxText: {
+      fontSize: 16,
+      color: ThemeColors.text,
+      marginLeft: 15,
+    },
     header: {
       fontSize: 18,
       fontWeight: "bold",

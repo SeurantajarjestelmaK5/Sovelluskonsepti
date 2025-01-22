@@ -55,7 +55,10 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       return (
         <TouchableOpacity
           onPress={() => toggleTaskCompletion(day, task.id)}
-          style={[styles.taskItemWashing, task.completed && styles.taskCompleted]}
+          style={[
+            styles.taskItemWashing,
+            task.completed && styles.taskCompleted,
+          ]}
         >
           <View>
             <Text style={styles.taskName}>{task.name}</Text>
@@ -66,27 +69,35 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
             </Text>
           </View>
 
-          <View style={styles.radioButtonContainer}>
-            <Checkbox
-              status={task.completed ? "checked" : "unchecked"}
-              onPress={() => toggleTaskCompletion(day, task.id)}
-              uncheckedColor={ThemeColors.text}
-              color="white"
-            />
-            <Checkbox
-              status={task.completed ? "checked" : "unchecked"}
-              onPress={() => toggleTaskCompletion(day, task.id)}
-              uncheckedColor={ThemeColors.text}
-              color="white"
-            />
-            <Checkbox
-              status={task.completed ? "checked" : "unchecked"}
-              onPress={() => toggleTaskCompletion(day, task.id)}
-              uncheckedColor={ThemeColors.text}
-              color="white"
-            />
-          </View>
+          <View style={{ flexDirection: "column" }}>
+            <View style={styles.radioButtonContainer}>
+              <Text style={styles.checkboxText}>TI</Text>
+              <Text style={styles.checkboxText}>PE</Text>
+              <Text style={styles.checkboxText}>SU</Text>
+            </View>
+            <View style={styles.radioButtonContainer}>
+              <Checkbox
+                status={task.completed ? "checked" : "unchecked"}
+                onPress={() => toggleTaskCompletion(day, task.id)}
+                uncheckedColor={ThemeColors.text}
+                color="white"
+              />
 
+              <Checkbox
+                status={task.completed ? "checked" : "unchecked"}
+                onPress={() => toggleTaskCompletion(day, task.id)}
+                uncheckedColor={ThemeColors.text}
+                color="white"
+              />
+
+              <Checkbox
+                status={task.completed ? "checked" : "unchecked"}
+                onPress={() => toggleTaskCompletion(day, task.id)}
+                uncheckedColor={ThemeColors.text}
+                color="white"
+              />
+            </View>
+          </View>
         </TouchableOpacity>
       );
     }
