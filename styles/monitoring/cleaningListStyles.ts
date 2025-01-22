@@ -34,12 +34,17 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       padding: 10,
       marginVertical: 5,
       borderRadius: 5,
-      width: Dimensions.get("window").width - 100,
+      width: '30%',
       backgroundColor: ThemeColors.navDefault,
       borderWidth: 1,
       borderColor: "#ccc",
-      flexDirection: 'row',
-      justifyContent: 'space-between'
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    taskRowContainer: {
+      marginVertical: 10,
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     taskCompleted: {
       backgroundColor: "#05b82e",

@@ -44,63 +44,9 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
     () => getCleaningListStyles(ThemeColors),
     [ThemeColors]
   );
-    // const { checkedFirst, setCheckedFirst } = useState(false);
-    // const { checkedSecond, setCheckedSecond } = useState(false);
-    // const { checkedThird, setCheckedThird } = useState(false);
 
+ 
   const renderTask = (task: Task, day: string) => {
-
-    
-    if (task.name === "Tiskikone") {
-      return (
-        <TouchableOpacity
-          onPress={() => toggleTaskCompletion(day, task.id)}
-          style={[
-            styles.taskItemWashing,
-            task.completed && styles.taskCompleted,
-          ]}
-        >
-          <View>
-            <Text style={styles.taskName}>{task.name}</Text>
-            <Text
-              style={[styles.taskDate, task.completed && { color: "black" }]}
-            >
-              {task.completed ? `Siivottu: ${task.date}` : "Ei siivottu"}
-            </Text>
-          </View>
-
-          <View style={{ flexDirection: "column" }}>
-            <View style={styles.radioButtonContainer}>
-              <Text style={styles.checkboxText}>TI</Text>
-              <Text style={styles.checkboxText}>PE</Text>
-              <Text style={styles.checkboxText}>SU</Text>
-            </View>
-            <View style={styles.radioButtonContainer}>
-              <Checkbox
-                status={task.completed ? "checked" : "unchecked"}
-                onPress={() => toggleTaskCompletion(day, task.id)}
-                uncheckedColor={ThemeColors.text}
-                color="white"
-              />
-
-              <Checkbox
-                status={task.completed ? "checked" : "unchecked"}
-                onPress={() => toggleTaskCompletion(day, task.id)}
-                uncheckedColor={ThemeColors.text}
-                color="white"
-              />
-
-              <Checkbox
-                status={task.completed ? "checked" : "unchecked"}
-                onPress={() => toggleTaskCompletion(day, task.id)}
-                uncheckedColor={ThemeColors.text}
-                color="white"
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-      );
-    }
 
     return (
       <TouchableOpacity
@@ -146,8 +92,51 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       ) : (
         <>
           <Text style={styles.header}>Siivoukset</Text>
+
+          {/* Render Washing Machine Tasks in a Row */}
+          <View style={[styles.taskRowContainer, { flexDirection: "row" }]}>
+            {diningRoomTasks
+              .filter((task) =>
+                ["Tiskikone - KE", "Tiskikone - PE", "Tiskikone - SU"].includes(
+                  task.name
+                )
+              )
+              .map((task) => (
+                <TouchableOpacity
+                  key={task.id}
+                  onPress={() => toggleTaskCompletion("all", task.id)}
+                  style={[
+                    styles.taskItemWashing,
+                    task.completed && styles.taskCompleted,
+                  ]}
+                >
+                  <View>
+                    <Text style={styles.taskName}>{task.name}</Text>
+                    <Text
+                      style={[
+                        styles.taskDate,
+                        task.completed && { color: "black" },
+                      ]}
+                    >
+                      {task.completed
+                        ? `Siivottu: ${task.date}`
+                        : "Ei siivottu"}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+          </View>
+
+          {/* Render Remaining Tasks */}
           <FlatList
-            data={diningRoomTasks}
+            data={diningRoomTasks.filter(
+              (task) =>
+                ![
+                  "Tiskikone - KE",
+                  "Tiskikone - PE",
+                  "Tiskikone - SU",
+                ].includes(task.name)
+            )}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => renderTask(item, "all")}
           />
