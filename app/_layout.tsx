@@ -70,17 +70,16 @@ export default function TabsLayout() {
     checkForUpdates();
   }, []);
 
-  useEffect(() => {
-    const checkNetwork = async () => {
-      const netInfo = await NetInfo.fetch();
-      if (netInfo.isConnected) {
-        setIsConnected(true);
-      } else {
-        setIsConnected(false);
-      }
-    };
 
-    checkNetwork();
+  useEffect(() => {
+      const unsubscribe = NetInfo.addEventListener((state) => {
+        setIsConnected(state.isConnected || false);
+      }
+      );
+
+      return () => {
+        unsubscribe();
+    }
   }, []);
 
   if (!isConnected) {
