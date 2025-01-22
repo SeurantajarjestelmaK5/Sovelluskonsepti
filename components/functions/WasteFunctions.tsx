@@ -242,7 +242,6 @@ export const AddWaste = async (
       date 
     );
 
-    console.log("Adding waste to path:", docRef.path);
 
     const docSnapshot = await getDoc(docRef);
     const currentAmount = docSnapshot.exists() ? docSnapshot.data().määrä : 0;  

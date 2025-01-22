@@ -68,7 +68,6 @@ export default function Diningroom() {
       const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
       const currentYear = currentDate.getFullYear();
       setSelectedDate(`${currentMonth}-${currentYear}`);
-      console.log("date selected");
       
     }
   }, [selectedDate]);
@@ -178,7 +177,7 @@ export default function Diningroom() {
       await setDoc(newDocRef, newItemData);
     });
   
-    console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
+    // console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
   };
 
   /** JA SE SITTEN LOPPUU TÄHÄN*/
@@ -227,7 +226,6 @@ export default function Diningroom() {
         fetchInventory(selectedDate).then((data) => {
           cachedData.current[selectedDate] = data;
           setInventoryData(data);          
-          console.log('item added');
           setItemAdded(false)
           return
         });
@@ -321,7 +319,7 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         return { ...prevData, [selectedCategory]: updatedCategoryItems };
       });
       
-      console.log(`${itemToRemove.Nimi} has been removed from inventory.`);
+      // console.log(`${itemToRemove.Nimi} has been removed from inventory.`);
     } catch (error) {
       console.error("Error deleting inventory item:", error);
     }

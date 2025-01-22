@@ -57,10 +57,9 @@ export const checkAndPopulateDefaults = async (
   if (!weekSnapshot.exists()) {
     // Create a placeholder document if it doesn't exist
     await setDoc(weekRef, { initialized: true });
-    console.log("Created placeholder document at weekRef.");
+
   } else {
     // If week document exists, assume data is already populated
-    console.log("Data already exists for the selected week.");
     return true;
   }
 

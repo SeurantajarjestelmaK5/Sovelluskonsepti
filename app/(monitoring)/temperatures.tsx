@@ -72,7 +72,6 @@ export default function Temperatures() {
       const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
       const currentYear = currentDate.getFullYear();
       setSelectedDateMMYY(`${currentMonth}-${currentYear}`);
-      console.log("date selected");
     }
   }, [selectedDateMMYY, ]);
 
@@ -196,7 +195,6 @@ const removeInventoryItem = async (item: any) => {
     const itemRef = doc(db, "omavalvonta", "lämpötilat", selectedCategory, year, month, `${reFormat}`);    
     await deleteDoc(itemRef); // Remove from Firebase
     setItemAdded(true)
-    console.log("hit");
     
   }
   } catch (error) {
@@ -601,7 +599,6 @@ const removeInventoryItem = async (item: any) => {
     setSelectedDay(formattedDate);
     setDate(formattedDate);
 
-  console.log(formattedDate);
   closeCalendar();
   };
   /** Main Component Return */

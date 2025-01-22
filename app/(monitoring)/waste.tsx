@@ -67,7 +67,6 @@ export default function waste() {
     setDate(dayOfMonth);
     setMonth(month);
     setSelectedDate(day.dateString);
-    console.log(date, month)
     setTimeout(() => setCalendarModal(false), 50);
   };
 
@@ -93,7 +92,6 @@ export default function waste() {
       setDate(currDate);
       setMonth(currMonth);
       setYear(currYear);
-      console.log(currDate, currMonth);
     };
     getCurrentDate();
   }, []);
