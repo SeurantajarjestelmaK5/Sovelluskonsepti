@@ -13,6 +13,9 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       fontWeight: "bold",
       color: ThemeColors.text,
     },
+    radioButtonContainer: {
+      flexDirection: "row",
+    },
     taskItem: {
       padding: 10,
       marginVertical: 5,
@@ -21,6 +24,17 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       backgroundColor: ThemeColors.navDefault,
       borderWidth: 1,
       borderColor: "#ccc",
+    },
+    taskItemWashing: {
+      padding: 10,
+      marginVertical: 5,
+      borderRadius: 5,
+      width: Dimensions.get("window").width - 100,
+      backgroundColor: ThemeColors.navDefault,
+      borderWidth: 1,
+      borderColor: "#ccc",
+      flexDirection: 'row',
+      justifyContent: 'space-between'
     },
     taskCompleted: {
       backgroundColor: "#05b82e",

@@ -35,7 +35,7 @@ export const getFeedBackStyles = (ThemeColors: ThemeColors) =>
     },
     header: {
       fontSize: 30,
-      color: "#1f81cc",
+      color: ThemeColors.tint,
       marginBottom: 20,
     },
     inner: {
