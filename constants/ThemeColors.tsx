@@ -1,5 +1,5 @@
 import { useColorScheme } from "react-native";
-import { Colors } from "./Colors";
+import { useColors } from "./Colors";
 
 export interface ThemeColors {
   tint: string;
@@ -12,10 +12,11 @@ export interface ThemeColors {
   navSelected: string;
   button: string;
   editableField: string;
-};
+}
 
 export const useThemeColors = () => {
   const colorScheme = useColorScheme();
+  const Colors = useColors(); // Get the dynamically updated colors from context
 
   return {
     tint: colorScheme === "light" ? Colors.light.tint : Colors.dark.tint,

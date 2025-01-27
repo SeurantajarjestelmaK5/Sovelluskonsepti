@@ -5,6 +5,7 @@ import * as Updates from "expo-updates";
 import NetInfo from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
+import { ColorProvider } from "../constants/ColorContext";
 import { useNavigationState } from "@react-navigation/native";
 import { ActivityIndicator } from "react-native-paper";
 
@@ -103,79 +104,89 @@ export default function TabsLayout() {
   }
 
   return (
-    <Tabs
-      initialRouteName="(monitoring)"
-      screenOptions={{
-        headerRight: () => (
-          <MaterialCommunityIcons
-            name="cog"
-            size={40}
-            style={{ marginRight: 20 }}
-            color={ThemeColors.tint}
-            onPress={() => handleCogPress()}
-          />
-        ),
-        // headerLeft: () => (
-        //   <MaterialCommunityIcons
-        //     name="menu"
-        //     size={40}
-        //     style={{ marginLeft: 20 }}
-        //     color={ThemeColors.tint}
-        //     onPress={() => router.push("/(menu)")}
-        //   />
-        // ),
-        tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
-        tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
-        tabBarActiveTintColor: ThemeColors.tabIconSelected,
-        tabBarInactiveTintColor: ThemeColors.tabIconDefault,
-        tabBarActiveBackgroundColor: ThemeColors.navSelected,
-        tabBarInactiveBackgroundColor: ThemeColors.navDefault,
-        tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
-        headerStyle: { backgroundColor: ThemeColors.background },
-        headerTintColor: ThemeColors.tint,
-      }}
-    >
-      <Tabs.Screen
-        name="(inventory)"
-        options={{
-          title: "Inventaario",
-          tabBarIcon: ({ color }) => (
+    <ColorProvider>
+      <Tabs
+        initialRouteName="(monitoring)"
+        screenOptions={{
+          headerRight: () => (
             <MaterialCommunityIcons
-              name="clipboard-list"
-              color={color}
-              size={35}
+              name="cog"
+              size={40}
+              style={{ marginRight: 20 }}
+              color={ThemeColors.tint}
+              onPress={() => handleCogPress()}
             />
           ),
+          // headerLeft: () => (
+          //   <MaterialCommunityIcons
+          //     name="menu"
+          //     size={40}
+          //     style={{ marginLeft: 20 }}
+          //     color={ThemeColors.tint}
+          //     onPress={() => router.push("/(menu)")}
+          //   />
+          // ),
+          tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
+          tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
+          tabBarActiveTintColor: ThemeColors.tabIconSelected,
+          tabBarInactiveTintColor: ThemeColors.tabIconDefault,
+          tabBarActiveBackgroundColor: ThemeColors.navSelected,
+          tabBarInactiveBackgroundColor: ThemeColors.navDefault,
+          tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
+          headerStyle: { backgroundColor: ThemeColors.background },
+          headerTintColor: ThemeColors.tint,
         }}
-      />
-      <Tabs.Screen
-        name="(monitoring)"
-        options={{
-          title: "Omavalvonta",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={35} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(reports)"
-        options={{
-          title: "Raportit",
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="chart-bar" color={color} size={35} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="(settings)/index"
-        options={{
-          title: "Asetukset",
-          href: null,
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="chart-bar" color={color} size={35} />
-          ),
-        }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="(inventory)"
+          options={{
+            title: "Inventaario",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="clipboard-list"
+                color={color}
+                size={35}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(monitoring)"
+          options={{
+            title: "Omavalvonta",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons name="home" color={color} size={35} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(reports)"
+          options={{
+            title: "Raportit",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="chart-bar"
+                color={color}
+                size={35}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="(settings)/index"
+          options={{
+            title: "Asetukset",
+            href: null,
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="chart-bar"
+                color={color}
+                size={35}
+              />
+            ),
+          }}
+        />
+      </Tabs>
+    </ColorProvider>
   );
 }

@@ -13,6 +13,7 @@ export default function MonitorHome() {
   ]);
 
   return (
+    
     <View style={monitoringNavStyle.container}>
       <View style={monitoringNavStyle.buttonContainer}>
         <Link href="/cleaning" asChild>

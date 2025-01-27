@@ -3,7 +3,6 @@ import { Appearance, Switch } from "react-native";
 import { ThemedText } from "@/components/themes/ThemedText";
 import { Text, View, useColorScheme, Keyboard, TouchableWithoutFeedback } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
-import { Colors } from "@/constants/Colors";
 import { Button } from "react-native-paper";
 import FeedBackComponent from "@/components/misc/FeedBackComponent";
 
@@ -29,10 +28,7 @@ export default function SettingsScreen() {
         justifyContent: "flex-start",
         alignItems: "center",
         padding: 20,
-        backgroundColor:
-          colorScheme === "light"
-            ? Colors.light.background
-            : Colors.dark.background,
+        backgroundColor: ThemeColors.background
       }}
       
     >
