@@ -99,38 +99,53 @@ export default function Diningroom() {
     ];
     
     return (
-    <View style={rowStyle} key={`${item.Nimi}-${index}`}>
-      <Text style={diningroomStyle.cellText}>{item.Nimi}</Text>
-      <TextInput
-        removeClippedSubviews={false}           
-        style={diningroomStyle.editableCell}
-        value={tempValues[item.Nimi]?.Määrä ?? item.Määrä.toString()}
-        onChangeText={(text) => handleChange(item.Nimi, "Määrä", text)}
-        onEndEditing={() => handleEditingEnd(item, "Määrä", index)}
-        keyboardType="numeric"
-      />
-      <Text style={diningroomStyle.cellText}>{item.Yksikkö}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Alv}</Text>
-      <TextInput
-        removeClippedSubviews={false}  
-        style={diningroomStyle.editableCell}
-        value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
-        onChangeText={(text) => {
-          const regex = /^[0-9]*\.?[0-9]*$/
-          if (regex.test(text)){
-          handleChange(item.Nimi, "Hinta", text)}
-        }}
-        onEndEditing={() => handleEditingEnd(item, "Hinta", index)}
-        keyboardType="decimal-pad"
-      />
-      <Text style={diningroomStyle.cellText}>{item.Yhteishinta?.toFixed(2)}</Text>
-      <Text style={diningroomStyle.cellText}>{item.Alv0}</Text>
-      <Pressable onPress={() => confirmDeleteItem(item)}>
-        <MaterialCommunityIcons name="trash-can-outline" style={diningroomStyle.trashIcon} />
-      </Pressable>
-    </View>
-  );}
-  
+      <View style={rowStyle} key={`${item.Nimi}-${index}`}>
+        <Text style={{ ...diningroomStyle.cellText, marginRight: 20 }}>
+          {item.Nimi}
+        </Text>
+        <TextInput
+          removeClippedSubviews={false}
+          style={diningroomStyle.editableCell}
+          value={tempValues[item.Nimi]?.Määrä ?? item.Määrä.toString()}
+          onChangeText={(text) => handleChange(item.Nimi, "Määrä", text)}
+          onEndEditing={() => handleEditingEnd(item, "Määrä", index)}
+          keyboardType="numeric"
+        />
+        <Text style={{ ...diningroomStyle.cellText, flex: 0.4 }}>
+          {item.Yksikkö}
+        </Text>
+        <Text style={{ ...diningroomStyle.cellText, flex: 0.4 }}>
+          {item.Alv}
+        </Text>
+        <TextInput
+          removeClippedSubviews={false}
+          style={diningroomStyle.editableCell}
+          value={tempValues[item.Nimi]?.Hinta ?? item.Hinta.toString()}
+          onChangeText={(text) => {
+            const regex = /^[0-9]*\.?[0-9]*$/;
+            if (regex.test(text)) {
+              handleChange(item.Nimi, "Hinta", text);
+            }
+          }}
+          onEndEditing={() => handleEditingEnd(item, "Hinta", index)}
+          keyboardType="decimal-pad"
+        />
+        <Text style={{ ...diningroomStyle.cellText, flex: 0.4 }}>
+          {item.Yhteishinta?.toFixed(2)}
+        </Text>
+        <Text style={{ ...diningroomStyle.cellText, flex: 0.4 }}>
+          {item.Alv0}
+        </Text>
+        <Pressable onPress={() => confirmDeleteItem(item)}>
+          <MaterialCommunityIcons
+            name="trash-can-outline"
+            style={diningroomStyle.trashIcon}
+          />
+        </Pressable>
+      </View>
+    );}
+
+
 /** MODAALIEN HELPPERIT LOPPUU */
 
 
@@ -384,13 +399,17 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         />
       </View>
       <View style={diningroomStyle.tableHeader}>
-        <Text style={diningroomStyle.columnHeader}>Tuote</Text>
+        <Text style={{ ...diningroomStyle.columnHeader, marginRight: 100 }}>
+          Tuote
+        </Text>
         <Text style={diningroomStyle.columnHeader}>Määrä</Text>
         <Text style={diningroomStyle.columnHeader}>Yksikkö</Text>
-        <Text style={diningroomStyle.columnHeader}>ALV %</Text>
-        <Text style={diningroomStyle.columnHeader}>Kpl. €</Text>
-        <Text style={diningroomStyle.columnHeader}>Yht. €</Text>
-        <Text style={diningroomStyle.columnHeader}>Yht. AVL 0%</Text>
+        <Text style={diningroomStyle.columnHeader}>ALV%</Text>
+        <Text style={diningroomStyle.columnHeader}>Kpl.€</Text>
+        <Text style={diningroomStyle.columnHeader}>Yht.€</Text>
+        <Text style={{ ...diningroomStyle.columnHeader, marginRight: 20 }}>
+          Yht.ALV 0%
+        </Text>
       </View>
       <View style={diningroomStyle.inventoryTable}>
         {isLoading ? (

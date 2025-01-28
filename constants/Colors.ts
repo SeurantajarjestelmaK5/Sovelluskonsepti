@@ -27,6 +27,6 @@ export const Colors = {
     tabIconSelected: tintColorDark,
     button: "#414141",
     navDefault: "#414141",
-    navSelected: "#adadad",
+    navSelected: "#969696FF",
   },
 };

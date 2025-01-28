@@ -107,7 +107,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
     },
     tableHeader: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "center",
       paddingVertical: 10,
       borderBottomWidth: 1,
       borderColor: "#ccc",
@@ -117,10 +117,11 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
     tableRow: {
       flexDirection: "row",
       justifyContent: "space-between",
+      paddingHorizontal: 5,
       paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderColor: "#e0e0e0",
       width: "100%",
+      borderRadius: 10,
+      marginBottom: 5,
     },
     columnHeader: {
       flex: 1,
@@ -130,21 +131,23 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       color: ThemeColors.text,
     },
     cellText: {
-      flex: 1,
+      flex: 0.7,
       fontSize: 16,
       textAlign: "center",
+      textAlignVertical: "center",
+      textShadowColor: "black",
+      textShadowRadius: 7,
+      fontWeight: "bold",
       color: ThemeColors.text,
-      paddingRight: 15,
     },
     editableCell: {
-      flex: 1,
+      flex: 0.4,
       fontSize: 16,
       textAlign: "center",
       backgroundColor: ThemeColors.editableField,
       color: "black",
       height: "auto",
       borderRadius: 5,
-      marginLeft: 5,
     },
     bottomButtons: {
       flex: 0.4,
@@ -164,7 +167,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
     trashIcon: {
       fontSize: 24,
       color: "red",
-      marginLeft: 10,
+      marginTop: 10,
     },
     logo: {
       width: "60%",
