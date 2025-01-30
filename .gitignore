@@ -9,7 +9,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
-# config.js
+config.js
 adminsdk.json
 admin.js
 serviceAccountKey.json
