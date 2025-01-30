@@ -221,7 +221,7 @@ export default function Diningroom() {
         Määrä: 0,
         Yhteishinta: 0,
         Alv0: 0 / (1 + itemData.Alv / 100),
-        Hinta: 0,
+        Hinta: itemData.Hinta,
       };
       const newDocRef = doc(db, "inventaario", month, "sali", item.id);
       await setDoc(newDocRef, newItemData);
