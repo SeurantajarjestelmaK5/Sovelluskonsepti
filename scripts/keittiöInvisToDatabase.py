@@ -67,7 +67,7 @@ def push_data_to_firebase(data):
         try:
 
             location = "keittiö"
-            selected_date = "11-2024"
+            selected_date = "02-2025"
             doc_ref = db.collection("inventaario").document(selected_date).collection(location).document(item["Nimi"])
 
             # Upload item to Firestore
