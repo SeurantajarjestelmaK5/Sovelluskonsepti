@@ -1,11 +1,5 @@
 import React, { useState, useMemo } from "react";
-import {
-  Modal,
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-} from "react-native";
+import { Modal, View, Text, Pressable, StyleSheet } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import { Picker } from "@react-native-picker/picker";
 import { InventoryItem } from "@/app/(inventory)/diningroom";
@@ -32,6 +26,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
   const [category, setCategory] = useState("Tankit");
+  const [price, setPrice] = useState("");
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [alv, setAlv] = useState(24);
 
@@ -40,7 +35,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   const categories = useMemo(() => {
     return location === "sali"
-      ? ["Tankit", "Oluet", "Siiderit", "Tyhjät", "Viinit", "Alkoholit", "ALV14"]
+      ? [
+          "Tankit",
+          "Oluet",
+          "Siiderit",
+          "Tyhjät",
+          "Viinit",
+          "Alkoholit",
+          "ALV14",
+        ]
       : ["Lihat", "Tuoreet", "Maitokylmiö", "Kuivat", "Pakasteet", "Muut"];
   }, [location]);
 
@@ -56,7 +59,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       Kategoria: category,
       Alv: alv,
       Alv0: 0 / (1 + alv / 100),
-      Hinta: 0,
+      Hinta: parseFloat(price) || 0,
       Yhteishinta: 0,
     };
 
@@ -69,9 +72,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     setQuantity("");
     setUnit("");
     setCategory("");
+    setPrice("");
   };
 
-  const isFormValid = name && quantity && unit && category;
+  const isFormValid = name && quantity && category && price;
 
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
@@ -88,6 +92,19 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             activeOutlineColor={ThemeColors.tint}
           />
           <TextInput
+            placeholder="Hinta"
+            value={price.toString()}
+            onChangeText={(text) => {
+              if (/^\d*\.?\d*$/.test(text)) {
+                setPrice(text);
+              }
+            }}
+            keyboardType="numeric"
+            style={styles.input}
+            mode="outlined"
+            activeOutlineColor={ThemeColors.tint}
+          />
+          <TextInput
             placeholder="Määrä"
             value={quantity}
             onChangeText={setQuantity}
@@ -96,15 +113,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             mode="outlined"
             activeOutlineColor={ThemeColors.tint}
           />
-          <TextInput
+         {location !== 'sali' && (<TextInput
             placeholder="Yksikkö"
             value={unit}
             onChangeText={setUnit}
             style={styles.input}
             mode="outlined"
             activeOutlineColor={ThemeColors.tint}
-          />
-          
+          />)}
+
           <Picker
             selectedValue={category}
             onValueChange={(itemValue) => setCategory(itemValue as string)}
@@ -113,7 +130,11 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             dropdownIconColor={ThemeColors.tint}
           >
             {categories.map((categoryOption) => (
-              <Picker.Item key={categoryOption} label={categoryOption} value={categoryOption} />
+              <Picker.Item
+                key={categoryOption}
+                label={categoryOption}
+                value={categoryOption}
+              />
             ))}
           </Picker>
 
@@ -132,7 +153,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
               >
                 {alv === value && <View style={styles.radioButtonInner} />}
               </View>
-              <Text style={{ color: 'white' }}>{value}%</Text>
+              <Text style={{ color: "white" }}>{value}%</Text>
             </Pressable>
           ))}
 
@@ -141,7 +162,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             onPress={handleAddItem}
             mode="contained"
             disabled={!isFormValid}
-            theme={{ colors: { onSurfaceDisabled: ThemeColors.text, surfaceDisabled: ThemeColors.navDefault, primary: ThemeColors.tint } }}
+            theme={{
+              colors: {
+                onSurfaceDisabled: ThemeColors.text,
+                surfaceDisabled: ThemeColors.navDefault,
+                primary: ThemeColors.tint,
+              },
+            }}
             style={{ marginBottom: 10, marginTop: 10 }}
             contentStyle={{ padding: 10 }}
           />

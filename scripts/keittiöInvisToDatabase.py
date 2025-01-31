@@ -6,7 +6,7 @@ import os
 
 
 
-file_path = "invis_keittiö.xlsx"
+file_path = "invis_keittiö_2025.xlsx"
 # REQUIRES PRIVATE KEY FROM FIREBASE TO WORK
 service_account_path = "serviceAccountKey.json"
 
@@ -67,7 +67,7 @@ def push_data_to_firebase(data):
         try:
 
             location = "keittiö"
-            selected_date = "02-2025"
+            selected_date = "01-2025"
             doc_ref = db.collection("inventaario").document(selected_date).collection(location).document(item["Nimi"])
 
             # Upload item to Firestore
