@@ -25,10 +25,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [unit, setUnit] = useState("");
-  const [category, setCategory] = useState("Tankit");
+  const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [alv, setAlv] = useState(24);
+  const [alv, setAlv] = useState(location === "keittiö" ? 14 : 25.5);
 
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getModalStyles(ThemeColors), [ThemeColors]);
@@ -48,7 +48,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   }, [location]);
 
   const handleAddItem = async () => {
-    if (!name || !quantity || !unit || !category) {
+    if (!name || !quantity || !category) {
       return;
     }
 
@@ -124,11 +124,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
           <Picker
             selectedValue={category}
+            
             onValueChange={(itemValue) => setCategory(itemValue as string)}
             mode="dropdown"
-            style={styles.dropdownButton}
+            style={[styles.dropdownButton, !category && styles.dropdownButtonDisabled]}
             dropdownIconColor={ThemeColors.tint}
           >
+            {!category && (
+              <Picker.Item label="Valitse kategoria" value="" />
+            )}
             {categories.map((categoryOption) => (
               <Picker.Item
                 key={categoryOption}
