@@ -1,6 +1,6 @@
 import { Link } from "expo-router";
 import React, { useMemo } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, Image } from "react-native";
 import { getInvNavStyle } from "../../styles/navigations/inventoryNavStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -11,6 +11,10 @@ export default function InventoryHome() {
 
   return (
     <View style={invNavStyle.container}>
+      {/* <Image
+        source={require("../../assets/images/k5dark.jpg")}
+        style={invNavStyle.logo}
+      /> */}
       <View style={invNavStyle.buttonContainer}>
         <Link href="/kitchen" asChild>
           <Pressable style={invNavStyle.button}>

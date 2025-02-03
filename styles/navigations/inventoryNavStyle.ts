@@ -37,4 +37,9 @@ export const getInvNavStyle = (ThemeColors: ThemeColors) =>
       fontSize: 50,
       paddingTop: 25,
     },
+    logo: {
+      width: "30%",
+      height: "10%",
+      borderRadius: 20,
+    }
   });

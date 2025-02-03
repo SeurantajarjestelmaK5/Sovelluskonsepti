@@ -64,7 +64,7 @@ export default function TabsLayout() {
           alert("Sovellus päivitetty uusimpaan versioon.");
         }
       } catch (error) {
-        console.error("Error checking for updates:", error);
+        
       }
     };
     checkForUpdates();

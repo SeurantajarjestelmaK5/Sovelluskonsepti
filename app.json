@@ -5,13 +5,13 @@
     "newArchEnabled": true,
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/burger.png",
+    "icon": "./assets/images/k5dark.jpg",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/burger-splash.png",
+      "image": "./assets/images/k5dark.jpg",
       "resizeMode": "contain",
-      "backgroundColor": "#5e5e5e"
+      "backgroundColor": "black"
     },
     "ios": {
       "supportsTablet": true

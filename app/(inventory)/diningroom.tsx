@@ -218,7 +218,7 @@ export default function Diningroom() {
       const itemData = item.data();
       const newItemData = {
         ...itemData,
-        Määrä: 0,
+        Määrä: itemData.Määrä,
         Yhteishinta: 0,
         Alv0: 0 / (1 + itemData.Alv / 100),
         Hinta: itemData.Hinta,
