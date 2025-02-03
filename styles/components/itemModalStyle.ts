@@ -32,6 +32,9 @@ export const getModalStyles = (ThemeColors: ThemeColors) =>
       borderRadius: 15,
       backgroundColor: "white",
     },
+    dropdownButtonDisabled: {
+      backgroundColor: "#5f5e5e",
+    },
     dropdownList: {
       borderWidth: 1,
       borderColor: "#ccc",
