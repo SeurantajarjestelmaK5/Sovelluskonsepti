@@ -16,7 +16,6 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       marginTop: 20,
     },
     calendar: {
-      width: "100%",
       backgroundColor: ThemeColors.navDefault,
       flexDirection: "row",
       justifyContent: "center",
@@ -47,11 +46,22 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       width: "60%",
       height: "20%",
     },
+
     modal: {
       flex: 1,
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: ThemeColors.background,
+    },
+    navigationContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+      padding: 10,
+      marginBottom: 15,
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 10,
     },
     text: {
       fontSize: 24,

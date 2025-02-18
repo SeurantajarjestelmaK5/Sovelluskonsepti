@@ -19,6 +19,7 @@ interface WasteButtonProps {
   styles: any;
   ThemeColors: { tint: string };
   date: { day: string; month: string; year: string };
+
 }
 
 export default function WasteButton({

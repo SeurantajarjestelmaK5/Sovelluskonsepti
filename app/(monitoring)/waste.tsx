@@ -78,23 +78,66 @@ export default function waste() {
     setChosenWaste(null); // Close modal
   };
 
+  const getCurrentDate = () => {
+    const date = new Date();
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const fullDate = `${day}.${month}.${year}`;
+    const currDate = `${day}`;
+    const currMonth = month.toString().length === 1 ? `0${month}` : `${month}`;
+    const currYear = `${year}`;
+    setCalendarDate(fullDate);
+    setDate(currDate);
+    setMonth(currMonth);
+    setYear(currYear);
+    return fullDate;
+  };
+
   useEffect(() => {
-    const getCurrentDate = () => {
-      const date = new Date();
-      const day = date.getDate();
-      const month = date.getMonth() + 1;
-      const year = date.getFullYear();
-      const fullDate = `${day}.${month}.${year}`;
-      const currDate = `${day}`;
-      const currMonth = month.toString().length === 1 ? `0${month}` : `${month}`;
-      const currYear = `${year}`;
-      setCalendarDate(fullDate);
-      setDate(currDate);
-      setMonth(currMonth);
-      setYear(currYear);
-    };
     getCurrentDate();
   }, []);
+
+  const navigationHandler = (iconPressed: string) => {
+      let newDay = parseInt(date, 10);
+      let newMonth = parseInt(month, 10);
+      let newYear = parseInt(year, 10);
+
+      if (iconPressed === "left") {
+        newDay -= 1;
+        if (newDay < 1) {
+          newMonth -= 1;
+          if (newMonth < 1) {
+            newMonth = 12;
+            newYear -= 1;
+          }
+          newDay = new Date(newYear, newMonth, 0).getDate();
+        }
+      } else if (iconPressed === "right") {
+        newDay += 1;
+        const daysInMonth = new Date(newYear, newMonth, 0).getDate();
+        if (newDay > daysInMonth) {
+          newDay = 1;
+          newMonth += 1;
+          if (newMonth > 12) {
+            newMonth = 1;
+            newYear += 1;
+          }
+        }
+      }
+
+      // Format month and day to ensure two digits
+      const formattedMonth = newMonth < 10 ? `0${newMonth}` : `${newMonth}`;
+      const formattedDay = newDay < 10 ? `0${newDay}` : `${newDay}`;
+
+      const newFullDate = `${formattedDay}.${formattedMonth}.${newYear}`;
+
+      setDate(formattedDay);
+      setMonth(formattedMonth);
+      setYear(`${newYear}`);
+      setCalendarDate(newFullDate);
+      fetchAllWasteData();
+  };
 
   const fetchAndSetWasteData = async (wasteName: string) => {
     const fetchWasteData = async (type: string) => {
@@ -161,25 +204,21 @@ export default function waste() {
       ...prevTotals,
       [wasteName]: monthTotal,
     }));
-    
+  };
 
+  const fetchAllWasteData = async () => {
+    const wasteTypes = ["Bio", "Muovi", "Pahvi", "Seka", "Metalli", "Lasi"];
+
+    // Create promises for all fetch operations
+    await Promise.all(
+      wasteTypes.map((wasteType) => fetchAndSetWasteData(wasteType))
+    );
   };
 
   useEffect(() => {
-  if (!month || !year || !date || bioData.length === undefined) {
-    return;
-  }
-
-
-
-    const fetchAllWasteData = async () => {
-      const wasteTypes = ["Bio", "Muovi", "Pahvi", "Seka", "Metalli", "Lasi"];
-
-      // Create promises for all fetch operations
-      await Promise.all(
-        wasteTypes.map((wasteType) => fetchAndSetWasteData(wasteType))
-      );
-    };
+    if (!month || !year || !date || bioData.length === undefined) {
+      return;
+    }
 
     fetchAllWasteData();
   }, [month, year, date, bioData.length]);
@@ -199,45 +238,57 @@ export default function waste() {
     }
   }, [month, year, date]);
 
-  if (isFetching) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.header}>Jätteet</Text>
-        <Pressable
-          style={styles.calendar}
-          onPress={() => setCalendarModal(!calendarModal)}
-        >
-          <Text style={styles.text}>{calendarDate}</Text>
-          <MaterialCommunityIcons
-            name="calendar"
-            size={35}
-            color={ThemeColors.tint}
-          />
-        </Pressable>
-        {calendarModal && (
-          <Modal
-            visible={calendarModal}
-            animationType="slide"
-            transparent={true}
-            onDismiss={() => setCalendarModal(false)}
-          >
-            <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
-              <View style={{ flex: 1 }}>
-                <CalendarComponent
-                  onDayPress={handleDatePress}
-                  dataDates={dateList}
-                  selectedDate={selectedDate}
-                />
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
-        )}
-        <View style={{ flex: 1 }}>
-          <SmallLoadingIndicator />
-        </View>
-      </View>
-    );
-  }
+  // if (isFetching) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <Text style={styles.header}>Jätteet</Text>
+  //       <View style={styles.navigationContainer}>
+  //         <MaterialCommunityIcons
+  //           name="chevron-right"
+  //           size={35}
+  //           color={ThemeColors.tint}
+  //         />
+  //         <Pressable
+  //           style={styles.calendar}
+  //           onPress={() => setCalendarModal(!calendarModal)}
+  //         >
+  //           <Text style={styles.text}>{calendarDate}</Text>
+  //           <MaterialCommunityIcons
+  //             name="calendar"
+  //             size={35}
+  //             color={ThemeColors.tint}
+  //           />
+  //         </Pressable>
+  //         <MaterialCommunityIcons
+  //           name="chevron-left"
+  //           size={35}
+  //           color={ThemeColors.tint}
+  //         />
+  //       </View>
+  //       {calendarModal && (
+  //         <Modal
+  //           visible={calendarModal}
+  //           animationType="slide"
+  //           transparent={true}
+  //           onDismiss={() => setCalendarModal(false)}
+  //         >
+  //           <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
+  //             <View style={{ flex: 1 }}>
+  //               <CalendarComponent
+  //                 onDayPress={handleDatePress}
+  //                 dataDates={dateList}
+  //                 selectedDate={selectedDate}
+  //               />
+  //             </View>
+  //           </TouchableWithoutFeedback>
+  //         </Modal>
+  //       )}
+  //       <View style={{ flex: 1 }}>
+  //         <SmallLoadingIndicator />
+  //       </View>
+  //     </View>
+  //   );
+  // }
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -247,17 +298,31 @@ export default function waste() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
           <Text style={styles.header}>Jätteet</Text>
-          <Pressable
-            style={styles.calendar}
-            onPress={() => setCalendarModal(!calendarModal)}
-          >
-            <Text style={styles.text}>{calendarDate}</Text>
+          <View style={styles.navigationContainer}>
             <MaterialCommunityIcons
-              name="calendar"
+              name="chevron-left"
               size={35}
               color={ThemeColors.tint}
+              onPress={() => navigationHandler("left")}
             />
-          </Pressable>
+            <Pressable
+              style={styles.calendar}
+              onPress={() => setCalendarModal(!calendarModal)}
+            >
+              <Text style={styles.text}>{calendarDate}</Text>
+              <MaterialCommunityIcons
+                name="calendar"
+                size={35}
+                color={ThemeColors.tint}
+              />
+            </Pressable>
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={35}
+              color={ThemeColors.tint}
+              onPress={() => navigationHandler("right")}
+            />
+          </View>
           {calendarModal && (
             <Modal
               visible={calendarModal}
