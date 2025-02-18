@@ -55,22 +55,35 @@ export default function Diningroom() {
     "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"
   ];
 
-  const getFormattedDate = () => {
-    if (!selectedDate) return "";
-    const [month, year] = selectedDate.split("-");
-    const monthName = finnishMonths[parseInt(month) - 1];
-    return `${monthName} ${year}`;
-  };
+const getFormattedDate = () => {
+  if (!selectedDate) return "";
 
-  useEffect(() => {
-    if (!selectedDate) {
-      const currentDate = new Date();
-      const currentMonth = String(currentDate.getMonth() + 1).padStart(2, '0');
-      const currentYear = currentDate.getFullYear();
-      setSelectedDate(`${currentMonth}-${currentYear}`);
-      
+  const [month, year] = selectedDate.split("-").map(Number);
+  const monthName = finnishMonths[month - 1];
+
+  return `${monthName} ${year}`;
+};
+
+useEffect(() => {
+  if (!selectedDate) {
+    const currentDate = new Date();
+    let currentMonth = currentDate.getMonth() + 1; // JS months are 0-indexed
+    let currentYear = currentDate.getFullYear();
+    const currentDay = currentDate.getDate();
+
+    // If it's the 1st or 2nd, go back to the previous month
+    if (currentDay <= 2) {
+      currentMonth -= 1;
+      if (currentMonth === 0) {
+        currentMonth = 12;
+        currentYear -= 1;
+      }
     }
-  }, [selectedDate]);
+
+    setSelectedDate(`${String(currentMonth).padStart(2, "0")}-${currentYear}`);
+  }
+}, [selectedDate]);
+
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT LOPPUU */
 
