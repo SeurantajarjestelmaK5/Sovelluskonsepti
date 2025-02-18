@@ -207,12 +207,14 @@ export default function waste() {
   };
 
   const fetchAllWasteData = async () => {
+
     const wasteTypes = ["Bio", "Muovi", "Pahvi", "Seka", "Metalli", "Lasi"];
 
     // Create promises for all fetch operations
     await Promise.all(
       wasteTypes.map((wasteType) => fetchAndSetWasteData(wasteType))
     );
+
   };
 
   useEffect(() => {
@@ -224,6 +226,7 @@ export default function waste() {
   }, [month, year, date, bioData.length]);
 
   useEffect(() => {
+    
     const fetchDatesWithData = async () => {
       try {
         const dates = await WasteFunctions.FetchDatesWithData(month, year);
@@ -299,12 +302,13 @@ export default function waste() {
         <View style={styles.container}>
           <Text style={styles.header}>Jätteet</Text>
           <View style={styles.navigationContainer}>
-            <MaterialCommunityIcons
-              name="chevron-left"
-              size={35}
-              color={ThemeColors.tint}
-              onPress={() => navigationHandler("left")}
-            />
+            <Pressable hitSlop={10} onPress={() => navigationHandler("left")}>
+              <MaterialCommunityIcons
+                name="chevron-left"
+                size={35}
+                color={ThemeColors.tint}
+              />
+            </Pressable>
             <Pressable
               style={styles.calendar}
               onPress={() => setCalendarModal(!calendarModal)}
@@ -316,12 +320,16 @@ export default function waste() {
                 color={ThemeColors.tint}
               />
             </Pressable>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={35}
-              color={ThemeColors.tint}
+            <Pressable
+              hitSlop={10}
               onPress={() => navigationHandler("right")}
-            />
+            >
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={35}
+                color={ThemeColors.tint}
+              />
+            </Pressable>
           </View>
           {calendarModal && (
             <Modal
@@ -345,9 +353,12 @@ export default function waste() {
           )}
 
           <View style={styles.content}>
-            {bioData.map((data) => (
+            {(bioData.length > 0
+              ? bioData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
               <WasteButton
-                key={data.id}
+                key={data.id !== "dummy" ? data.id : `dummy-bio-${index}`}
                 data={data}
                 wasteName="Bio"
                 date={{ day: date, month: month, year: year }}
@@ -362,11 +373,16 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"}
               />
             ))}
-            {mixedData.map((data) => (
+
+            {(mixedData.length > 0
+              ? mixedData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
               <WasteButton
-                key={data.id}
+                key={data.id !== "dummy" ? data.id : `dummy-mixed-${index}`}
                 data={data}
                 wasteName="Seka"
                 date={{ day: date, month: month, year: year }}
@@ -380,11 +396,16 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"}
               />
             ))}
-            {plasticData.map((data) => (
+
+            {(plasticData.length > 0
+              ? plasticData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
               <WasteButton
-                key={data.id}
+                key={data.id !== "dummy" ? data.id : `dummy-plastic-${index}`}
                 data={data}
                 wasteName="Muovi"
                 date={{ day: date, month: month, year: year }}
@@ -398,11 +419,16 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"}
               />
             ))}
-            {cardboardData.map((data) => (
+
+            {(cardboardData.length > 0
+              ? cardboardData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
               <WasteButton
-                key={data.id}
+                key={data.id !== "dummy" ? data.id : `dummy-cardboard-${index}`}
                 data={data}
                 wasteName="Pahvi"
                 date={{ day: date, month: month, year: year }}
@@ -416,11 +442,16 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"}
               />
             ))}
-            {metalData.map((data) => (
+
+            {(metalData.length > 0
+              ? metalData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
               <WasteButton
-                key={data.id}
+                key={data.id !== "dummy" ? data.id : `dummy-metal-${index}`}
                 data={data}
                 wasteName="Metalli"
                 date={{ day: date, month: month, year: year }}
@@ -434,11 +465,16 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"}
               />
             ))}
-            {glassData.map((data) => (
+
+            {(glassData.length > 0
+              ? glassData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
               <WasteButton
-                key={data.id}
+                key={data.id !== "dummy" ? data.id : `dummy-glass-${index}`}
                 data={data}
                 wasteName="Lasi"
                 date={{ day: date, month: month, year: year }}
@@ -452,6 +488,7 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"}
               />
             ))}
           </View>

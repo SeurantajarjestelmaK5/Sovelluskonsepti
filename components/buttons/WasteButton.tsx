@@ -1,5 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Text, Modal, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button, TextInput } from "react-native-paper";
 import * as WasteFunctions from "@/components/functions/WasteFunctions";
@@ -19,7 +25,7 @@ interface WasteButtonProps {
   styles: any;
   ThemeColors: { tint: string };
   date: { day: string; month: string; year: string };
-
+  isLoading: boolean;
 }
 
 export default function WasteButton({
@@ -32,6 +38,7 @@ export default function WasteButton({
   styles,
   ThemeColors,
   date,
+  isLoading,
 }: WasteButtonProps) {
   const [displayedAmount, setDisplayedAmount] = useState<number>(data.määrä);
   const [wasteAmount, setWasteAmount] = useState<number>(0);
@@ -45,9 +52,13 @@ export default function WasteButton({
     <View key={data.id} style={styles.wasteContainer}>
       <View style={styles.wasteContent}>
         <Text style={styles.text}>{wasteName}</Text>
-        <Text style={styles.text}>
-          {displayedAmount} {data.yksikkö}
-        </Text>
+        {isLoading ? (
+          <ActivityIndicator size="small" color={ThemeColors.tint} />
+        ) : (
+          <Text style={styles.text}>
+            {displayedAmount} {data.yksikkö}
+          </Text>
+        )}
       </View>
 
       <MaterialCommunityIcons
