@@ -50,6 +50,9 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       backgroundColor: "#05b82e",
       borderColor: "#c3e6cb",
     },
+    taskLoading: {
+      backgroundColor: 'black',
+    },
     taskName: {
       fontSize: 16,
       color: ThemeColors.text,

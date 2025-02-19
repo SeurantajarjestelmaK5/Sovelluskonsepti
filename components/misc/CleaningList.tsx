@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { useThemeColors } from "@/constants/ThemeColors";
@@ -47,11 +48,24 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
 
  
   const renderTask = (task: Task, day: string) => {
+    if (isLoading) {
+      return (
+        <TouchableOpacity
+          onPress={() => toggleTaskCompletion(day, task.id)}
+          style={[styles.taskItem, task.completed && styles.taskCompleted]}
+        >
+          <Text style={styles.taskName}>{task.name}</Text>
+          <Text style={[styles.taskDate, task.completed && { color: "black" }]}>
+            {task.completed ? `Siivottu: ${task.date}` : "Ei siivottu"}
+          </Text>
+        </TouchableOpacity>
+      );
+    }
 
     return (
       <TouchableOpacity
         onPress={() => toggleTaskCompletion(day, task.id)}
-        style={[styles.taskItem, task.completed && styles.taskCompleted]}
+        style={[styles.taskItem, task.completed && styles.taskCompleted ]}
       >
         <Text style={styles.taskName}>{task.name}</Text>
         <Text style={[styles.taskDate, task.completed && { color: "black" }]}>
@@ -60,9 +74,6 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       </TouchableOpacity>
     );
   };
-  if (isLoading) {
-    return <SmallLoadingIndicator />;
-  }
 
   return (
     <View style={styles.container}>
