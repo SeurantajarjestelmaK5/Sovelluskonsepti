@@ -5,12 +5,13 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
 } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getCleaningListStyles } from "@/styles/monitoring/cleaningListStyles";
 import SmallLoadingIndicator from "./SmallLoadingIncidator";
+import * as cleaningTasks from "@/constants/CleaningTasks";
 
 interface Task {
   name: string;
@@ -38,15 +39,21 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
   isLoading,
   toggleTaskCompletion,
 }) => {
-
-
   const ThemeColors = useThemeColors();
   const styles = useMemo(
     () => getCleaningListStyles(ThemeColors),
     [ThemeColors]
   );
 
- 
+  const renderDummyContent = (task: string ) => {
+    return (
+      <TouchableOpacity style={styles.taskItem}>
+        <Text style={styles.taskName}>{task}</Text>
+        <Text style={styles.taskDate}>Ei siivottu</Text>
+      </TouchableOpacity>
+    );
+  };
+
   const renderTask = (task: Task, day: string) => {
     if (isLoading) {
       return (
@@ -62,10 +69,14 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       );
     }
 
+    if (isLoading && kitchenTasksSunday.length === 0) {
+      return <SmallLoadingIndicator />;
+    }
+
     return (
       <TouchableOpacity
         onPress={() => toggleTaskCompletion(day, task.id)}
-        style={[styles.taskItem, task.completed && styles.taskCompleted ]}
+        style={[styles.taskItem, task.completed && styles.taskCompleted]}
       >
         <Text style={styles.taskName}>{task.name}</Text>
         <Text style={[styles.taskDate, task.completed && { color: "black" }]}>
@@ -80,25 +91,45 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
       {selectedSide === "Keittiö" ? (
         <>
           <Text style={styles.header}>Sunnuntai</Text>
-          <FlatList
-            data={kitchenTasksSunday}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => renderTask(item, "sunday")}
-          />
-
+          {isLoading && kitchenTasksSunday.length === 0 ? (
+            <FlatList
+              data={cleaningTasks.kitchenTasksSunday}
+              renderItem={({ item }) => renderDummyContent(item)}
+            />
+          ) : (
+            <FlatList
+              data={kitchenTasksSunday}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => renderTask(item, "sunday")}
+            />
+          )}
           <Text style={styles.header}>Tiistai</Text>
-          <FlatList
-            data={kitchenTasksTuesday}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => renderTask(item, "tuesday")}
-          />
+          {isLoading && kitchenTasksTuesday.length === 0 ? (
+            <FlatList
+              data={cleaningTasks.kitchenTasksTuesday}
+              renderItem={({ item }) => renderDummyContent(item)}
+            />
+          ) : (
+            <FlatList
+              data={kitchenTasksTuesday}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => renderTask(item, "tuesday")}
+            />
+          )}
 
           <Text style={styles.header}>Keskiviikko</Text>
-          <FlatList
-            data={kitchenTasksWednesday}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => renderTask(item, "wednesday")}
-          />
+          {isLoading && kitchenTasksWednesday.length === 0 ? (
+            <FlatList
+              data={cleaningTasks.kitchenTasksWednesday}
+              renderItem={({ item }) => renderDummyContent(item)}
+            />
+          ) : (
+            <FlatList
+              data={kitchenTasksWednesday}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => renderTask(item, "wednesday")}
+            />
+          )}
         </>
       ) : (
         <>
@@ -106,51 +137,81 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
 
           {/* Render Washing Machine Tasks in a Row */}
           <View style={[styles.taskRowContainer, { flexDirection: "row" }]}>
-            {diningRoomTasks
-              .filter((task) =>
-                ["Tiskikone - KE", "Tiskikone - PE", "Tiskikone - SU"].includes(
-                  task.name
-                )
-              )
-              .map((task) => (
-                <TouchableOpacity
-                  key={task.id}
-                  onPress={() => toggleTaskCompletion("all", task.id)}
-                  style={[
-                    styles.taskItemWashing,
-                    task.completed && styles.taskCompleted,
-                  ]}
-                >
-                  <View>
-                    <Text style={styles.taskName}>{task.name}</Text>
-                    <Text
+            {isLoading
+              ? cleaningTasks.diningRoomTasks
+                  .filter((task) =>
+                    [
+                      "Tiskikone - KE",
+                      "Tiskikone - PE",
+                      "Tiskikone - SU",
+                    ].includes(task)
+                  )
+                  .map((task, index) => (
+                    <View key={index} style={[styles.taskItemWashing]}>
+                      <Text style={[styles.taskName]}>{task}</Text>
+                      <Text style={[styles.taskDate]}>Ei siivottu</Text>
+                    </View>
+                  ))
+              : diningRoomTasks
+                  .filter((task) =>
+                    [
+                      "Tiskikone - KE",
+                      "Tiskikone - PE",
+                      "Tiskikone - SU",
+                    ].includes(task.name)
+                  )
+                  .map((task) => (
+                    <TouchableOpacity
+                      key={task.id}
+                      onPress={() => toggleTaskCompletion("all", task.id)}
                       style={[
-                        styles.taskDate,
-                        task.completed && { color: "black" },
+                        styles.taskItemWashing,
+                        task.completed && styles.taskCompleted,
                       ]}
                     >
-                      {task.completed
-                        ? `Siivottu: ${task.date}`
-                        : "Ei siivottu"}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                      <View>
+                        <Text style={styles.taskName}>{task.name}</Text>
+                        <Text
+                          style={[
+                            styles.taskDate,
+                            task.completed && { color: "black" },
+                          ]}
+                        >
+                          {task.completed
+                            ? `Siivottu: ${task.date}`
+                            : "Ei siivottu"}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
           </View>
 
-          {/* Render Remaining Tasks */}
-          <FlatList
-            data={diningRoomTasks.filter(
-              (task) =>
-                ![
-                  "Tiskikone - KE",
-                  "Tiskikone - PE",
-                  "Tiskikone - SU",
-                ].includes(task.name)
-            )}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => renderTask(item, "all")}
-          />
+          {isLoading ? (
+            <FlatList
+              data={cleaningTasks.diningRoomTasks.filter(
+                (task) =>
+                  ![
+                    "Tiskikone - KE",
+                    "Tiskikone - PE",
+                    "Tiskikone - SU",
+                  ].includes(task)
+              )}
+              renderItem={({ item }) => renderDummyContent(item)}
+            />
+          ) : (
+            <FlatList
+              data={diningRoomTasks.filter(
+                (task) =>
+                  ![
+                    "Tiskikone - KE",
+                    "Tiskikone - PE",
+                    "Tiskikone - SU",
+                  ].includes(task.name)
+              )}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => renderTask(item, "all")}
+            />
+          )}
         </>
       )}
     </View>

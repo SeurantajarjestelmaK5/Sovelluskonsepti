@@ -18,8 +18,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/burger-icon.png",
-        "backgroundColor": "#5e5e5e"
+        "foregroundImage": "./assets/images/burger-icon2.png",
+        "backgroundColor": "#000000FF"
       },
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",

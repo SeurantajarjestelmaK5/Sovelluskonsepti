@@ -24,6 +24,6 @@ export const kitchenTasksSunday = [
   "Hevi-kaappi",
 ];
 
-export const diningroomTasks = [
+export const diningRoomTasks = [
     "Jääpalakone", "Baarihyllyt", "Lasihyllyt", "Pullopaljut", "Huuva", "Kylmäkaapit", "Tankkien ympäristö", "Varastot", "Tiskikone - KE", "Tiskikone - PE", "Tiskikone - SU", "Veitsikippo"
 ]
