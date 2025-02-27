@@ -42,7 +42,7 @@ export default function waste() {
     name: string;
     visible: boolean;
   } | null>(null);
-  const [showInKilograms, setShowInKilograms] = useState(false);
+  const [showInKilograms, setShowInKilograms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
 
@@ -241,259 +241,216 @@ export default function waste() {
     }
   }, [month, year, date]);
 
-  // if (isFetching) {
-  //   return (
-  //     <View style={styles.container}>
-  //       <Text style={styles.header}>Jätteet</Text>
-  //       <View style={styles.navigationContainer}>
-  //         <MaterialCommunityIcons
-  //           name="chevron-right"
-  //           size={35}
-  //           color={ThemeColors.tint}
-  //         />
-  //         <Pressable
-  //           style={styles.calendar}
-  //           onPress={() => setCalendarModal(!calendarModal)}
-  //         >
-  //           <Text style={styles.text}>{calendarDate}</Text>
-  //           <MaterialCommunityIcons
-  //             name="calendar"
-  //             size={35}
-  //             color={ThemeColors.tint}
-  //           />
-  //         </Pressable>
-  //         <MaterialCommunityIcons
-  //           name="chevron-left"
-  //           size={35}
-  //           color={ThemeColors.tint}
-  //         />
-  //       </View>
-  //       {calendarModal && (
-  //         <Modal
-  //           visible={calendarModal}
-  //           animationType="slide"
-  //           transparent={true}
-  //           onDismiss={() => setCalendarModal(false)}
-  //         >
-  //           <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
-  //             <View style={{ flex: 1 }}>
-  //               <CalendarComponent
-  //                 onDayPress={handleDatePress}
-  //                 dataDates={dateList}
-  //                 selectedDate={selectedDate}
-  //               />
-  //             </View>
-  //           </TouchableWithoutFeedback>
-  //         </Modal>
-  //       )}
-  //       <View style={{ flex: 1 }}>
-  //         <SmallLoadingIndicator />
-  //       </View>
-  //     </View>
-  //   );
-  // }
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // Adjust this offset based on headers
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Text style={styles.header}>Jätteet</Text>
-          <View style={styles.navigationContainer}>
-            <Pressable hitSlop={10} onPress={() => navigationHandler("left")}>
-              <MaterialCommunityIcons
-                name="chevron-left"
-                size={35}
-                color={ThemeColors.tint}
-              />
-            </Pressable>
-            <Pressable
-              style={styles.calendar}
-              onPress={() => setCalendarModal(!calendarModal)}
-            >
-              <Text style={styles.text}>{calendarDate}</Text>
-              <MaterialCommunityIcons
-                name="calendar"
-                size={35}
-                color={ThemeColors.tint}
-              />
-            </Pressable>
-            <Pressable
-              hitSlop={10}
-              onPress={() => navigationHandler("right")}
-            >
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={35}
-                color={ThemeColors.tint}
-              />
-            </Pressable>
-          </View>
-          {calendarModal && (
-            <Modal
-              visible={calendarModal}
-              animationType="slide"
-              transparent={true}
-              onDismiss={() => setCalendarModal(false)}
-            >
-              <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
-                <View
-                  style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // Adjust this offset based on headers
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.container}>
+            <Text style={styles.header}>Jätteet</Text>
+            <View style={styles.navigationContainer}>
+              <Pressable hitSlop={10} onPress={() => navigationHandler("left")}>
+                <MaterialCommunityIcons
+                  name="chevron-left"
+                  size={35}
+                  color={ThemeColors.tint}
+                />
+              </Pressable>
+              <Pressable
+                style={styles.calendar}
+                onPress={() => setCalendarModal(!calendarModal)}
+              >
+                <Text style={styles.text}>{calendarDate}</Text>
+                <MaterialCommunityIcons
+                  name="calendar"
+                  size={35}
+                  color={ThemeColors.tint}
+                />
+              </Pressable>
+              <Pressable
+                hitSlop={10}
+                onPress={() => navigationHandler("right")}
+              >
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={35}
+                  color={ThemeColors.tint}
+                />
+              </Pressable>
+            </View>
+            {calendarModal && (
+              <Modal
+                visible={calendarModal}
+                animationType="slide"
+                transparent={true}
+                onDismiss={() => setCalendarModal(false)}
+              >
+                <TouchableWithoutFeedback
+                  onPress={() => setCalendarModal(false)}
                 >
-                  <CalendarComponent
-                    onDayPress={handleDatePress}
-                    dataDates={dateList}
-                    selectedDate={selectedDate}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-            </Modal>
-          )}
+                  <View
+                    style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}
+                  >
+                    <CalendarComponent
+                      onDayPress={handleDatePress}
+                      dataDates={dateList}
+                      selectedDate={selectedDate}
+                    />
+                  </View>
+                </TouchableWithoutFeedback>
+              </Modal>
+            )}
 
-          <View style={styles.content}>
-            {(bioData.length > 0
-              ? bioData
-              : Array(1).fill({ id: "dummy", name: "Loading..." })
-            ).map((data, index) => (
-              <WasteButton
-                key={data.id !== "dummy" ? data.id : `dummy-bio-${index}`}
-                data={data}
-                wasteName="Bio"
-                date={{ day: date, month: month, year: year }}
-                wasteModal={chosenWaste?.name === "Bio" && chosenWaste?.visible}
-                showModal={() => showWasteModal("Bio")}
-                setWasteModal={() => {
-                  fetchAndSetWasteData("Bio");
-                  hideWasteModal();
-                }}
-                addWaste={() => {
-                  fetchAndSetWasteData("Bio");
-                }}
-                styles={styles}
-                ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"}
-              />
-            ))}
+            <View style={styles.content}>
+              {(bioData.length > 0
+                ? bioData
+                : Array(1).fill({ id: "dummy", name: "Loading..." })
+              ).map((data, index) => (
+                <WasteButton
+                  key={data.id !== "dummy" ? data.id : `dummy-bio-${index}`}
+                  data={data}
+                  wasteName="Bio"
+                  date={{ day: date, month: month, year: year }}
+                  wasteModal={
+                    chosenWaste?.name === "Bio" && chosenWaste?.visible
+                  }
+                  showModal={() => showWasteModal("Bio")}
+                  setWasteModal={() => {
+                    fetchAndSetWasteData("Bio");
+                    hideWasteModal();
+                  }}
+                  addWaste={() => {
+                    fetchAndSetWasteData("Bio");
+                  }}
+                  styles={styles}
+                  ThemeColors={ThemeColors}
+                  isLoading={data.id === "dummy"}
+                />
+              ))}
 
-            {(mixedData.length > 0
-              ? mixedData
-              : Array(1).fill({ id: "dummy", name: "Loading..." })
-            ).map((data, index) => (
-              <WasteButton
-                key={data.id !== "dummy" ? data.id : `dummy-mixed-${index}`}
-                data={data}
-                wasteName="Seka"
-                date={{ day: date, month: month, year: year }}
-                wasteModal={
-                  chosenWaste?.name === "Seka" && chosenWaste?.visible
-                }
-                showModal={() => showWasteModal("Seka")}
-                setWasteModal={hideWasteModal}
-                addWaste={() => {
-                  fetchAndSetWasteData("Seka");
-                }}
-                styles={styles}
-                ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"}
-              />
-            ))}
+              {(mixedData.length > 0
+                ? mixedData
+                : Array(1).fill({ id: "dummy", name: "Loading..." })
+              ).map((data, index) => (
+                <WasteButton
+                  key={data.id !== "dummy" ? data.id : `dummy-mixed-${index}`}
+                  data={data}
+                  wasteName="Seka"
+                  date={{ day: date, month: month, year: year }}
+                  wasteModal={
+                    chosenWaste?.name === "Seka" && chosenWaste?.visible
+                  }
+                  showModal={() => showWasteModal("Seka")}
+                  setWasteModal={hideWasteModal}
+                  addWaste={() => {
+                    fetchAndSetWasteData("Seka");
+                  }}
+                  styles={styles}
+                  ThemeColors={ThemeColors}
+                  isLoading={data.id === "dummy"}
+                />
+              ))}
 
-            {(plasticData.length > 0
-              ? plasticData
-              : Array(1).fill({ id: "dummy", name: "Loading..." })
-            ).map((data, index) => (
-              <WasteButton
-                key={data.id !== "dummy" ? data.id : `dummy-plastic-${index}`}
-                data={data}
-                wasteName="Muovi"
-                date={{ day: date, month: month, year: year }}
-                wasteModal={
-                  chosenWaste?.name === "Muovi" && chosenWaste?.visible
-                }
-                showModal={() => showWasteModal("Muovi")}
-                setWasteModal={hideWasteModal}
-                addWaste={() => {
-                  fetchAndSetWasteData("Muovi");
-                }}
-                styles={styles}
-                ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"}
-              />
-            ))}
+              {(plasticData.length > 0
+                ? plasticData
+                : Array(1).fill({ id: "dummy", name: "Loading..." })
+              ).map((data, index) => (
+                <WasteButton
+                  key={data.id !== "dummy" ? data.id : `dummy-plastic-${index}`}
+                  data={data}
+                  wasteName="Muovi"
+                  date={{ day: date, month: month, year: year }}
+                  wasteModal={
+                    chosenWaste?.name === "Muovi" && chosenWaste?.visible
+                  }
+                  showModal={() => showWasteModal("Muovi")}
+                  setWasteModal={hideWasteModal}
+                  addWaste={() => {
+                    fetchAndSetWasteData("Muovi");
+                  }}
+                  styles={styles}
+                  ThemeColors={ThemeColors}
+                  isLoading={data.id === "dummy"}
+                />
+              ))}
 
-            {(cardboardData.length > 0
-              ? cardboardData
-              : Array(1).fill({ id: "dummy", name: "Loading..." })
-            ).map((data, index) => (
-              <WasteButton
-                key={data.id !== "dummy" ? data.id : `dummy-cardboard-${index}`}
-                data={data}
-                wasteName="Pahvi"
-                date={{ day: date, month: month, year: year }}
-                wasteModal={
-                  chosenWaste?.name === "Pahvi" && chosenWaste?.visible
-                }
-                showModal={() => showWasteModal("Pahvi")}
-                setWasteModal={hideWasteModal}
-                addWaste={() => {
-                  fetchAndSetWasteData("Pahvi");
-                }}
-                styles={styles}
-                ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"}
-              />
-            ))}
+              {(cardboardData.length > 0
+                ? cardboardData
+                : Array(1).fill({ id: "dummy", name: "Loading..." })
+              ).map((data, index) => (
+                <WasteButton
+                  key={
+                    data.id !== "dummy" ? data.id : `dummy-cardboard-${index}`
+                  }
+                  data={data}
+                  wasteName="Pahvi"
+                  date={{ day: date, month: month, year: year }}
+                  wasteModal={
+                    chosenWaste?.name === "Pahvi" && chosenWaste?.visible
+                  }
+                  showModal={() => showWasteModal("Pahvi")}
+                  setWasteModal={hideWasteModal}
+                  addWaste={() => {
+                    fetchAndSetWasteData("Pahvi");
+                  }}
+                  styles={styles}
+                  ThemeColors={ThemeColors}
+                  isLoading={data.id === "dummy"}
+                />
+              ))}
 
-            {(metalData.length > 0
-              ? metalData
-              : Array(1).fill({ id: "dummy", name: "Loading..." })
-            ).map((data, index) => (
-              <WasteButton
-                key={data.id !== "dummy" ? data.id : `dummy-metal-${index}`}
-                data={data}
-                wasteName="Metalli"
-                date={{ day: date, month: month, year: year }}
-                wasteModal={
-                  chosenWaste?.name === "Metalli" && chosenWaste?.visible
-                }
-                showModal={() => showWasteModal("Metalli")}
-                setWasteModal={hideWasteModal}
-                addWaste={() => {
-                  fetchAndSetWasteData("Metalli");
-                }}
-                styles={styles}
-                ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"}
-              />
-            ))}
+              {(metalData.length > 0
+                ? metalData
+                : Array(1).fill({ id: "dummy", name: "Loading..." })
+              ).map((data, index) => (
+                <WasteButton
+                  key={data.id !== "dummy" ? data.id : `dummy-metal-${index}`}
+                  data={data}
+                  wasteName="Metalli"
+                  date={{ day: date, month: month, year: year }}
+                  wasteModal={
+                    chosenWaste?.name === "Metalli" && chosenWaste?.visible
+                  }
+                  showModal={() => showWasteModal("Metalli")}
+                  setWasteModal={hideWasteModal}
+                  addWaste={() => {
+                    fetchAndSetWasteData("Metalli");
+                  }}
+                  styles={styles}
+                  ThemeColors={ThemeColors}
+                  isLoading={data.id === "dummy"}
+                />
+              ))}
 
-            {(glassData.length > 0
-              ? glassData
-              : Array(1).fill({ id: "dummy", name: "Loading..." })
-            ).map((data, index) => (
-              <WasteButton
-                key={data.id !== "dummy" ? data.id : `dummy-glass-${index}`}
-                data={data}
-                wasteName="Lasi"
-                date={{ day: date, month: month, year: year }}
-                wasteModal={
-                  chosenWaste?.name === "Lasi" && chosenWaste?.visible
-                }
-                showModal={() => showWasteModal("Lasi")}
-                setWasteModal={hideWasteModal}
-                addWaste={() => {
-                  fetchAndSetWasteData("Lasi");
-                }}
-                styles={styles}
-                ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"}
-              />
-            ))}
-          </View>
+              {(glassData.length > 0
+                ? glassData
+                : Array(1).fill({ id: "dummy", name: "Loading..." })
+              ).map((data, index) => (
+                <WasteButton
+                  key={data.id !== "dummy" ? data.id : `dummy-glass-${index}`}
+                  data={data}
+                  wasteName="Lasi"
+                  date={{ day: date, month: month, year: year }}
+                  wasteModal={
+                    chosenWaste?.name === "Lasi" && chosenWaste?.visible
+                  }
+                  showModal={() => showWasteModal("Lasi")}
+                  setWasteModal={hideWasteModal}
+                  addWaste={() => {
+                    fetchAndSetWasteData("Lasi");
+                  }}
+                  styles={styles}
+                  ThemeColors={ThemeColors}
+                  isLoading={data.id === "dummy"}
+                />
+              ))}
+            </View>
 
-          <View>
+            <View>
             <Text style={{ ...styles.text }}>Kuukausi yhteensä:</Text>
             {Object.entries(monthTotals).map(([wasteType, total]) => (
               <Text key={wasteType} style={{ ...styles.text }}>
@@ -519,8 +476,9 @@ export default function waste() {
           <View style={styles.buttonContainer}>
             <BackButton />
           </View>
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+
   );
 }

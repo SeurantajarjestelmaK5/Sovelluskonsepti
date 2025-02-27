@@ -259,6 +259,40 @@ export const AddWaste = async (
   }
 };
 
+export const RemoveWaste = async (
+  wasteType: string,
+  month: string,
+  year: string,
+  date: string,
+  amount: number
+): Promise<void> => {
+  try {
+    const docRef = doc(
+      db,
+      "omavalvonta",
+      "jätteet2",
+      wasteType,
+      year,
+      month,
+      date
+    );
+
+    const docSnapshot = await getDoc(docRef);
+    const currentAmount = docSnapshot.exists() ? docSnapshot.data().määrä : 0;
+
+    await setDoc(
+      docRef,
+      {
+        määrä: Math.max(currentAmount - amount, 0),
+        yksikkö: "g",
+      },
+      { merge: true }
+    );
+  } catch (error) {
+    console.error("Error removing waste:", error);
+  }
+}
+
  export const getMonthTotal = async (
   month: string,
   year: string,
