@@ -5,6 +5,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   ActivityIndicator,
+  Keyboard,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button, TextInput, TouchableRipple } from "react-native-paper";
@@ -51,12 +52,16 @@ export default function WasteButton({
     setDisplayedAmount(data.määrä);
   }, [data.määrä]);
 
-  // Focus the TextInput when the modal becomes visible
   useEffect(() => {
     if (wasteModal) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
+      // Increase timeout to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100); // Try a longer delay
+
+      return () => clearTimeout(timer);
     }
   }, [wasteModal]);
 
@@ -94,7 +99,6 @@ export default function WasteButton({
           </Text>
         )}
       </View>
-
       <TouchableRipple hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
         <MaterialCommunityIcons
           name="minus"
@@ -106,7 +110,6 @@ export default function WasteButton({
           }}
         />
       </TouchableRipple>
-
       <TouchableRipple hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
         <MaterialCommunityIcons
           name="plus"
@@ -123,7 +126,6 @@ export default function WasteButton({
         visible={wasteModal}
         animationType="slide"
         transparent={true}
-        onShow={() => inputRef.current?.focus()}
       >
         <TouchableWithoutFeedback onPress={() => setWasteModal(false)}>
           <View style={styles.wasteModalContainer}>
@@ -135,7 +137,6 @@ export default function WasteButton({
                 </Text>
                 <TextInput
                   ref={inputRef}
-                  autoFocus={true}
                   mode="outlined"
                   style={styles.wasteInput}
                   placeholder="Määrä"
@@ -144,24 +145,6 @@ export default function WasteButton({
                   onChangeText={(text) => setWasteAmount(Number(text))}
                   onSubmitEditing={submitEditing}
                 />
-                {/* <Button
-                  children="Lisää"
-                  icon={() => <MaterialCommunityIcons name="plus" size={20} />}
-                  contentStyle={{ flexDirection: "row-reverse" }}
-                  mode="contained"
-                  buttonColor={ThemeColors.tint}
-                  onPress={async () => {
-                    await WasteFunctions.AddWaste(
-                      wasteName,
-                      date.month,
-                      date.year,
-                      date.day,
-                      wasteAmount
-                    );
-                    addWaste(); // This triggers re-fetch in the parent
-                    setWasteModal(false);
-                  }}
-                /> */}
               </View>
             </TouchableWithoutFeedback>
           </View>
