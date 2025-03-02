@@ -17,6 +17,7 @@ export const getCleaningListStyles = (ThemeColors: ThemeColors) =>
       fontSize: 18,
       fontWeight: "bold",
       color: ThemeColors.text,
+
     },
     radioButtonContainer: {
       flexDirection: "row",

@@ -31,6 +31,22 @@ export const getCleaningStyles = (ThemeColors: ThemeColors) =>
       color: ThemeColors.tint,
       marginBottom: 15,
     },
+    kevinButton: {
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 5,
+      justifyContent: "center",
+
+    },
+    kevinButtonText: {
+      color: ThemeColors.text,
+      fontSize: 16,
+    },
+    modal: {
+      flex: 0.9,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: ThemeColors.background,
+    },
     selectionContainer: {
       flexDirection: "row",
       justifyContent: "space-evenly",
@@ -53,7 +69,7 @@ export const getCleaningStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
     },
     text: {
-      fontSize: 26,
+      fontSize: 20,
       color: ThemeColors.text,
     },
     weekCalendar: {

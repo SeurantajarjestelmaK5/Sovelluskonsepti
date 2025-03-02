@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "expo-router";
-import { Pressable, Text, View, FlatList } from "react-native";
+import { Pressable, Text, View, FlatList, Modal } from "react-native";
 import { Button } from "react-native-paper";
 import BackButton from "@/components/buttons/BackButton";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -10,6 +10,7 @@ import { getCleaningStyles } from "@/styles/monitoring/cleaningStyles";
 import * as CleaningFunctions from "@/components/functions/CleaningFunctions";
 import DisplayTasks from "@/components/misc/CleaningList";
 import LoadingScreen from "@/components/misc/LoadingScreen";
+import KevinModal from "@/components/modals/KevinModal";
 
 interface Task {
   name: string;
@@ -32,6 +33,7 @@ export default function Cleaning() {
   const [kitchenTasksWednesday, setKitchenTasksWednesday] = useState<Task[]>(
     []
   );
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getCleaningStyles(ThemeColors), [ThemeColors]);
@@ -66,48 +68,48 @@ export default function Cleaning() {
     }
   }
 
- const toggleTaskCompletion = async (day: string, taskId: string) => {
-   try {
-     const tasks = {
-       sunday: kitchenTasksSunday,
-       tuesday: kitchenTasksTuesday,
-       wednesday: kitchenTasksWednesday,
-       all: diningRoomTasks,
-     }[day];
+  const toggleTaskCompletion = async (day: string, taskId: string) => {
+    try {
+      const tasks = {
+        sunday: kitchenTasksSunday,
+        tuesday: kitchenTasksTuesday,
+        wednesday: kitchenTasksWednesday,
+        all: diningRoomTasks,
+      }[day];
 
-     if (!tasks) return;
-     const taskIndex = tasks.findIndex((task) => task.id === taskId);
-     if (taskIndex === -1) return;
+      if (!tasks) return;
+      const taskIndex = tasks.findIndex((task) => task.id === taskId);
+      if (taskIndex === -1) return;
 
-     const task = tasks[taskIndex];
-     const newCompletionStatus = !task.completed;
+      const task = tasks[taskIndex];
+      const newCompletionStatus = !task.completed;
 
-     await CleaningFunctions.toggleTaskCompletionInFirestore(
-       selectedSide === "Keittiö" ? "keittiö" : "sali",
-       year,
-       month,
-       propWeek,
-       day === "all" ? null : day, 
-       taskId,
-       newCompletionStatus
-     );
+      await CleaningFunctions.toggleTaskCompletionInFirestore(
+        selectedSide === "Keittiö" ? "keittiö" : "sali",
+        year,
+        month,
+        propWeek,
+        day === "all" ? null : day,
+        taskId,
+        newCompletionStatus
+      );
 
-     // Update state locally for immediate feedback
-     const updatedTasks = [...tasks];
-     updatedTasks[taskIndex] = {
-       ...task,
-       completed: newCompletionStatus,
-       date: new Date().toLocaleString(),
-     };
+      // Update state locally for immediate feedback
+      const updatedTasks = [...tasks];
+      updatedTasks[taskIndex] = {
+        ...task,
+        completed: newCompletionStatus,
+        date: new Date().toLocaleString(),
+      };
 
-     if (day === "sunday") setKitchenTasksSunday(updatedTasks);
-     else if (day === "tuesday") setKitchenTasksTuesday(updatedTasks);
-     else if (day === "wednesday") setKitchenTasksWednesday(updatedTasks);
-     else if (day === "all") setDiningRoomTasks(updatedTasks); 
-   } catch (error) {
-     console.error("Error toggling task completion:", error);
-   }
- };
+      if (day === "sunday") setKitchenTasksSunday(updatedTasks);
+      else if (day === "tuesday") setKitchenTasksTuesday(updatedTasks);
+      else if (day === "wednesday") setKitchenTasksWednesday(updatedTasks);
+      else if (day === "all") setDiningRoomTasks(updatedTasks);
+    } catch (error) {
+      console.error("Error toggling task completion:", error);
+    }
+  };
 
   useEffect(() => {
     const checkAndPopulateDefaults = async () => {
@@ -166,7 +168,6 @@ export default function Cleaning() {
 
     fetchAndPopulateTasks();
   }, [selectedSide, propWeek]);
-
 
   function getWeekRange(date: Date) {
     const startOfWeek = new Date(date);
@@ -232,9 +233,9 @@ export default function Cleaning() {
           </Pressable>
         </View>
         <DisplayTasks
-          kitchenTasksSunday={kitchenTasksSunday}
           kitchenTasksTuesday={kitchenTasksTuesday}
           kitchenTasksWednesday={kitchenTasksWednesday}
+          kitchenTasksSunday={kitchenTasksSunday}
           diningRoomTasks={diningRoomTasks}
           selectedSide={selectedSide}
           toggleTaskCompletion={toggleTaskCompletion}
@@ -243,7 +244,18 @@ export default function Cleaning() {
       </View>
       <View style={styles.buttonContainer}>
         <BackButton />
+        {selectedSide === "Keittiö" && (
+          <Button
+            children="Pihvikone"
+            mode="contained"
+            onPress={() => setModalVisible(true)}
+            style={styles.kevinButton}
+            labelStyle={styles.kevinButtonText}
+            disabled={true}
+          />
+        )}
       </View>
+        <KevinModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}/>
     </View>
   );
 }

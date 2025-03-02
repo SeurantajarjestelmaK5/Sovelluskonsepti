@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import { Checkbox } from "react-native-paper";
+import { Button } from "react-native-paper";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getCleaningListStyles } from "@/styles/monitoring/cleaningListStyles";
 import SmallLoadingIndicator from "./SmallLoadingIncidator";
@@ -90,19 +90,6 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
     <View style={styles.container}>
       {selectedSide === "Keittiö" ? (
         <>
-          <Text style={styles.header}>Sunnuntai</Text>
-          {isLoading && kitchenTasksSunday.length === 0 ? (
-            <FlatList
-              data={cleaningTasks.kitchenTasksSunday}
-              renderItem={({ item }) => renderDummyContent(item)}
-            />
-          ) : (
-            <FlatList
-              data={kitchenTasksSunday}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => renderTask(item, "sunday")}
-            />
-          )}
           <Text style={styles.header}>Tiistai</Text>
           {isLoading && kitchenTasksTuesday.length === 0 ? (
             <FlatList
@@ -116,7 +103,6 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
               renderItem={({ item }) => renderTask(item, "tuesday")}
             />
           )}
-
           <Text style={styles.header}>Keskiviikko</Text>
           {isLoading && kitchenTasksWednesday.length === 0 ? (
             <FlatList
@@ -128,6 +114,21 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
               data={kitchenTasksWednesday}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => renderTask(item, "wednesday")}
+
+            />
+          )}
+
+          <Text style={styles.header}>Sunnuntai</Text>
+          {isLoading && kitchenTasksSunday.length === 0 ? (
+            <FlatList
+              data={cleaningTasks.kitchenTasksSunday}
+              renderItem={({ item }) => renderDummyContent(item)}
+            />
+          ) : (
+            <FlatList
+              data={kitchenTasksSunday}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => renderTask(item, "sunday")}
             />
           )}
         </>

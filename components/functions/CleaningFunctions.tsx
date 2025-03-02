@@ -87,7 +87,7 @@ export const checkAndPopulateDefaults = async (
     );
     const batch = writeBatch(db);
 
-    Cleaning.diningroomTasks.forEach((task, index) => {
+    Cleaning.diningRoomTasks.forEach((task, index) => {
       const taskRef = doc(dayRef, `task-${index}`);
       batch.set(taskRef, {
         name: task,
