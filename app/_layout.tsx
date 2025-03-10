@@ -131,7 +131,7 @@ export default function TabsLayout() {
           //   />
           // ),
           tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
-          tabBarLabelStyle: { fontSize: 23, fontWeight: "bold" },
+          tabBarLabelStyle: { fontSize: 23, fontWeight: "bold", textShadowRadius: 0 },
           tabBarActiveTintColor: ThemeColors.tabIconSelected,
           tabBarInactiveTintColor: ThemeColors.tabIconDefault,
           tabBarActiveBackgroundColor: ThemeColors.navSelected,

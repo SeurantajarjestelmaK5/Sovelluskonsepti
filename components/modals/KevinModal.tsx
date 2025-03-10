@@ -51,12 +51,14 @@ export default function KevinModal({
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
 
-  const getParsedDate = (date: string) => {
-    const [month, day, year] = date.split("/");
-    const parsedDate = `${day}.${month}.${year}`;
-    console.log(parsedDate);
-    setPropDate(parsedDate);
-  };
+const getParsedDate = (date: Date) => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1; // Months are zero-based
+  const year = date.getFullYear();
+  const parsedDate = `${day}.${month}.${year}`;
+  console.log(parsedDate);
+  setPropDate(parsedDate);
+};
 
   async function fetchTasks() {
     try {
@@ -67,6 +69,11 @@ export default function KevinModal({
     }
   }
 
+  const onDismissModal = () => {
+    onClose();
+    setTaskAuthor("");
+  }
+
 
   useEffect(() => {
     if (month) {
@@ -75,17 +82,17 @@ export default function KevinModal({
     if (year) {
       setFilterYear(year);
     }
-    getParsedDate(currentDate.toLocaleDateString());
-  }, [month]);
+    getParsedDate(currentDate);
+  }, [month, year]);
 
   useEffect(() => {
     fetchTasks();
   }, [year, month, taskAuthor]);
 
-  const chevronHandler = (direction: "left" | "right") => {
-    if (direction === "left") {
-    }
-  };
+  // const chevronHandler = (direction: "left" | "right") => {
+  //   if (direction === "left") {
+  //   }
+  // };
 
   const saveButtonHandler = async () => {
     if (!taskAuthor) {
@@ -108,7 +115,7 @@ export default function KevinModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback onPress={onDismissModal}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <View style={styles.modalContainer}>
@@ -180,7 +187,7 @@ export default function KevinModal({
 
               <Button
                 children="Sulje"
-                onPress={onClose}
+                onPress={onDismissModal}
                 style={styles.closeButton}
                 labelStyle={styles.closeButtonText}
               />
