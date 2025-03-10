@@ -142,7 +142,7 @@ export const exportAndSendData = async (selectedDate: string, location: string) 
       const available = await MailComposer.isAvailableAsync();
       if (available) {
         const options = {
-          recipients: ["olli.vainio@tekodo.fi"],
+          recipients: ["tositteet@tekodo.fi"],
           subject: `Inventaario Kauppuri 5 - ${selectedDate} - ${location} `,
           body: `Liitteenä inventaario ${location} - ${selectedDate} --- (Älä vastaa tähän viestiin)`,
           attachments: [fileUri],
