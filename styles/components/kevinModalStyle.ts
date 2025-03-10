@@ -72,12 +72,15 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     },
     tasksContainer: {
       width: "60%",
+      maxHeight: Dimensions.get("window").height * 0.25,
       flexDirection: "column",
       alignContent: "center",
       justifyContent: "space-between",
       backgroundColor: ThemeColors.background,
       borderRadius: 10,
       padding: 20,
+      borderWidth: 1,
+      borderColor: ThemeColors.navSelected,
     },
     task: {
       width: "100%",

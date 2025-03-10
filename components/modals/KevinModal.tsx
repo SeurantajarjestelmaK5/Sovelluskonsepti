@@ -97,7 +97,8 @@ export default function KevinModal({
     } catch (error) {
       console.error("Error saving Kevin task:", error);
     }
-    setTaskAuthor("");
+    // setTaskAuthor("");
+    fetchTasks();
   };
 
   return (
@@ -161,6 +162,7 @@ export default function KevinModal({
                 </View> */}
                 <FlatList
                   data={tasks}
+                  
                   keyExtractor={(item) => item.id}
                   renderItem={({ item }) => (
                     <View style={styles.task} key={item.id}>
