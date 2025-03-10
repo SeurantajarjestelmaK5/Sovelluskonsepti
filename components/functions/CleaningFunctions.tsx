@@ -299,7 +299,7 @@ export const saveKevinTask = async (
       "keittiö",
       year,
       month,
-      "pihvikone " + fullDate
+      "pihvikone"+fullDate
     );
 
     await setDoc(taskRef, {
