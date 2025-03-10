@@ -32,10 +32,9 @@ export const getCleaningStyles = (ThemeColors: ThemeColors) =>
       marginBottom: 15,
     },
     kevinButton: {
-      backgroundColor: ThemeColors.navDefault,
+      backgroundColor: ThemeColors.tint,
       borderRadius: 5,
       justifyContent: "center",
-
     },
     kevinButtonText: {
       color: ThemeColors.text,

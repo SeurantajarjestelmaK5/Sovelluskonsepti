@@ -25,6 +25,8 @@ export const getInvNavStyle = (ThemeColors: ThemeColors) =>
       justifyContent: "center",
       alignItems: "center",
       borderRadius: 10,
+      borderWidth: 2,
+      borderColor: ThemeColors.navSelected,
       backgroundColor: ThemeColors.button,
     },
     buttonText: {

@@ -11,6 +11,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import * as Cleaning from "../../constants/CleaningTasks";
+import { QueryConstraint, where as firestoreWhere } from "firebase/firestore";
 
 export const FetchDiningRoomDefaults = async (): Promise<string[]> => {
   const docRef = doc(db, "omavalvonta", "siivous", "sali", "defaults");
@@ -281,3 +282,78 @@ export const toggleTaskCompletionInFirestore = async (
     throw error;
   }
 };
+
+// PIHVIKONEEN PESU -NÄKYMÄN FUNKTIOT TÄSSÄ/KEVINMODAL/KEVIN
+
+export const saveKevinTask = async (
+  year: string,
+  month: string,
+  author: string,
+  fullDate: string,
+) => {
+  try {
+    const taskRef = doc(
+      db,
+      "omavalvonta",
+      "siivous",
+      "keittiö",
+      year,
+      month,
+      "pihvikone " + fullDate
+    );
+
+    await setDoc(taskRef, {
+      author,
+      date: fullDate,
+      type: "pihvikone",
+    });
+  } catch (error) {
+    console.error("Error saving task:", error);
+    throw error;
+  }
+}
+
+export const fetchKevinTasks = async (
+  year: string,
+  month: string,
+) => {
+  try {
+    const tasksRef = collection(
+      db,
+      "omavalvonta",
+      "siivous",
+      "keittiö",
+      year,
+      month
+    );
+
+    const q = query(tasksRef, firestoreWhere("type", "==", "pihvikone"));
+
+    const tasksSnapshot = await getDocs(q);
+
+    if (tasksSnapshot.empty) {
+      console.warn("No tasks found for Kevin.");
+      return [];
+    }
+
+    const tasks: any[] = [];
+
+    tasksSnapshot.forEach((taskDoc) => {
+      const task = taskDoc.data();
+      tasks.push({
+        author: task.author,
+        date: task.date,
+        id: taskDoc.id,
+      });
+    });
+
+    return tasks;
+  } catch (error) {
+    console.error("Error fetching Kevin tasks:", error);
+    throw error;
+  }
+};
+
+function where(arg0: string, arg1: string, arg2: string): import("@firebase/firestore").QueryCompositeFilterConstraint {
+  throw new Error("Function not implemented.");
+}

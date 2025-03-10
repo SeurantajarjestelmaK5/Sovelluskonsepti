@@ -136,7 +136,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       textAlign: "center",
       textAlignVertical: "center",
       textShadowColor: "black",
-      textShadowRadius: 7,
+      textShadowRadius: 6,
       fontWeight: "bold",
       color: ThemeColors.text,
     },

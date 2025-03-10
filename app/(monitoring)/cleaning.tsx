@@ -43,6 +43,7 @@ export default function Cleaning() {
   useEffect(() => {
     updateWeekRange(currentDate);
   }, [currentDate]);
+
   function updateWeekRange(date: Date) {
     const { startOfWeek, endOfWeek } = getWeekRange(date);
 
@@ -59,6 +60,22 @@ export default function Cleaning() {
     setStartOfWeek(formatDate(startOfWeek));
     setEndOfWeek(formatDate(endOfWeek));
   }
+
+  function getWeekRange(date: Date) {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+    startOfWeek.setDate(diff);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    return { startOfWeek, endOfWeek };
+  }
+
+    function handleWeekChange(offset: number) {
+      const newDate = new Date(currentDate);
+      newDate.setDate(currentDate.getDate() + offset);
+      setCurrentDate(newDate);
+    }
 
   function handleSideChange(side: string) {
     if (side === "keittiö") {
@@ -169,19 +186,7 @@ export default function Cleaning() {
     fetchAndPopulateTasks();
   }, [selectedSide, propWeek]);
 
-  function getWeekRange(date: Date) {
-    const startOfWeek = new Date(date);
-    startOfWeek.setDate(date.getDate() - date.getDay() + 1);
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    return { startOfWeek, endOfWeek };
-  }
 
-  function handleWeekChange(offset: number) {
-    const newDate = new Date(currentDate);
-    newDate.setDate(currentDate.getDate() + offset);
-    setCurrentDate(newDate);
-  }
 
   return (
     <View style={styles.container}>
@@ -251,11 +256,10 @@ export default function Cleaning() {
             onPress={() => setModalVisible(true)}
             style={styles.kevinButton}
             labelStyle={styles.kevinButtonText}
-            disabled={true}
           />
         )}
       </View>
-        <KevinModal modalVisible={modalVisible} onClose={() => setModalVisible(false)}/>
+        <KevinModal modalVisible={modalVisible} onClose={() => setModalVisible(false)} year={year} month={month}/>
     </View>
   );
 }
