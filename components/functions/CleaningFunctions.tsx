@@ -306,6 +306,8 @@ export const saveKevinTask = async (
       author,
       date: fullDate,
       type: "pihvikone",
+      month: month,
+      year: year,
     });
   } catch (error) {
     console.error("Error saving task:", error);
@@ -327,7 +329,14 @@ export const fetchKevinTasks = async (
       month
     );
 
-    const q = query(tasksRef, firestoreWhere("type", "==", "pihvikone"));
+    console.log("Fetching Kevin tasks for", year, month);
+
+    const q = query(
+      tasksRef,
+      firestoreWhere("type", "==", "pihvikone"),
+      firestoreWhere("month", "==", month),
+      firestoreWhere("year", "==", year)
+    );
 
     const tasksSnapshot = await getDocs(q);
 

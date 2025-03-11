@@ -48,19 +48,19 @@ export default function KevinModal({
   const [taskAuthor, setTaskAuthor] = useState("");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [propDate, setPropDate] = useState("");
+  const [monthIndex, setMonthIndex] = useState(month);
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
 
-const getParsedDate = (date: Date) => {
-  const day = date.getDate();
-  const month = date.getMonth() + 1; // Months are zero-based
-  const year = date.getFullYear();
-  const parsedDate = `${day}.${month}.${year}`;
-  console.log(parsedDate);
-  setPropDate(parsedDate);
-};
+  const getParsedDate = (date: Date) => {
+    const day = date.getDate();
+    const month = date.getMonth() + 1; 
+    const year = date.getFullYear();
+    const parsedDate = `${day}.${month}.${year}`;
+    setPropDate(parsedDate);
+  };
 
-  async function fetchTasks() {
+  async function fetchTasks(year: string, month: string) {
     try {
       const tasks = await CleaningFunctions.fetchKevinTasks(year, month);
       setTasks(tasks);
@@ -72,12 +72,16 @@ const getParsedDate = (date: Date) => {
   const onDismissModal = () => {
     onClose();
     setTaskAuthor("");
-  }
+  };
 
+  const parseMonth = (index: string) => {
+    return finnishMonths[parseInt(index) - 1];
+  };
 
   useEffect(() => {
+
     if (month) {
-      setFilterMonth(finnishMonths[parseInt(month) - 1]);
+      setFilterMonth(parseMonth(month));
     }
     if (year) {
       setFilterYear(year);
@@ -86,13 +90,32 @@ const getParsedDate = (date: Date) => {
   }, [month, year]);
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(year, month);
   }, [year, month, taskAuthor]);
 
-  // const chevronHandler = (direction: "left" | "right") => {
-  //   if (direction === "left") {
-  //   }
-  // };
+  const chevronHandler = (direction: "left" | "right") => {
+    let monthIndex = finnishMonths.indexOf(filterMonth);
+    let yearIndex = parseInt(filterYear);
+
+    if (direction === "left") {
+      monthIndex -= 1;
+      if (monthIndex < 0) {
+        monthIndex = 11; 
+        yearIndex -= 1;
+      }
+    } else if (direction === "right") {
+      monthIndex += 1;
+      if (monthIndex > 11) {
+        monthIndex = 0; 
+        yearIndex += 1;
+      }
+    }
+    console.log(yearIndex);
+    console.log(monthIndex);
+    setFilterMonth(finnishMonths[monthIndex]);
+    setFilterYear(yearIndex.toString());
+    fetchTasks(yearIndex.toString(), (monthIndex + 1).toString());
+  };
 
   const saveButtonHandler = async () => {
     if (!taskAuthor) {
@@ -104,8 +127,8 @@ const getParsedDate = (date: Date) => {
     } catch (error) {
       console.error("Error saving Kevin task:", error);
     }
-    // setTaskAuthor("");
-    fetchTasks();
+    setTaskAuthor("");
+    fetchTasks(monthIndex, year);
   };
 
   return (
@@ -152,24 +175,25 @@ const getParsedDate = (date: Date) => {
                 Tehdyt siivoukset:
               </Text>
               <View style={styles.tasksContainer}>
-                {/* <View style={styles.dateFilterContainer}>
+                <View style={styles.dateFilterContainer}>
                   <MaterialCommunityIcons
                     name="chevron-left"
                     size={30}
                     color={ThemeColors.tint}
                     onPress={() => chevronHandler("left")}
                   />
-                  <Text style={styles.label}>{filterMonth} {filterYear}</Text>
+                  <Text style={styles.label}>
+                    {filterMonth} {filterYear}
+                  </Text>
                   <MaterialCommunityIcons
                     name="chevron-right"
                     size={30}
                     color={ThemeColors.tint}
                     onPress={() => chevronHandler("right")}
                   />
-                </View> */}
+                </View>
                 <FlatList
                   data={tasks}
-                  
                   keyExtractor={(item) => item.id}
                   renderItem={({ item }) => (
                     <View style={styles.task} key={item.id}>
