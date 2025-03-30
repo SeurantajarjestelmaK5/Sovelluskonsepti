@@ -27,6 +27,13 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
       marginBottom: 20,
     },
+    flatlist: {
+      flexGrow: 0,
+    },
+    flatlistContainer: {
+      width: "100%",
+      maxHeight: 200,
+    },
     input: {
       width: "80%",
       marginBottom: 20,
@@ -72,13 +79,14 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     },
     tasksContainer: {
       width: "60%",
-      maxHeight: Dimensions.get("window").height * 0.25,
+      maxHeight: 300,
       flexDirection: "column",
       alignContent: "center",
       justifyContent: "space-between",
       backgroundColor: ThemeColors.background,
       borderRadius: 10,
       padding: 20,
+      margin: 10,
       borderWidth: 1,
       borderColor: ThemeColors.navSelected,
     },

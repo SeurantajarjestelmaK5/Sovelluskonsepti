@@ -54,7 +54,7 @@ export default function KevinModal({
 
   const getParsedDate = (date: Date) => {
     const day = date.getDate();
-    const month = date.getMonth() + 1; 
+    const month = date.getMonth() + 1;
     const year = date.getFullYear();
     const parsedDate = `${day}.${month}.${year}`;
     setPropDate(parsedDate);
@@ -79,7 +79,6 @@ export default function KevinModal({
   };
 
   useEffect(() => {
-
     if (month) {
       setFilterMonth(parseMonth(month));
     }
@@ -100,18 +99,16 @@ export default function KevinModal({
     if (direction === "left") {
       monthIndex -= 1;
       if (monthIndex < 0) {
-        monthIndex = 11; 
+        monthIndex = 11;
         yearIndex -= 1;
       }
     } else if (direction === "right") {
       monthIndex += 1;
       if (monthIndex > 11) {
-        monthIndex = 0; 
+        monthIndex = 0;
         yearIndex += 1;
       }
     }
-    console.log(yearIndex);
-    console.log(monthIndex);
     setFilterMonth(finnishMonths[monthIndex]);
     setFilterYear(yearIndex.toString());
     fetchTasks(yearIndex.toString(), (monthIndex + 1).toString());
@@ -138,87 +135,85 @@ export default function KevinModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onDismissModal}>
-        <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={styles.modalContainer}>
-              <Text style={styles.header}>Pihvikoneen pesu</Text>
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}> Tekijä </Text>
-                <Picker
-                  selectedValue={taskAuthor}
-                  onValueChange={(itemValue) => setTaskAuthor(itemValue)}
-                  style={styles.picker}
-                  mode="dropdown"
-                  dropdownIconColor={ThemeColors.tint}
-                >
-                  {taskAuthor === "" && (
-                    <Picker.Item label="Valitse tekijä" value="" />
-                  )}
-                  {authorList.map((author) => (
-                    <Picker.Item
-                      key={author}
-                      label={author}
-                      value={author}
-                      style={styles.pickerItem}
-                    />
-                  ))}
-                </Picker>
-              </View>
-              <Button
-                children="Tallenna"
-                onPress={saveButtonHandler}
-                style={styles.closeButton}
-                labelStyle={styles.closeButtonText}
-              />
-              <Text style={{ ...styles.label, marginTop: 40 }}>
-                Tehdyt siivoukset:
-              </Text>
-              <View style={styles.tasksContainer}>
-                <View style={styles.dateFilterContainer}>
-                  <MaterialCommunityIcons
-                    name="chevron-left"
-                    size={30}
-                    color={ThemeColors.tint}
-                    onPress={() => chevronHandler("left")}
-                  />
-                  <Text style={styles.label}>
-                    {filterMonth} {filterYear}
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="chevron-right"
-                    size={30}
-                    color={ThemeColors.tint}
-                    onPress={() => chevronHandler("right")}
-                  />
-                </View>
-                <FlatList
-                  data={tasks}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <View style={styles.task} key={item.id}>
-                      <Text style={styles.taskText}>{item.author}</Text>
-                      <Text style={styles.taskText}>{item.date}</Text>
-                      <MaterialCommunityIcons
-                        name="checkbox-marked"
-                        size={24}
-                        color={ThemeColors.text}
-                      />
-                    </View>
-                  )}
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.header}>Pihvikoneen pesu</Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}> Tekijä </Text>
+            <Picker
+              selectedValue={taskAuthor}
+              onValueChange={(itemValue) => setTaskAuthor(itemValue)}
+              style={styles.picker}
+              mode="dropdown"
+              dropdownIconColor={ThemeColors.tint}
+            >
+              {taskAuthor === "" && (
+                <Picker.Item label="Valitse tekijä" value="" />
+              )}
+              {authorList.map((author) => (
+                <Picker.Item
+                  key={author}
+                  label={author}
+                  value={author}
+                  style={styles.pickerItem}
                 />
-              </View>
-
-              <Button
-                children="Sulje"
-                onPress={onDismissModal}
-                style={styles.closeButton}
-                labelStyle={styles.closeButtonText}
+              ))}
+            </Picker>
+          </View>
+          <Button
+            children="Tallenna"
+            onPress={saveButtonHandler}
+            style={styles.closeButton}
+            labelStyle={styles.closeButtonText}
+          />
+          <Text style={{ ...styles.label, marginTop: 40 }}>
+            Tehdyt siivoukset:
+          </Text>
+          <View style={styles.tasksContainer}>
+            <View style={styles.dateFilterContainer}>
+              <MaterialCommunityIcons
+                name="chevron-left"
+                size={30}
+                color={ThemeColors.tint}
+                onPress={() => chevronHandler("left")}
+              />
+              <Text style={styles.label}>
+                {filterMonth} {filterYear}
+              </Text>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={30}
+                color={ThemeColors.tint}
+                onPress={() => chevronHandler("right")}
               />
             </View>
-          </TouchableWithoutFeedback>
+            <FlatList
+              data={tasks}
+              contentContainerStyle={styles.flatlist}
+              showsVerticalScrollIndicator={false}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.task} key={item.id}>
+                  <Text style={styles.taskText}>{item.author}</Text>
+                  <Text style={styles.taskText}>{item.date}</Text>
+                  <MaterialCommunityIcons
+                    name="checkbox-marked"
+                    size={24}
+                    color={ThemeColors.text}
+                  />
+                </View>
+              )}
+            />
+          </View>
+
+          <Button
+            children="Sulje"
+            onPress={onDismissModal}
+            style={styles.closeButton}
+            labelStyle={styles.closeButtonText}
+          />
         </View>
-      </TouchableWithoutFeedback>
+      </View>
     </Modal>
   );
 }
