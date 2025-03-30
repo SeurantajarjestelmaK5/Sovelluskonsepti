@@ -25,7 +25,7 @@ export default function MonitorHome() {
             />
           </Pressable>
         </Link>
-        <Link href="/temperatures" asChild>
+        <Link href="/temperatures_fixed" asChild>
           <Pressable style={monitoringNavStyle.button}>
             <Text style={monitoringNavStyle.buttonText}>Lämpötilat</Text>
             <MaterialCommunityIcons

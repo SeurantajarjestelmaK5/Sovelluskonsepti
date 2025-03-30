@@ -63,6 +63,14 @@ export const getTempStyles = (ThemeColors: ThemeColors) =>
     selectedCategoryText: {
       color: ThemeColors.background,
     },
+    table: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: ThemeColors.background,
+      width: "100%",
+      height: windowHeight * 0.2,
+    },
     tableRow: {
       flexDirection: "row",
       justifyContent: "space-between",

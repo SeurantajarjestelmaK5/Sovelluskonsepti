@@ -6,7 +6,7 @@ export default function MonitoringStack() {
       <Stack.Screen name="index"/>
       <Stack.Screen name="cleaning"/>
       <Stack.Screen name="samples"/>
-      <Stack.Screen name="temperatures"/>
+      <Stack.Screen name="temperatures_fixed"/>
       <Stack.Screen name="waste"/>
     </Stack>
   );
