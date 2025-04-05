@@ -14,7 +14,6 @@ export const fetchCategoryData = async (
   year: string,
   month: string
 ) => {
-  console.log("Fetching data for category:", category, year, month);
   const docRef = collection(
     db,
     "omavalvonta",
@@ -39,13 +38,12 @@ export const saveItem = async (
   month: string,
   data: any
 ) => {
-  console.log("Saving data for category:", category, year, month, data);
+
   const docRef = doc(
     collection(db, "omavalvonta", "lämpötilat", category, year, month)
   );
   await setDoc(docRef, data);
 
-  console.log("Document saved with ID:", docRef.id);
   return docRef.id; // Return the generated ID if needed
 };
 

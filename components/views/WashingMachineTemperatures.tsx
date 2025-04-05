@@ -64,7 +64,6 @@ export default function WashingMachineTemperatures() {
   };
 
   const handleDayPress = (day: any) => {
-    console.log("Selected day:", day.dateString);
     const [year, month, date] = day.dateString.split("-");
     setCurrentDate(date);
     setCurrentMonth(month);
@@ -134,6 +133,7 @@ export default function WashingMachineTemperatures() {
             <Pressable
               style={{ flex: 1 }}
               onPress={() => setCalendarModal(false)}
+              pointerEvents="box-none"
             />
             <View
               style={{
@@ -163,7 +163,7 @@ export default function WashingMachineTemperatures() {
         onPress={saveButtonHandler}
       />
 
-      {/* Pass refreshKey to WMTemps */}
+      
       <WMTemps
         day={currentDate}
         month={currentMonth}

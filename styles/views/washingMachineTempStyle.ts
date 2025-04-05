@@ -41,15 +41,22 @@ export const getWashingTempStyles = (ThemeColors: ThemeColors) =>
       borderColor: ThemeColors.navSelected,
     },
     dataList: {
+      width: "80%",
       padding: 16,
-      backgroundColor: ThemeColors.background,
+      backgroundColor: 'ThemeColors.background',
       maxHeight: 370,
       borderRadius: 10,
       borderWidth: 1,
       borderColor: ThemeColors.navDefault,
     },
+    dataListContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 16,
+      backgroundColor: ThemeColors.background,
+      width: "100%",
+    },
     dataContainer: {
-      flex: 1,
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
@@ -67,6 +74,8 @@ export const getWashingTempStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
       width: "100%",
       marginBottom: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: ThemeColors.navDefault,
     },
     icon: {
       justifyContent: "center",

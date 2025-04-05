@@ -7,6 +7,7 @@ import {
   View,
   Modal,
   TouchableWithoutFeedback,
+  TouchableOpacity,
 } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getWashingTempStyles } from "@/styles/views/washingMachineTempStyle";
@@ -98,11 +99,10 @@ export default function WMTemps({
     getParsedDate(currentDate);
   }, [month, year]);
 
-
   useEffect(() => {
     if (filterMonth && filterYear) {
       const monthIndex = finnishMonths.indexOf(filterMonth) + 1;
-      const formattedMonth = monthIndex.toString().padStart(2, "0"); 
+      const formattedMonth = monthIndex.toString().padStart(2, "0");
       fetchCategoryData(formattedMonth, filterYear);
     }
   }, [filterMonth, filterYear, refreshKey]);
@@ -128,32 +128,37 @@ export default function WMTemps({
     setFilterYear(yearIndex.toString());
   };
 
-const deleteHandler = async (id: string) => {
-  Alert.alert(
-    "Vahvista poisto",
-    "Haluatko varmasti poistaa tämän kirjauksen?",
-    [
-      {
-        text: "Peruuta",
-        style: "cancel",
-      },
-      {
-        text: "Poista",
-        onPress: async () => {
-          try {
-            await TemperatureFunctions.deleteItem("Tiskikone", year, month, id);
-            setFetchedData((prevData) =>
-              prevData.filter((item) => item.id !== id)
-            );
-          } catch (error) {
-            console.error("Error deleting data:", error);
-            Alert.alert("Virhe", "Poisto epäonnistui.");
-          }
+  const deleteHandler = async (id: string) => {
+    Alert.alert(
+      "Vahvista poisto",
+      "Haluatko varmasti poistaa tämän kirjauksen?",
+      [
+        {
+          text: "Peruuta",
+          style: "cancel",
         },
-      },
-    ]
-  );
-};
+        {
+          text: "Poista",
+          onPress: async () => {
+            try {
+              await TemperatureFunctions.deleteItem(
+                "Tiskikone",
+                year,
+                month,
+                id
+              );
+              setFetchedData((prevData) =>
+                prevData.filter((item) => item.id !== id)
+              );
+            } catch (error) {
+              console.error("Error deleting data:", error);
+              Alert.alert("Virhe", "Poisto epäonnistui.");
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <>
@@ -166,6 +171,7 @@ const deleteHandler = async (id: string) => {
           size={30}
           color={ThemeColors.tint}
           onPress={() => chevronHandler("left")}
+          hitslop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         />
         <Text style={{ fontSize: 20, color: ThemeColors.text }}>
           {filterMonth} {filterYear}
@@ -175,54 +181,62 @@ const deleteHandler = async (id: string) => {
           size={30}
           color={ThemeColors.tint}
           onPress={() => chevronHandler("right")}
+          hitslop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         />
       </View>
-      <View style={styles.dataContainer}>
-        {fetchedData.length > 0 ? (
-          <FlatList
-            data={fetchedData}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            style={styles.dataList}
-            renderItem={({ item }) => (
-              <View style={styles.dataItemContainer}>
-                <View style={styles.dataItem}>
-                  <MaterialCommunityIcons
-                    name="chart-bubble"
-                    size={30}
-                    color={ThemeColors.text}
-                  />
-                  <Text style={styles.label}>{item.Pesuvesi} °C</Text>
-                </View>
-                <View style={styles.dataItem}>
-                  <MaterialCommunityIcons
-                    name="water"
-                    size={30}
-                    color={ThemeColors.text}
-                  />
-                  <Text style={styles.label}>{item.Huuhteluvesi} °C</Text>
-                </View>
-                <View style={styles.dataItem}>
-                  <MaterialCommunityIcons
-                    name="calendar"
-                    size={30}
-                    color={ThemeColors.text}
-                  />
-                  <Text style={styles.label}>{item.Pvm}</Text>
-                </View>
+      {fetchedData.length > 0 ? (
+        <FlatList
+          data={fetchedData}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={true}
+          style={styles.dataList}
+          scrollEnabled={true}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <Pressable
+              style={styles.dataItemContainer}
+              onPress={() => console.log("Item pressed:", item)} // Add any desired action here
+            >
+              <View style={styles.dataItem}>
+                <MaterialCommunityIcons
+                  name="chart-bubble"
+                  size={30}
+                  color={ThemeColors.text}
+                />
+                <Text style={styles.label}>{item.Pesuvesi} °C</Text>
+              </View>
+              <View style={styles.dataItem}>
+                <MaterialCommunityIcons
+                  name="water"
+                  size={30}
+                  color={ThemeColors.text}
+                />
+                <Text style={styles.label}>{item.Huuhteluvesi} °C</Text>
+              </View>
+              <View style={styles.dataItem}>
+                <MaterialCommunityIcons
+                  name="calendar"
+                  size={30}
+                  color={ThemeColors.text}
+                />
+                <Text style={styles.label}>{item.Pvm}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => deleteHandler(item.id)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
                 <MaterialCommunityIcons
                   name="trash-can-outline"
                   size={30}
                   color="red"
-                  onPress={() => deleteHandler(item.id)}
                 />
-              </View>
-            )}
-          />
-        ) : (
-          <Text style={styles.label}>Ei kirjauksia</Text>
-        )}
-      </View>
+              </TouchableOpacity>
+            </Pressable>
+          )}
+        />
+      ) : (
+        <Text style={styles.label}>Ei kirjauksia</Text>
+      )}
     </>
   );
 }
