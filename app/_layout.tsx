@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+
 import { Tabs, useRouter } from "expo-router";
 import { View, Text } from "react-native";
 import * as Updates from "expo-updates";
@@ -58,23 +59,27 @@ export default function TabsLayout() {
     checkActiveScreen();
   }, [navigationState]);
 
-  useEffect(() => {
-    const checkForUpdates = async () => {
-      try {
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          await Updates.fetchUpdateAsync();
+useEffect(() => {
+  const checkForUpdates = async () => {
+    try {
+      const update = await Updates.checkForUpdateAsync();
+      if (update.isAvailable) {
+        await Updates.fetchUpdateAsync();
 
-          // Reload the app to apply the update
+        // Show the Snackbar
+        setSnackbarVisible(true);
+
+        // Delay the reload to allow the Snackbar to be visible
+        setTimeout(async () => {
           await Updates.reloadAsync();
-          setSnackbarVisible(true);
-        }
-      } catch (error) {
-        // console.error("Failed to check for updates:", error);
+        }, 8000); // Delay for 8 seconds
       }
-    };
-    checkForUpdates();
-  }, []);
+    } catch (error) {
+      console.error("Failed to check for updates:", error);
+    }
+  };
+  checkForUpdates();
+}, []);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -204,7 +209,7 @@ export default function TabsLayout() {
         elevation={1}
       >
         <Text style={styles.snackbarText}>
-          Sovellus päivitetty uusimpaan versioon!
+          Sovellusta päivitetään, odota hetki...
         </Text>
       </Snackbar>
     </>

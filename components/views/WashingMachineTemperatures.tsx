@@ -7,6 +7,7 @@ import {
   View,
   Modal,
   TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getWashingTempStyles } from "@/styles/views/washingMachineTempStyle";
@@ -40,6 +41,8 @@ export default function WashingMachineTemperatures() {
   }, []);
 
   const saveButtonHandler = async () => {
+    Keyboard.dismiss();
+
     if (!washTemp || !rinseTemp) {
       Alert.alert("Virhe", "Täytä kaikki kentät ennen tallentamista.");
       return;
@@ -61,6 +64,8 @@ export default function WashingMachineTemperatures() {
       console.error("Error saving data:", error);
       Alert.alert("Virhe", "Tallennus epäonnistui.");
     }
+    setWashTemp("");
+    setRinseTemp("");
   };
 
   const handleDayPress = (day: any) => {

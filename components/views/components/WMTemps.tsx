@@ -185,17 +185,19 @@ export default function WMTemps({
         />
       </View>
       {fetchedData.length > 0 ? (
+        
         <FlatList
           data={fetchedData}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={true}
+          
           style={styles.dataList}
           scrollEnabled={true}
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <Pressable
               style={styles.dataItemContainer}
-              onPress={() => console.log("Item pressed:", item)} // Add any desired action here
+              onPress={() => {}}
             >
               <View style={styles.dataItem}>
                 <MaterialCommunityIcons
