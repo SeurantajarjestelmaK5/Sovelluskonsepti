@@ -11,7 +11,12 @@ export default function CoolingTemperatures() {
 
   return (
     <View style={styles.container}>
-      <Text>Jäähdytys</Text>
+      <Text style={{ fontSize: 24, color: "white" }}>
+        Remontissa! 
+      </Text>
+      <Text style={{ fontSize: 24, color: "white" }}>
+       Palaa myöhemmin.
+      </Text>
     </View>
   );
 }

@@ -4,9 +4,57 @@ import {
   deleteDoc,
   doc,
   getDocs,
+  getDoc,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 
+export const fetchCategoryData = async (
+  category: string,
+  year: string,
+  month: string
+) => {
+  console.log("Fetching data for category:", category, year, month);
+  const docRef = collection(
+    db,
+    "omavalvonta",
+    "lämpötilat",
+    category,
+    year,
+    month
+  );
+  const docSnap = await getDocs(docRef);
+  if (!docSnap.empty) {
+    return docSnap.docs.map((doc) => ({
+      id: doc.id, // Include the document ID
+      ...doc.data(), // Spread the document data
+    }));
+  }
+  return [];
+};
 
-export const fetchCategoryData  = async (category: string) => {
+export const saveItem = async (
+  category: string,
+  year: string,
+  month: string,
+  data: any
+) => {
+  console.log("Saving data for category:", category, year, month, data);
+  const docRef = doc(
+    collection(db, "omavalvonta", "lämpötilat", category, year, month)
+  );
+  await setDoc(docRef, data);
+
+  console.log("Document saved with ID:", docRef.id);
+  return docRef.id; // Return the generated ID if needed
+};
+
+export const deleteItem = async (
+  category: string,
+  year: string,
+  month: string,
+  id: string,
+) => {
+  const docRef = doc(db, "omavalvonta", "lämpötilat", category, year, month, id);
+  await deleteDoc(docRef);
 }
