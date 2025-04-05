@@ -138,7 +138,7 @@ export default function WashingMachineTemperatures() {
             <Pressable
               style={{ flex: 1 }}
               onPress={() => setCalendarModal(false)}
-              pointerEvents="box-none"
+              
             />
             <View
               style={{
