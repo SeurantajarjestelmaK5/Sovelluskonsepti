@@ -12,6 +12,7 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
+
 import CalendarComponent from "@/components/modals/CalendarComponent";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackButton from "@/components/buttons/BackButton";
@@ -59,6 +60,8 @@ export default function waste() {
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
   const styles = useMemo(() => getWasteStyles(ThemeColors), [ThemeColors]);
+  const {width, height} = Dimensions.get("window");
+  const isSmallScreen =  height < 1200; // KANTISPÄD ON 1380x800
 
   const handleDatePress = (day: any) => {
     const [year, month, dayOfMonth] = day.dateString.split("-");
@@ -450,7 +453,8 @@ export default function waste() {
               ))}
             </View>
 
-            <View>
+            {!isSmallScreen && (
+              <View>
             <Text style={{ ...styles.text }}>Kuukausi yhteensä:</Text>
             {Object.entries(monthTotals).map(([wasteType, total]) => (
               <Text key={wasteType} style={{ ...styles.text }}>
@@ -471,7 +475,7 @@ export default function waste() {
               buttonColor={ThemeColors.tint}
               onPress={() => setShowInKilograms((prev) => !prev)}
             />
-          </View>
+          </View>)}
 
           <View style={styles.buttonContainer}>
             <BackButton />
