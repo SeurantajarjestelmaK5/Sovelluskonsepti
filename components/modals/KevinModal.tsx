@@ -78,6 +78,7 @@ export default function KevinModal({
     return finnishMonths[parseInt(index) - 1];
   };
 
+
   useEffect(() => {
     if (month) {
       setFilterMonth(parseMonth(month));
@@ -88,9 +89,17 @@ export default function KevinModal({
     getParsedDate(currentDate);
   }, [month, year]);
 
-  useEffect(() => {
-    fetchTasks(year, month);
-  }, [year, month, taskAuthor]);
+useEffect(() => {
+
+  fetchTasks(year, month);
+
+  if (month) {
+    setFilterMonth(parseMonth(month));
+  }
+  if (year) {
+    setFilterYear(year);
+  }
+}, [year, month, taskAuthor]);
 
   const chevronHandler = (direction: "left" | "right") => {
     let monthIndex = finnishMonths.indexOf(filterMonth);
@@ -114,19 +123,24 @@ export default function KevinModal({
     fetchTasks(yearIndex.toString(), (monthIndex + 1).toString());
   };
 
-  const saveButtonHandler = async () => {
-    if (!taskAuthor) {
-      alert("Valitse tekijä valikosta ennen tallentamista.");
-      return;
-    }
-    try {
-      await CleaningFunctions.saveKevinTask(year, month, taskAuthor, propDate);
-    } catch (error) {
-      console.error("Error saving Kevin task:", error);
-    }
-    setTaskAuthor("");
-    fetchTasks(monthIndex, year);
-  };
+ const saveButtonHandler = async () => {
+   if (!taskAuthor) {
+     alert("Valitse tekijä valikosta ennen tallentamista.");
+     return;
+   }
+
+   // Dynamically calculate the correct month and year from propDate
+   const [day, month, year] = propDate.split(".").map((value) => value.trim());
+
+   try {
+     await CleaningFunctions.saveKevinTask(year, month, taskAuthor, propDate);
+   } catch (error) {
+     console.error("Error saving Kevin task:", error);
+   }
+
+   setTaskAuthor("");
+   fetchTasks(year, month); 
+ };
 
   return (
     <Modal
@@ -176,6 +190,7 @@ export default function KevinModal({
                 size={30}
                 color={ThemeColors.tint}
                 onPress={() => chevronHandler("left")}
+                hitSlop={30}
               />
               <Text style={styles.label}>
                 {filterMonth} {filterYear}
@@ -185,25 +200,38 @@ export default function KevinModal({
                 size={30}
                 color={ThemeColors.tint}
                 onPress={() => chevronHandler("right")}
+                hitSlop={30}
               />
             </View>
-            <FlatList
-              data={tasks}
-              contentContainerStyle={styles.flatlist}
-              showsVerticalScrollIndicator={false}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View style={styles.task} key={item.id}>
-                  <Text style={styles.taskText}>{item.author}</Text>
-                  <Text style={styles.taskText}>{item.date}</Text>
-                  <MaterialCommunityIcons
-                    name="checkbox-marked"
-                    size={24}
-                    color={ThemeColors.text}
-                  />
-                </View>
-              )}
-            />
+            <View style={{ ...styles.flatlistContainer, height: 300 }}>
+              <FlatList
+                data={tasks}
+                contentContainerStyle={styles.flatlist}
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View style={styles.task} key={item.id}>
+                    <Text style={[styles.taskText, { flex: 3 }]}>
+                      {item.author}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.taskText,
+                        { flex: 4, textAlign: "center" },
+                      ]}
+                    >
+                      {item.date}
+                    </Text>
+                    <MaterialCommunityIcons
+                      name="checkbox-marked"
+                      size={24}
+                      color={ThemeColors.text}
+                      style={{ flex: 2, textAlign: "right" }}
+                    />
+                  </View>
+                )}
+              />
+            </View>
           </View>
 
           <Button

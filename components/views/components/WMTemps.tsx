@@ -79,6 +79,7 @@ export default function WMTemps({
         year,
         month
       );
+
       setFetchedData(data || []);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -171,7 +172,7 @@ export default function WMTemps({
           size={30}
           color={ThemeColors.tint}
           onPress={() => chevronHandler("left")}
-          hitslop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitslop={{ top: 30, bottom: 30, left: 30, right: 30 }}
         />
         <Text style={{ fontSize: 20, color: ThemeColors.text }}>
           {filterMonth} {filterYear}
@@ -181,24 +182,19 @@ export default function WMTemps({
           size={30}
           color={ThemeColors.tint}
           onPress={() => chevronHandler("right")}
-          hitslop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          hitslop={{ top: 30, bottom: 30, left: 30, right: 30 }}
         />
       </View>
       {fetchedData.length > 0 ? (
-        
         <FlatList
           data={fetchedData}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={true}
-          
           style={styles.dataList}
           scrollEnabled={true}
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
-            <Pressable
-              style={styles.dataItemContainer}
-              onPress={() => {}}
-            >
+            <Pressable style={styles.dataItemContainer} onPress={() => {}}>
               <View style={styles.dataItem}>
                 <MaterialCommunityIcons
                   name="chart-bubble"
@@ -225,7 +221,7 @@ export default function WMTemps({
               </View>
               <TouchableOpacity
                 onPress={() => deleteHandler(item.id)}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
               >
                 <MaterialCommunityIcons
                   name="trash-can-outline"

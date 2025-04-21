@@ -315,10 +315,7 @@ export const saveKevinTask = async (
   }
 }
 
-export const fetchKevinTasks = async (
-  year: string,
-  month: string,
-) => {
+export const fetchKevinTasks = async (year: string, month: string) => {
   try {
     const tasksRef = collection(
       db,
@@ -329,7 +326,6 @@ export const fetchKevinTasks = async (
       month
     );
 
-    console.log("Fetching Kevin tasks for", year, month);
 
     const q = query(
       tasksRef,
@@ -356,6 +352,17 @@ export const fetchKevinTasks = async (
       });
     });
 
+    // Sort tasks by date in ascending order
+    tasks.sort((a, b) => {
+      const [dayA, monthA, yearA] = a.date.split(".").map(Number);
+      const [dayB, monthB, yearB] = b.date.split(".").map(Number);
+
+      const dateA = new Date(yearA, monthA - 1, dayA).getTime();
+      const dateB = new Date(yearB, monthB - 1, dayB).getTime();
+
+      return dateA - dateB;
+    });
+
     return tasks;
   } catch (error) {
     console.error("Error fetching Kevin tasks:", error);
@@ -363,6 +370,4 @@ export const fetchKevinTasks = async (
   }
 };
 
-function where(arg0: string, arg1: string, arg2: string): import("@firebase/firestore").QueryCompositeFilterConstraint {
-  throw new Error("Function not implemented.");
-}
+

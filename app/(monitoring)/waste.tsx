@@ -253,7 +253,7 @@ export default function waste() {
           <View style={styles.container}>
             <Text style={styles.header}>Jätteet</Text>
             <View style={styles.navigationContainer}>
-              <Pressable hitSlop={10} onPress={() => navigationHandler("left")}>
+              <Pressable hitSlop={30} onPress={() => navigationHandler("left")}>
                 <MaterialCommunityIcons
                   name="chevron-left"
                   size={35}
@@ -272,7 +272,7 @@ export default function waste() {
                 />
               </Pressable>
               <Pressable
-                hitSlop={10}
+                hitSlop={30}
                 onPress={() => navigationHandler("right")}
               >
                 <MaterialCommunityIcons

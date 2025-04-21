@@ -187,6 +187,7 @@ const DisplayTasks: React.FC<DisplayTasksProps> = ({
                   ))}
           </View>
 
+
           {isLoading ? (
             <FlatList
               data={cleaningTasks.diningRoomTasks.filter(

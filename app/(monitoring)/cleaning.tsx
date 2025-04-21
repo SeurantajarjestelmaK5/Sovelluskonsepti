@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "expo-router";
 import { Pressable, Text, View, FlatList, Modal } from "react-native";
 import { Button } from "react-native-paper";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BackButton from "@/components/buttons/BackButton";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
@@ -197,18 +198,18 @@ export default function Cleaning() {
             onPress={() => {
               handleWeekChange(-7);
             }}
-            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+            hitSlop={30}
           >
-            <AntDesign name="caretleft" size={24} color={ThemeColors.tint} />
+            <MaterialCommunityIcons name="chevron-left" size={34} color={ThemeColors.tint} />
           </Pressable>
           <Text style={styles.text}>
             {startOfWeek} - {endOfWeek} {year}
           </Text>
           <Pressable
             onPress={() => handleWeekChange(7)}
-            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+            hitSlop={ 30 }
           >
-            <AntDesign name="caretright" size={24} color={ThemeColors.tint} />
+            <MaterialCommunityIcons name="chevron-right" size={34} color={ThemeColors.tint} />
           </Pressable>
         </View>
 
@@ -259,7 +260,12 @@ export default function Cleaning() {
           />
         )}
       </View>
-        <KevinModal modalVisible={modalVisible} onClose={() => setModalVisible(false)} year={year} month={month}/>
+      <KevinModal
+        modalVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        year={year}
+        month={month}
+      />
     </View>
   );
 }
