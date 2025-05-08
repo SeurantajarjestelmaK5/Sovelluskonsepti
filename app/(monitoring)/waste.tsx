@@ -81,13 +81,14 @@ export default function waste() {
     setChosenWaste(null); // Close modal
   };
 
+
   const getCurrentDate = () => {
     const date = new Date();
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
     const fullDate = `${day}.${month}.${year}`;
-    const currDate = `${day}`;
+    const currDate = `0${day}`;
     const currMonth = month.toString().length === 1 ? `0${month}` : `${month}`;
     const currYear = `${year}`;
     setCalendarDate(fullDate);

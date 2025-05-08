@@ -242,7 +242,7 @@ export const AddWaste = async (
       date 
     );
 
-
+    
     const docSnapshot = await getDoc(docRef);
     const currentAmount = docSnapshot.exists() ? docSnapshot.data().määrä : 0;  
 
