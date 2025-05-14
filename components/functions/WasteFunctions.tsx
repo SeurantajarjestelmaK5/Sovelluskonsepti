@@ -241,7 +241,7 @@ export const AddWaste = async (
       month,
       date 
     );
-
+    
     
     const docSnapshot = await getDoc(docRef);
     const currentAmount = docSnapshot.exists() ? docSnapshot.data().määrä : 0;  
@@ -265,7 +265,7 @@ export const RemoveWaste = async (
   year: string,
   date: string,
   amount: number
-): Promise<void> => {
+): Promise<void> => { 
   try {
     const docRef = doc(
       db,

@@ -60,17 +60,20 @@ export default function waste() {
   const ThemeColors = useThemeColors();
   const colorScheme = useColorScheme();
   const styles = useMemo(() => getWasteStyles(ThemeColors), [ThemeColors]);
-  const {width, height} = Dimensions.get("window");
-  const isSmallScreen =  height < 1200; // KANTISPÄD ON 1380x800
+  const { width, height } = Dimensions.get("window");
+  const isSmallScreen = height < 1200; // KANTISPÄD ON 1380x800
 
   const handleDatePress = (day: any) => {
+    setIsLoading(true);
     const [year, month, dayOfMonth] = day.dateString.split("-");
     const formattedDate = `${dayOfMonth}.${month}.${year}`;
     setCalendarDate(formattedDate);
     setDate(dayOfMonth);
     setMonth(month);
+    setYear(year);
     setSelectedDate(day.dateString);
     setTimeout(() => setCalendarModal(false), 50);
+    setIsLoading(false);
   };
 
   const showWasteModal = (wasteName: string) => {
@@ -81,20 +84,21 @@ export default function waste() {
     setChosenWaste(null); // Close modal
   };
 
-
   const getCurrentDate = () => {
     const date = new Date();
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    const fullDate = `${day}.${month}.${year}`;
-    const currDate = `0${day}`;
-    const currMonth = month.toString().length === 1 ? `0${month}` : `${month}`;
-    const currYear = `${year}`;
+
+    // Ensure day and month are two digits
+    const formattedDay = day < 10 ? `0${day}` : `${day}`;
+    const formattedMonth = month < 10 ? `0${month}` : `${month}`;
+
+    const fullDate = `${formattedDay}.${formattedMonth}.${year}`;
     setCalendarDate(fullDate);
-    setDate(currDate);
-    setMonth(currMonth);
-    setYear(currYear);
+    setDate(formattedDay);
+    setMonth(formattedMonth);
+    setYear(`${year}`);
     return fullDate;
   };
 
@@ -103,47 +107,49 @@ export default function waste() {
   }, []);
 
   const navigationHandler = (iconPressed: string) => {
-      let newDay = parseInt(date, 10);
-      let newMonth = parseInt(month, 10);
-      let newYear = parseInt(year, 10);
+    setIsLoading(true);
+    let newDay = parseInt(date, 10);
+    let newMonth = parseInt(month, 10);
+    let newYear = parseInt(year, 10);
 
-      if (iconPressed === "left") {
-        newDay -= 1;
-        if (newDay < 1) {
-          newMonth -= 1;
-          if (newMonth < 1) {
-            newMonth = 12;
-            newYear -= 1;
-          }
-          newDay = new Date(newYear, newMonth, 0).getDate();
+    if (iconPressed === "left") {
+      newDay -= 1;
+      if (newDay < 1) {
+        newMonth -= 1;
+        if (newMonth < 1) {
+          newMonth = 12;
+          newYear -= 1;
         }
-      } else if (iconPressed === "right") {
-        newDay += 1;
-        const daysInMonth = new Date(newYear, newMonth, 0).getDate();
-        if (newDay > daysInMonth) {
-          newDay = 1;
-          newMonth += 1;
-          if (newMonth > 12) {
-            newMonth = 1;
-            newYear += 1;
-          }
+        newDay = new Date(newYear, newMonth, 0).getDate();
+      }
+    } else if (iconPressed === "right") {
+      newDay += 1;
+      const daysInMonth = new Date(newYear, newMonth, 0).getDate();
+      if (newDay > daysInMonth) {
+        newDay = 1;
+        newMonth += 1;
+        if (newMonth > 12) {
+          newMonth = 1;
+          newYear += 1;
         }
       }
+    }
 
-      // Format month and day to ensure two digits
-      const formattedMonth = newMonth < 10 ? `0${newMonth}` : `${newMonth}`;
-      const formattedDay = newDay < 10 ? `0${newDay}` : `${newDay}`;
+    // Format month and day to ensure two digits
+    const formattedMonth = newMonth < 10 ? `0${newMonth}` : `${newMonth}`;
+    const formattedDay = newDay < 10 ? `0${newDay}` : `${newDay}`;
 
-      const newFullDate = `${formattedDay}.${formattedMonth}.${newYear}`;
+    const newFullDate = `${formattedDay}.${formattedMonth}.${newYear}`;
 
-      setDate(formattedDay);
-      setMonth(formattedMonth);
-      setYear(`${newYear}`);
-      setCalendarDate(newFullDate);
-      fetchAllWasteData();
+    setDate(formattedDay);
+    setMonth(formattedMonth);
+    setYear(`${newYear}`);
+    setCalendarDate(newFullDate);
+    fetchAllWasteData();
   };
 
   const fetchAndSetWasteData = async (wasteName: string) => {
+    setIsLoading(true);
     const fetchWasteData = async (type: string) => {
       switch (type) {
         case "Bio":
@@ -208,17 +214,16 @@ export default function waste() {
       ...prevTotals,
       [wasteName]: monthTotal,
     }));
+    setIsLoading(false);
   };
 
   const fetchAllWasteData = async () => {
-
     const wasteTypes = ["Bio", "Muovi", "Pahvi", "Seka", "Metalli", "Lasi"];
 
     // Create promises for all fetch operations
     await Promise.all(
       wasteTypes.map((wasteType) => fetchAndSetWasteData(wasteType))
     );
-
   };
 
   useEffect(() => {
@@ -230,7 +235,6 @@ export default function waste() {
   }, [month, year, date, bioData.length]);
 
   useEffect(() => {
-    
     const fetchDatesWithData = async () => {
       try {
         const dates = await WasteFunctions.FetchDatesWithData(month, year);
@@ -245,245 +249,234 @@ export default function waste() {
     }
   }, [month, year, date]);
 
-
   return (
-
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // Adjust this offset based on headers
-      >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={styles.container}>
-            <Text style={styles.header}>Jätteet</Text>
-            <View style={styles.navigationContainer}>
-              <Pressable hitSlop={30} onPress={() => navigationHandler("left")}>
-                <MaterialCommunityIcons
-                  name="chevron-left"
-                  size={35}
-                  color={ThemeColors.tint}
-                />
-              </Pressable>
-              <Pressable
-                style={styles.calendar}
-                onPress={() => setCalendarModal(!calendarModal)}
-              >
-                <Text style={styles.text}>{calendarDate}</Text>
-                <MaterialCommunityIcons
-                  name="calendar"
-                  size={35}
-                  color={ThemeColors.tint}
-                />
-              </Pressable>
-              <Pressable
-                hitSlop={30}
-                onPress={() => navigationHandler("right")}
-              >
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={35}
-                  color={ThemeColors.tint}
-                />
-              </Pressable>
-            </View>
-            {calendarModal && (
-              <Modal
-                visible={calendarModal}
-                animationType="slide"
-                transparent={true}
-                onDismiss={() => setCalendarModal(false)}
-              >
-                <TouchableWithoutFeedback
-                  onPress={() => setCalendarModal(false)}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // Adjust this offset based on headers
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+          <Text style={styles.header}>Jätteet</Text>
+          <View style={styles.navigationContainer}>
+            <Pressable hitSlop={30} onPress={() => navigationHandler("left")}>
+              <MaterialCommunityIcons
+                name="chevron-left"
+                size={35}
+                color={ThemeColors.tint}
+              />
+            </Pressable>
+            <Pressable
+              style={styles.calendar}
+              onPress={() => setCalendarModal(!calendarModal)}
+            >
+              <Text style={styles.text}>{calendarDate}</Text>
+              <MaterialCommunityIcons
+                name="calendar"
+                size={35}
+                color={ThemeColors.tint}
+              />
+            </Pressable>
+            <Pressable hitSlop={30} onPress={() => navigationHandler("right")}>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={35}
+                color={ThemeColors.tint}
+              />
+            </Pressable>
+          </View>
+          {calendarModal && (
+            <Modal
+              visible={calendarModal}
+              animationType="slide"
+              transparent={true}
+              onDismiss={() => setCalendarModal(false)}
+            >
+              <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
+                <View
+                  style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}
                 >
-                  <View
-                    style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-                  >
-                    <CalendarComponent
-                      onDayPress={handleDatePress}
-                      dataDates={dateList}
-                      selectedDate={selectedDate}
-                    />
-                  </View>
-                </TouchableWithoutFeedback>
-              </Modal>
-            )}
+                  <CalendarComponent
+                    onDayPress={handleDatePress}
+                    dataDates={dateList}
+                    selectedDate={selectedDate}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
+            </Modal>
+          )}
 
-            <View style={styles.content}>
-              {(bioData.length > 0
-                ? bioData
-                : Array(1).fill({ id: "dummy", name: "Loading..." })
-              ).map((data, index) => (
-                <WasteButton
-                  key={data.id !== "dummy" ? data.id : `dummy-bio-${index}`}
-                  data={data}
-                  wasteName="Bio"
-                  date={{ day: date, month: month, year: year }}
-                  wasteModal={
-                    chosenWaste?.name === "Bio" && chosenWaste?.visible
-                  }
-                  showModal={() => showWasteModal("Bio")}
-                  setWasteModal={() => {
-                    fetchAndSetWasteData("Bio");
-                    hideWasteModal();
-                  }}
-                  addWaste={() => {
-                    fetchAndSetWasteData("Bio");
-                  }}
-                  styles={styles}
-                  ThemeColors={ThemeColors}
-                  isLoading={data.id === "dummy"}
-                />
-              ))}
-
-              {(mixedData.length > 0
-                ? mixedData
-                : Array(1).fill({ id: "dummy", name: "Loading..." })
-              ).map((data, index) => (
-                <WasteButton
-                  key={data.id !== "dummy" ? data.id : `dummy-mixed-${index}`}
-                  data={data}
-                  wasteName="Seka"
-                  date={{ day: date, month: month, year: year }}
-                  wasteModal={
-                    chosenWaste?.name === "Seka" && chosenWaste?.visible
-                  }
-                  showModal={() => showWasteModal("Seka")}
-                  setWasteModal={hideWasteModal}
-                  addWaste={() => {
-                    fetchAndSetWasteData("Seka");
-                  }}
-                  styles={styles}
-                  ThemeColors={ThemeColors}
-                  isLoading={data.id === "dummy"}
-                />
-              ))}
-
-              {(plasticData.length > 0
-                ? plasticData
-                : Array(1).fill({ id: "dummy", name: "Loading..." })
-              ).map((data, index) => (
-                <WasteButton
-                  key={data.id !== "dummy" ? data.id : `dummy-plastic-${index}`}
-                  data={data}
-                  wasteName="Muovi"
-                  date={{ day: date, month: month, year: year }}
-                  wasteModal={
-                    chosenWaste?.name === "Muovi" && chosenWaste?.visible
-                  }
-                  showModal={() => showWasteModal("Muovi")}
-                  setWasteModal={hideWasteModal}
-                  addWaste={() => {
-                    fetchAndSetWasteData("Muovi");
-                  }}
-                  styles={styles}
-                  ThemeColors={ThemeColors}
-                  isLoading={data.id === "dummy"}
-                />
-              ))}
-
-              {(cardboardData.length > 0
-                ? cardboardData
-                : Array(1).fill({ id: "dummy", name: "Loading..." })
-              ).map((data, index) => (
-                <WasteButton
-                  key={
-                    data.id !== "dummy" ? data.id : `dummy-cardboard-${index}`
-                  }
-                  data={data}
-                  wasteName="Pahvi"
-                  date={{ day: date, month: month, year: year }}
-                  wasteModal={
-                    chosenWaste?.name === "Pahvi" && chosenWaste?.visible
-                  }
-                  showModal={() => showWasteModal("Pahvi")}
-                  setWasteModal={hideWasteModal}
-                  addWaste={() => {
-                    fetchAndSetWasteData("Pahvi");
-                  }}
-                  styles={styles}
-                  ThemeColors={ThemeColors}
-                  isLoading={data.id === "dummy"}
-                />
-              ))}
-
-              {(metalData.length > 0
-                ? metalData
-                : Array(1).fill({ id: "dummy", name: "Loading..." })
-              ).map((data, index) => (
-                <WasteButton
-                  key={data.id !== "dummy" ? data.id : `dummy-metal-${index}`}
-                  data={data}
-                  wasteName="Metalli"
-                  date={{ day: date, month: month, year: year }}
-                  wasteModal={
-                    chosenWaste?.name === "Metalli" && chosenWaste?.visible
-                  }
-                  showModal={() => showWasteModal("Metalli")}
-                  setWasteModal={hideWasteModal}
-                  addWaste={() => {
-                    fetchAndSetWasteData("Metalli");
-                  }}
-                  styles={styles}
-                  ThemeColors={ThemeColors}
-                  isLoading={data.id === "dummy"}
-                />
-              ))}
-
-              {(glassData.length > 0
-                ? glassData
-                : Array(1).fill({ id: "dummy", name: "Loading..." })
-              ).map((data, index) => (
-                <WasteButton
-                  key={data.id !== "dummy" ? data.id : `dummy-glass-${index}`}
-                  data={data}
-                  wasteName="Lasi"
-                  date={{ day: date, month: month, year: year }}
-                  wasteModal={
-                    chosenWaste?.name === "Lasi" && chosenWaste?.visible
-                  }
-                  showModal={() => showWasteModal("Lasi")}
-                  setWasteModal={hideWasteModal}
-                  addWaste={() => {
-                    fetchAndSetWasteData("Lasi");
-                  }}
-                  styles={styles}
-                  ThemeColors={ThemeColors}
-                  isLoading={data.id === "dummy"}
-                />
-              ))}
-            </View>
-
-            {!isSmallScreen && (
-              <View>
-            <Text style={{ ...styles.text }}>Kuukausi yhteensä:</Text>
-            {Object.entries(monthTotals).map(([wasteType, total]) => (
-              <Text key={wasteType} style={{ ...styles.text }}>
-                {wasteType}:{" "}
-                {showInKilograms
-                  ? ((total as number) / 1000).toFixed(2)
-                  : (total as number)}{" "}
-                {showInKilograms ? "kg" : "g"}
-              </Text>
+          <View style={styles.content}>
+            {(bioData.length > 0
+              ? bioData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
+              <WasteButton
+                key={data.id !== "dummy" ? data.id : `dummy-bio-${index}`}
+                data={data}
+                wasteName="Bio"
+                date={{ day: date, month: month, year: year }}
+                wasteModal={chosenWaste?.name === "Bio" && chosenWaste?.visible}
+                showModal={() => showWasteModal("Bio")}
+                setWasteModal={() => {
+                  fetchAndSetWasteData("Bio");
+                  hideWasteModal();
+                }}
+                addWaste={() => {
+                  fetchAndSetWasteData("Bio");
+                }}
+                styles={styles}
+                ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy" || isLoading}
+              />
             ))}
-            <Button
-              children={`Näytä ${showInKilograms ? "grammoina" : "kiloina"}`}
-              icon={() => (
-                <MaterialCommunityIcons name="scale-balance" size={20} />
-              )}
-              contentStyle={{ flexDirection: "row-reverse" }}
-              mode="contained"
-              buttonColor={ThemeColors.tint}
-              onPress={() => setShowInKilograms((prev) => !prev)}
-            />
-          </View>)}
+
+            {(mixedData.length > 0
+              ? mixedData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
+              <WasteButton
+                key={data.id !== "dummy" ? data.id : `dummy-mixed-${index}`}
+                data={data}
+                wasteName="Seka"
+                date={{ day: date, month: month, year: year }}
+                wasteModal={
+                  chosenWaste?.name === "Seka" && chosenWaste?.visible
+                }
+                showModal={() => showWasteModal("Seka")}
+                setWasteModal={hideWasteModal}
+                addWaste={() => {
+                  fetchAndSetWasteData("Seka");
+                }}
+                styles={styles}
+                ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy"  || isLoading}
+              />
+            ))}
+
+            {(plasticData.length > 0
+              ? plasticData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
+              <WasteButton
+                key={data.id !== "dummy" ? data.id : `dummy-plastic-${index}`}
+                data={data}
+                wasteName="Muovi"
+                date={{ day: date, month: month, year: year }}
+                wasteModal={
+                  chosenWaste?.name === "Muovi" && chosenWaste?.visible
+                }
+                showModal={() => showWasteModal("Muovi")}
+                setWasteModal={hideWasteModal}
+                addWaste={() => {
+                  fetchAndSetWasteData("Muovi");
+                }}
+                styles={styles}
+                ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy" || isLoading}
+              />
+            ))}
+
+            {(cardboardData.length > 0
+              ? cardboardData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
+              <WasteButton
+                key={data.id !== "dummy" ? data.id : `dummy-cardboard-${index}`}
+                data={data}
+                wasteName="Pahvi"
+                date={{ day: date, month: month, year: year }}
+                wasteModal={
+                  chosenWaste?.name === "Pahvi" && chosenWaste?.visible
+                }
+                showModal={() => showWasteModal("Pahvi")}
+                setWasteModal={hideWasteModal}
+                addWaste={() => {
+                  fetchAndSetWasteData("Pahvi");
+                }}
+                styles={styles}
+                ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy" || isLoading}
+              />
+            ))}
+
+            {(metalData.length > 0
+              ? metalData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
+              <WasteButton
+                key={data.id !== "dummy" ? data.id : `dummy-metal-${index}`}
+                data={data}
+                wasteName="Metalli"
+                date={{ day: date, month: month, year: year }}
+                wasteModal={
+                  chosenWaste?.name === "Metalli" && chosenWaste?.visible
+                }
+                showModal={() => showWasteModal("Metalli")}
+                setWasteModal={hideWasteModal}
+                addWaste={() => {
+                  fetchAndSetWasteData("Metalli");
+                }}
+                styles={styles}
+                ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy" || isLoading}
+              />
+            ))}
+
+            {(glassData.length > 0
+              ? glassData
+              : Array(1).fill({ id: "dummy", name: "Loading..." })
+            ).map((data, index) => (
+              <WasteButton
+                key={data.id !== "dummy" ? data.id : `dummy-glass-${index}`}
+                data={data}
+                wasteName="Lasi"
+                date={{ day: date, month: month, year: year }}
+                wasteModal={
+                  chosenWaste?.name === "Lasi" && chosenWaste?.visible
+                }
+                showModal={() => showWasteModal("Lasi")}
+                setWasteModal={hideWasteModal}
+                addWaste={() => {
+                  fetchAndSetWasteData("Lasi");
+                }}
+                styles={styles}
+                ThemeColors={ThemeColors}
+                isLoading={data.id === "dummy" || isLoading}
+              />
+            ))}
+          </View>
+
+          {!isSmallScreen && (
+            <View>
+              <Text style={{ ...styles.text }}>Kuukausi yhteensä:</Text>
+              {Object.entries(monthTotals).map(([wasteType, total]) => (
+                <Text key={wasteType} style={{ ...styles.text }}>
+                  {wasteType}:{" "}
+                  {showInKilograms
+                    ? ((total as number) / 1000).toFixed(2)
+                    : (total as number)}{" "}
+                  {showInKilograms ? "kg" : "g"}
+                </Text>
+              ))}
+              <Button
+                children={`Näytä ${showInKilograms ? "grammoina" : "kiloina"}`}
+                icon={() => (
+                  <MaterialCommunityIcons name="scale-balance" size={20} />
+                )}
+                contentStyle={{ flexDirection: "row-reverse" }}
+                mode="contained"
+                buttonColor={ThemeColors.tint}
+                onPress={() => setShowInKilograms((prev) => !prev)}
+              />
+            </View>
+          )}
 
           <View style={styles.buttonContainer}>
             <BackButton />
           </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
