@@ -8,10 +8,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getGeneralStyles } from "@/styles/navigations/generalStyles";
 import { useNavigationState } from "@react-navigation/native";
-import {
-  ActivityIndicator,
-  Snackbar,
-} from "react-native-paper";
+import { ActivityIndicator, Snackbar } from "react-native-paper";
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -23,6 +20,7 @@ export default function TabsLayout() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
 
   const handleCogPress = () => {
+    checkForUpdates();
     if (isInSettings) {
       // Navigate back to the previous screen
       if (navigationState.routes.length > 1) {
@@ -59,7 +57,6 @@ export default function TabsLayout() {
     checkActiveScreen();
   }, [navigationState]);
 
-useEffect(() => {
   const checkForUpdates = async () => {
     try {
       const update = await Updates.checkForUpdateAsync();
@@ -78,8 +75,10 @@ useEffect(() => {
       console.error("Failed to check for updates:", error);
     }
   };
-  checkForUpdates();
-}, []);
+
+  useEffect(() => {
+    checkForUpdates();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -136,7 +135,11 @@ useEffect(() => {
           //   />
           // ),
           tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
-          tabBarLabelStyle: { fontSize: 23, fontWeight: "bold", textShadowRadius: 0 },
+          tabBarLabelStyle: {
+            fontSize: 23,
+            fontWeight: "bold",
+            textShadowRadius: 0,
+          },
           tabBarActiveTintColor: ThemeColors.tabIconSelected,
           tabBarInactiveTintColor: ThemeColors.tabIconDefault,
           tabBarActiveBackgroundColor: ThemeColors.navSelected,
