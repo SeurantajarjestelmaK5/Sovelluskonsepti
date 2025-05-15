@@ -20,7 +20,7 @@ interface KevinModalProps {
   month: string;
 }
 
-const authorList = ["Teemu", "Tony", "Lari", "Risto", "Milja", "Milla", "Sepi"];
+const authorList = ["Teemu", "Tony", "Lari", "Risto", "Milja", "Milla", "Sepi", "Casper"];
 const finnishMonths = [
   "Tammikuu",
   "Helmikuu",
