@@ -79,8 +79,12 @@ export default function WMTemps({
         year,
         month
       );
-
-      setFetchedData(data || []);
+      const sortedData = data.sort((a: any, b: any) => {
+        const dayA = parseInt(a.Pvm.split(".")[0]);
+        const dayB = parseInt(b.Pvm.split(".")[0]);
+        return dayA - dayB;
+      });
+      setFetchedData(sortedData || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
