@@ -6,16 +6,19 @@ import { getReportNavStyle } from "@/styles/navigations/reportNavStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useMemo } from "react";
+import AppHeader from "@/components/misc/AppHeader";
 
 export default function ReportsHome() {
   const ThemeColors = useThemeColors();
-  const reportNavStyle = useMemo(() => getReportNavStyle(ThemeColors), [ThemeColors]);
+  const reportNavStyle = useMemo(
+    () => getReportNavStyle(ThemeColors),
+    [ThemeColors]
+  );
 
   return (
-    <View
-      style={reportNavStyle.container}
-    >
-      <Text style={{fontSize: 30, color: ThemeColors.text}}>TBA</Text>
+    <View style={reportNavStyle.container}>
+      <AppHeader />
+      <Text style={{ fontSize: 30, color: ThemeColors.text }}>TBA</Text>
       {/* <View style={reportNavStyle.buttonContainer} >
         <Link href="/cleaningReport" asChild>
         <Pressable style={reportNavStyle.button}>

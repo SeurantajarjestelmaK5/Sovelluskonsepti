@@ -115,6 +115,7 @@ export default function TabsLayout() {
       <Tabs
         initialRouteName="(monitoring)"
         screenOptions={{
+          headerShown: false,
           headerRight: () => (
             <MaterialCommunityIcons
               name="cog"
@@ -134,7 +135,7 @@ export default function TabsLayout() {
           //     onPress={() => router.push("/(menu)")}
           //   />
           // ),
-          tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
+          tabBarStyle: { height: 100, backgroundColor: ThemeColors.background },
           tabBarLabelStyle: {
             fontSize: 23,
             fontWeight: "bold",

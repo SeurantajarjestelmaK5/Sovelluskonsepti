@@ -10,6 +10,7 @@ export const getDiningroomStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "flex-start",
       alignItems: "center",
       padding: 5,
+      paddingTop: "10%",
       backgroundColor: ThemeColors.background,
     },
 

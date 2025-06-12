@@ -6,21 +6,26 @@ import { Button } from "react-native-paper";
 
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getButtonStyle } from "@/styles/components/backButtonStyle";
+import { useRouter } from "expo-router";
 
 export default function BackButton() {
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getButtonStyle(ThemeColors), [ThemeColors]);
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back();
+  };
 
   // Tätä ku käyttää niin vois wrapata Viewillä ja antaa:
-  //       flexDirection: "row",
-  //       justifyContent: "space-between",
-  //       alignContent: "flex-start",
-  //       width: "100%",
-  //       marginTop: 20,
+        // flexDirection: "row",
+        // justifyContent: "space-between",
+        // alignContent: "flex-start",
+        // width: "100%",
+        // marginTop: 20,
   // menee suoraan vasempaan alakulmaan
   return (
     <>
-      <Link href="../">
         <Button
           children="Takaisin"
           mode="contained"
@@ -34,8 +39,9 @@ export default function BackButton() {
               color={ThemeColors.text}
             />
           )}
+          onPress={handleBack}
         />
-      </Link>
+
     </>
   );
 }

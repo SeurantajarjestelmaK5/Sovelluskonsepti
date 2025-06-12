@@ -5,7 +5,7 @@ const windowHeight = Dimensions.get('window').height;
 export const getReportNavStyle = (ThemeColors: ThemeColors) => StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-evenly",
     alignItems: "center",
     padding: 16,
     backgroundColor: ThemeColors.background,

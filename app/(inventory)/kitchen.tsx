@@ -205,7 +205,6 @@ useEffect(() => {
       await setDoc(newDocRef, newItemData);
     });
   
-    // console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
   };
 
   /** JA SE SITTEN LOPPUU TÄHÄN*/
@@ -347,7 +346,6 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
         return { ...prevData, [selectedCategory]: updatedCategoryItems };
       });
       
-      // console.log(`${itemToRemove.Nimi} has been removed from inventory.`);
     } catch (error) {
       console.error("Error deleting inventory item:", error);
     }
