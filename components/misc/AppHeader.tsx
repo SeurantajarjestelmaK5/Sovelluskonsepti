@@ -19,6 +19,7 @@ export default function AppHeader() {
         alignItems: "center",
         width: "100%",
         paddingHorizontal: 20,
+        marginBottom: 20,
       }}
     >
       <MaterialCommunityIcons

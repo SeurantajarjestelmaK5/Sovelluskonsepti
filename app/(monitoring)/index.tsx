@@ -17,7 +17,7 @@ export default function MonitorHome() {
   return (
     <View style={monitoringNavStyle.container}>
       <AppHeader />
-      <View style={monitoringNavStyle.buttonContainer}>
+      <View style={{...monitoringNavStyle.buttonContainer}}>
         <Link href="/samples" asChild>
           <Pressable style={monitoringNavStyle.button}>
             <Text style={monitoringNavStyle.buttonText}>Näytteenotto</Text>
