@@ -14,12 +14,20 @@
       "backgroundColor": "#000000FF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "statusBar": {
+        "style": "auto",
+        "backgroundColor": "transparent"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/täppä_hd_thick.png",
         "backgroundColor": "#000000FF"
+      },
+      "statusBar": {
+        "style": "auto",
+        "backgroundColor": "transparent"
       },
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",
