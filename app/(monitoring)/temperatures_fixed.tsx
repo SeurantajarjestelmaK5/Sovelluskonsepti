@@ -21,7 +21,7 @@ export default function TemperaturesFixedScreen() {
   const ThemeColors = useThemeColors();
   const styles = getTemperatureStyles(ThemeColors);
   const categories = ["Tiskikone", "Liha", "Jäähdytys"];
-  const [selectedCategory, setSelectedCategory] = useState(categories[2]);
+  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
   const [showCalendar, setShowCalendar] = useState(false);
 
   return (

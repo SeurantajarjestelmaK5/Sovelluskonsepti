@@ -290,7 +290,7 @@ export default function WMTemps({
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <Pressable style={styles.dataItemContainer} onPress={() => {}}>
-              <View style={{...styles.dataItem, minWidth: 100,}}>
+              <View style={{ ...styles.dataItem, minWidth: 100 }}>
                 <MaterialCommunityIcons
                   name="food-variant"
                   size={30}
@@ -330,6 +330,7 @@ export default function WMTemps({
                       style={{
                         position: "relative",
                         zIndex: 1001,
+                        marginTop: 5,
                       }}
                     >
                       <TextInput
