@@ -3,10 +3,25 @@ import { getDiningroomStyles } from "@/styles/inventory/diningroomStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState, useEffect, useMemo, useRef } from "react";
-import { Alert, FlatList, Pressable, Text, TextInput, View, KeyboardAvoidingView } from "react-native";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  Text,
+  TextInput,
+  View,
+  KeyboardAvoidingView,
+} from "react-native";
 import { db } from "@/firebase/config";
 import AddItemModal from "@/components/modals/AddItemModal";
-import { collection, getDocs, updateDoc, doc, setDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  setDoc,
+  deleteDoc,
+} from "firebase/firestore";
 import BackButton from "@/components/buttons/BackButton";
 import LoadingScreen from "@/components/misc/LoadingScreen";
 import { useLoadingScreenStyle } from "@/styles/components/loadingScreenStyle";
@@ -14,7 +29,6 @@ import SmallLoadingIndicator from "@/components/misc/SmallLoadingIncidator";
 import { exportAndSendData } from "@/scripts/mailSender";
 import AddItemButton from "@/components/buttons/AddItemButton";
 import SendInventoryButton from "@/components/buttons/SendInventoryButton";
-
 
 export interface InventoryItem {
   Alv: number;
@@ -34,15 +48,20 @@ type InventoryData = {
 export default function Diningroom() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [addItemModalVisible, setAddItemModalVisible] = useState(false); 
+  const [addItemModalVisible, setAddItemModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("Lihat");
   const [inventoryData, setInventoryData] = useState<InventoryData>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [itemAdded, setItemAdded] = useState(false);
   const ThemeColors = useThemeColors();
-  const diningroomStyle = useMemo(() => getDiningroomStyles(ThemeColors), [ThemeColors]);
-  const [tempValues, setTempValues] = useState<{ [key: string]: { Määrä?: string, Hinta?: string, Alv?: string  } }>({});
+  const diningroomStyle = useMemo(
+    () => getDiningroomStyles(ThemeColors),
+    [ThemeColors]
+  );
+  const [tempValues, setTempValues] = useState<{
+    [key: string]: { Määrä?: string; Hinta?: string; Alv?: string };
+  }>({});
   const cachedData = useRef<Record<string, InventoryData>>({});
   const styles = useMemo(
     () => useLoadingScreenStyle(ThemeColors),
@@ -51,44 +70,54 @@ export default function Diningroom() {
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT ALKAA */
   const finnishMonths = [
-    "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kesäkuu",
-    "Heinäkuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu"
+    "Tammikuu",
+    "Helmikuu",
+    "Maaliskuu",
+    "Huhtikuu",
+    "Toukokuu",
+    "Kesäkuu",
+    "Heinäkuu",
+    "Elokuu",
+    "Syyskuu",
+    "Lokakuu",
+    "Marraskuu",
+    "Joulukuu",
   ];
 
-const getFormattedDate = () => {
-  if (!selectedDate) return "";
+  const getFormattedDate = () => {
+    if (!selectedDate) return "";
 
-  const [month, year] = selectedDate.split("-").map(Number);
-  const monthName = finnishMonths[month - 1];
+    const [month, year] = selectedDate.split("-").map(Number);
+    const monthName = finnishMonths[month - 1];
 
-  return `${monthName} ${year}`;
-};
+    return `${monthName} ${year}`;
+  };
 
-useEffect(() => {
-  if (!selectedDate) {
-    const currentDate = new Date();
-    let currentMonth = currentDate.getMonth() + 1; // JS months are 0-indexed
-    let currentYear = currentDate.getFullYear();
-    const currentDay = currentDate.getDate();
+  useEffect(() => {
+    if (!selectedDate) {
+      const currentDate = new Date();
+      let currentMonth = currentDate.getMonth() + 1; // JS months are 0-indexed
+      let currentYear = currentDate.getFullYear();
+      const currentDay = currentDate.getDate();
 
-    // If it's the 1st or 2nd, go back to the previous month
-    if (currentDay <= 2) {
-      currentMonth -= 1;
-      if (currentMonth === 0) {
-        currentMonth = 12;
-        currentYear -= 1;
+      // If it's the 1st or 2nd, go back to the previous month
+      if (currentDay <= 2) {
+        currentMonth -= 1;
+        if (currentMonth === 0) {
+          currentMonth = 12;
+          currentYear -= 1;
+        }
       }
+
+      setSelectedDate(
+        `${String(currentMonth).padStart(2, "0")}-${currentYear}`
+      );
     }
-
-    setSelectedDate(`${String(currentMonth).padStart(2, "0")}-${currentYear}`);
-  }
-}, [selectedDate]);
-
+  }, [selectedDate]);
 
   /** KUUKAUDET, PVM HAKU FUNKTIOT LOPPUU */
 
-
-/** MODAALIEN HELPPERIT ALKAA */
+  /** MODAALIEN HELPPERIT ALKAA */
 
   const handleConfirm = (formattedDate: string) => {
     setSelectedDate(formattedDate);
@@ -96,21 +125,30 @@ useEffect(() => {
   };
 
   const handleModalToggle = () => {
-    setAddItemModalVisible(true)
-  }
+    setAddItemModalVisible(true);
+  };
   const handleItemAdded = () => {
     setAddItemModalVisible(false);
-    setItemAdded(true)
+    setItemAdded(true);
   };
 
-
-  const renderInventoryItem = ({ item, index }: { item: InventoryItem; index: number }) => {
+  const renderInventoryItem = ({
+    item,
+    index,
+  }: {
+    item: InventoryItem;
+    index: number;
+  }) => {
     const isEven = index % 2 === 0;
     const rowStyle = [
       diningroomStyle.tableRow,
-      { backgroundColor: isEven ? ThemeColors.navSelected : ThemeColors.navDefault }, // Alternate colors
+      {
+        backgroundColor: isEven
+          ? ThemeColors.navSelected
+          : ThemeColors.navDefault,
+      }, // Alternate colors
     ];
-    
+
     return (
       <View style={rowStyle} key={`${item.Nimi}-${index}`}>
         <Text style={{ ...diningroomStyle.cellText, marginRight: 20 }}>
@@ -156,13 +194,12 @@ useEffect(() => {
           />
         </Pressable>
       </View>
-    );}
+    );
+  };
 
+  /** MODAALIEN HELPPERIT LOPPUU */
 
-/** MODAALIEN HELPPERIT LOPPUU */
-
-
-/** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
+  /** TÄSSÄ ON UUDEN KUUKAUDEN TEKEMINEN DATABASEEN JOS SELLAISTA EI VIELÄ OLE */
   const getPreviousMonthDate = (dateString: string): string => {
     const [month, year] = dateString.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1, 1);
@@ -171,26 +208,31 @@ useEffect(() => {
     const prevYear = date.getFullYear();
     return `${prevMonth}-${prevYear}`;
   };
-  
+
   const checkOrCreateMonth = async (month: string) => {
     const inventoryRef = collection(db, "inventaario", month, "keittiö");
     const docSnapshot = await getDocs(inventoryRef);
-  
+
     if (!docSnapshot.empty) {
       // Data for this month already exists
       return;
     }
-  
+
     // Get previous month's data
     const previousMonth = getPreviousMonthDate(month);
-    const prevMonthRef = collection(db, "inventaario", previousMonth, "keittiö");
+    const prevMonthRef = collection(
+      db,
+      "inventaario",
+      previousMonth,
+      "keittiö"
+    );
     const prevMonthSnapshot = await getDocs(prevMonthRef);
-  
+
     if (prevMonthSnapshot.empty) {
       console.warn(`No data found for the previous month: ${previousMonth}`);
       return;
     }
-  
+
     // Copy previous month's data to new month
     prevMonthSnapshot.forEach(async (item) => {
       const itemData = item.data();
@@ -204,7 +246,6 @@ useEffect(() => {
       const newDocRef = doc(db, "inventaario", month, "keittiö", item.id);
       await setDoc(newDocRef, newItemData);
     });
-  
   };
 
   /** JA SE SITTEN LOPPUU TÄHÄN*/
@@ -215,11 +256,11 @@ useEffect(() => {
     try {
       setIsLoading(true);
       await checkOrCreateMonth(date);
-  
+
       const inventoryRef = collection(db, "inventaario", date, "keittiö");
       const querySnapshot = await getDocs(inventoryRef);
-  
-      const fetchedData : InventoryData = {
+
+      const fetchedData: InventoryData = {
         Lihat: [],
         Tuoreet: [],
         Maitokylmiö: [],
@@ -227,7 +268,7 @@ useEffect(() => {
         Pakasteet: [],
         Muut: [],
       };
-  
+
       querySnapshot.forEach((doc) => {
         const data = doc.data() as InventoryItem;
         fetchedData[data.Kategoria]?.push(data);
@@ -243,7 +284,6 @@ useEffect(() => {
       setIsLoading(false);
     }
   };
-  
 
   // Fetch data on initial load or when selectedDate changes
   useEffect(() => {
@@ -252,9 +292,9 @@ useEffect(() => {
         // Fetch data if not cached
         fetchInventory(selectedDate).then((data) => {
           cachedData.current[selectedDate] = data;
-          setInventoryData(data);          
-          setItemAdded(false)
-          return
+          setInventoryData(data);
+          setItemAdded(false);
+          return;
         });
       }
       if (cachedData.current[selectedDate]) {
@@ -265,63 +305,84 @@ useEffect(() => {
         // Fetch data if not cached
         fetchInventory(selectedDate).then((data) => {
           cachedData.current[selectedDate] = data;
-          setInventoryData(data);          
+          setInventoryData(data);
         });
       }
     }
   }, [selectedDate, itemAdded]);
 
-/** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
-const handleEditingEnd =  async (item: InventoryItem, field: "Määrä" | "Hinta", index: number) => {
-  const tempValue = tempValues[item.Nimi]?.[field];
-  if (tempValue !== undefined) {
-    const parsedValue = parseFloat(tempValue);
-    if (!isNaN(parsedValue) && parsedValue !== item[field]) {
-      try {
-        let newYhteishinta = item.Yhteishinta;
-        let newALV0 = 0;
-        if (field === "Määrä") {
-          newYhteishinta = parsedValue * item.Hinta;
-          newALV0 = +(item.Hinta / (1 + item.Alv / 100) * parsedValue).toFixed(2);
-        } else if (field === "Hinta") {
-          newYhteishinta = item.Määrä * parsedValue;
-          newALV0 = +(parsedValue / (1 + item.Alv / 100) * item.Määrä).toFixed(2);
-        }
+  /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN ALKAA  */
+  const handleEditingEnd = async (
+    item: InventoryItem,
+    field: "Määrä" | "Hinta",
+    index: number
+  ) => {
+    const tempValue = tempValues[item.Nimi]?.[field];
+    if (tempValue !== undefined) {
+      const parsedValue = parseFloat(tempValue);
+      if (!isNaN(parsedValue) && parsedValue !== item[field]) {
+        try {
+          let newYhteishinta = item.Yhteishinta;
+          let newALV0 = 0;
+          if (field === "Määrä") {
+            newYhteishinta = parsedValue * item.Hinta;
+            newALV0 = +(
+              (item.Hinta / (1 + item.Alv / 100)) *
+              parsedValue
+            ).toFixed(2);
+          } else if (field === "Hinta") {
+            newYhteishinta = item.Määrä * parsedValue;
+            newALV0 = +(
+              (parsedValue / (1 + item.Alv / 100)) *
+              item.Määrä
+            ).toFixed(2);
+          }
 
-        // Update Firestore with the new value and Yhteishinta
-        const docRef = doc(db, "inventaario", selectedDate!, "keittiö", item.Nimi);
-        await updateDoc(docRef, { 
-          [field]: parsedValue, 
-          Yhteishinta: newYhteishinta,
-           Alv0: newALV0,
-        });
-
-        // Update the local inventory data with the new value and Yhteishinta
-        setInventoryData((prevData) => {
-          const updatedCategoryItems = [...prevData[selectedCategory]];
-          const updatedItem = { ...updatedCategoryItems[index], 
-            [field]: parsedValue, 
+          // Update Firestore with the new value and Yhteishinta
+          const docRef = doc(
+            db,
+            "inventaario",
+            selectedDate!,
+            "keittiö",
+            item.Nimi
+          );
+          await updateDoc(docRef, {
+            [field]: parsedValue,
             Yhteishinta: newYhteishinta,
-            Alv0: newALV0 
-          };
-          updatedCategoryItems[index] = updatedItem;
-          return { ...prevData, [selectedCategory]: updatedCategoryItems };
-        });
-      } catch (error) {
-        console.error("Error updating inventory item:", error);
+            Alv0: newALV0,
+          });
+
+          // Update the local inventory data with the new value and Yhteishinta
+          setInventoryData((prevData) => {
+            const updatedCategoryItems = [...prevData[selectedCategory]];
+            const updatedItem = {
+              ...updatedCategoryItems[index],
+              [field]: parsedValue,
+              Yhteishinta: newYhteishinta,
+              Alv0: newALV0,
+            };
+            updatedCategoryItems[index] = updatedItem;
+            return { ...prevData, [selectedCategory]: updatedCategoryItems };
+          });
+        } catch (error) {
+          console.error("Error updating inventory item:", error);
+        }
       }
     }
-  }
-};
-const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: string) => {
-  setTempValues((prevTempValues) => ({
-    ...prevTempValues,
-    [itemName]: {
-      ...prevTempValues[itemName],
-      [field]: value,
-    },
-  }));
-};
+  };
+  const handleChange = (
+    itemName: string,
+    field: "Määrä" | "Hinta",
+    value: string
+  ) => {
+    setTempValues((prevTempValues) => ({
+      ...prevTempValues,
+      [itemName]: {
+        ...prevTempValues[itemName],
+        [field]: value,
+      },
+    }));
+  };
 
   const confirmDeleteItem = (item: InventoryItem) => {
     Alert.alert(
@@ -329,7 +390,11 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
       `Haluatko varmasti poistaa tuotteen ${item.Nimi}?`,
       [
         { text: "Peruuta", style: "cancel" },
-        { text: "Poista", style: "destructive", onPress: () => removeInventoryItem(item) }
+        {
+          text: "Poista",
+          style: "destructive",
+          onPress: () => removeInventoryItem(item),
+        },
       ],
       { cancelable: true }
     );
@@ -337,22 +402,29 @@ const handleChange = (itemName: string, field: "Määrä" | "Hinta", value: stri
 
   const removeInventoryItem = async (itemToRemove: InventoryItem) => {
     try {
-      const itemRef = doc(db, "inventaario", selectedDate!, "keittiö", itemToRemove.Nimi);
+      const itemRef = doc(
+        db,
+        "inventaario",
+        selectedDate!,
+        "keittiö",
+        itemToRemove.Nimi
+      );
       await deleteDoc(itemRef); // Remove from Firebase
-  
+
       // Remove from local state
       setInventoryData((prevData) => {
-        const updatedCategoryItems = prevData[selectedCategory].filter(item => item.Nimi !== itemToRemove.Nimi);
+        const updatedCategoryItems = prevData[selectedCategory].filter(
+          (item) => item.Nimi !== itemToRemove.Nimi
+        );
         return { ...prevData, [selectedCategory]: updatedCategoryItems };
       });
-      
     } catch (error) {
       console.error("Error deleting inventory item:", error);
     }
   };
-  const handleInventorySend = async (selectedDate : any) => {
-    exportAndSendData(selectedDate, "keittiö")
-}
+  const handleInventorySend = async (selectedDate: any) => {
+    exportAndSendData(selectedDate, "keittiö");
+  };
   /** MÄÄRIEN PÄIVITTÄMINEN JA ITEMIEN POISTAMINEN LOPPUU  */
 
   /** INVENTAARION FUNKTIOT LOPPUU */

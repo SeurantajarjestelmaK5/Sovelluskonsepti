@@ -21,7 +21,7 @@ export default function TemperaturesFixedScreen() {
   const ThemeColors = useThemeColors();
   const styles = getTemperatureStyles(ThemeColors);
   const categories = ["Tiskikone", "Liha", "Jäähdytys"];
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
+  const [selectedCategory, setSelectedCategory] = useState(categories[2]);
   const [showCalendar, setShowCalendar] = useState(false);
 
   return (
@@ -61,9 +61,11 @@ export default function TemperaturesFixedScreen() {
             )}
           />
         </View>
-        {selectedCategory === "Tiskikone" && <WashingMachineTemperatures />}
-        {selectedCategory === "Liha" && <MeatTemperatures />}
-        {selectedCategory === "Jäähdytys" && <CoolingTemperatures />}
+        {selectedCategory === "Tiskikone" ? (
+          <WashingMachineTemperatures />
+        ) : null}
+        {selectedCategory === "Liha" ? <MeatTemperatures /> : null}
+        {selectedCategory === "Jäähdytys" ? <CoolingTemperatures /> : null}
 
         <View style={{ position: "absolute", bottom: 10, left: 10 }}>
           <BackButton />

@@ -119,7 +119,6 @@ export default function TabsLayout() {
           ThemeColors.background === Colors.light.background ? "dark" : "light"
         }
         translucent={true}
-        backgroundColor="transparent"
       />
       <Tabs
         initialRouteName="(monitoring)"

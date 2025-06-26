@@ -26,6 +26,7 @@ export default function WashingMachineTemperatures() {
   const [washTemp, setWashTemp] = useState("");
   const [rinseTemp, setRinseTemp] = useState("");
   const [calendarModal, setCalendarModal] = useState(false);
+  
 
   // State to trigger re-render of WMTemps
   const [refreshKey, setRefreshKey] = useState(0);

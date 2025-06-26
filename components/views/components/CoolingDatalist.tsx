@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import {
   Alert,
   FlatList,
@@ -42,14 +42,21 @@ export default function WMTemps({
   day: string;
   refreshKey: number;
 }) {
-  const ThemeColors = useThemeColors();
-  const styles = getWashingTempStyles(ThemeColors);
+  const [fetchedData, setFetchedData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
+  const [endTempInput, setEndTempInput] = useState(false);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState("");
+  const inputRef = useRef<any>(null);
+  const ThemeColors = useThemeColors();
+  const styles = useMemo(
+    () => getWashingTempStyles(ThemeColors),
+    [ThemeColors]
+  );
   const [currentDate, setCurrentDate] = useState(new Date());
   const [propDate, setPropDate] = useState("");
-  const [fetchedData, setFetchedData] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const finnishMonths = [
     "Tammikuu",
@@ -78,13 +85,13 @@ export default function WMTemps({
     setIsLoading(true);
     try {
       const data = await TemperatureFunctions.fetchCategoryData(
-        "Tiskikone",
+        "Jäähdytys",
         year,
         month
       );
       const sortedData = data.sort((a: any, b: any) => {
-        const dayA = parseInt(a.Pvm.split(".")[0]);
-        const dayB = parseInt(b.Pvm.split(".")[0]);
+        const dayA = parseInt(a.date.split(".")[0]);
+        const dayB = parseInt(b.date.split(".")[0]);
         return dayA - dayB;
       });
       setFetchedData(sortedData || []);
@@ -116,6 +123,64 @@ export default function WMTemps({
       fetchCategoryData(formattedMonth, filterYear);
     }
   }, [filterMonth, filterYear, refreshKey]);
+
+  useEffect(() => {
+    if (endTempInput && editingItemId) {
+      // Increase timeout to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 100); // Try a longer delay
+
+      return () => clearTimeout(timer);
+    }
+  }, [endTempInput, editingItemId]);
+
+  const submitEditing = async () => {
+    if (!inputValue.trim() || !editingItemId) return;
+
+    try {
+      // Find the item being edited
+      const itemToUpdate = fetchedData.find(
+        (item) => item.id === editingItemId
+      );
+      if (!itemToUpdate) return;
+
+      // Update the item in Firebase
+      await TemperatureFunctions.updateItem(
+        "Jäähdytys",
+        year,
+        month,
+        editingItemId,
+        { endTemp: parseFloat(inputValue) }
+      );
+
+      // Update local state immediately
+      setFetchedData((prevData) =>
+        prevData.map((item) =>
+          item.id === editingItemId
+            ? { ...item, endTemp: parseFloat(inputValue) }
+            : item
+        )
+      );
+
+      // Clear the input and hide it
+      setEndTempInput(false);
+      setEditingItemId(null);
+      setInputValue("");
+
+      // Refetch data to ensure we have the latest
+      if (filterMonth && filterYear) {
+        const monthIndex = finnishMonths.indexOf(filterMonth) + 1;
+        const formattedMonth = monthIndex.toString().padStart(2, "0");
+        await fetchCategoryData(formattedMonth, filterYear);
+      }
+    } catch (error) {
+      console.error("Error updating temperature:", error);
+      Alert.alert("Virhe", "Lämpötilan päivitys epäonnistui.");
+    }
+  };
 
   const chevronHandler = (direction: "left" | "right") => {
     let monthIndex = finnishMonths.indexOf(filterMonth);
@@ -152,7 +217,7 @@ export default function WMTemps({
           onPress: async () => {
             try {
               await TemperatureFunctions.deleteItem(
-                "Tiskikone",
+                "Jäähdytys",
                 year,
                 month,
                 id
@@ -172,6 +237,23 @@ export default function WMTemps({
 
   return (
     <>
+      {endTempInput && (
+        <Pressable
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "transparent",
+            zIndex: 1000,
+          }}
+          onPress={() => {
+            setEndTempInput(false);
+            setEditingItemId(null);
+          }}
+        />
+      )}
       <Text style={{ fontSize: 20, color: ThemeColors.text, marginTop: 20 }}>
         Tehdyt kirjaukset
       </Text>
@@ -208,29 +290,70 @@ export default function WMTemps({
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <Pressable style={styles.dataItemContainer} onPress={() => {}}>
-              <View style={styles.dataItem}>
+              <View style={{...styles.dataItem, minWidth: 100,}}>
                 <MaterialCommunityIcons
-                  name="chart-bubble"
+                  name="food-variant"
                   size={30}
                   color={ThemeColors.text}
                 />
-                <Text style={styles.label}>{item.Pesuvesi} °C</Text>
+                <Text style={styles.label}>{item.product}</Text>
               </View>
               <View style={styles.dataItem}>
                 <MaterialCommunityIcons
-                  name="water"
+                  name="thermometer-chevron-up"
                   size={30}
                   color={ThemeColors.text}
                 />
-                <Text style={styles.label}>{item.Huuhteluvesi} °C</Text>
+                <Text style={styles.label}>{item.startTemp} °C</Text>
               </View>
+              <Pressable
+                onPress={() => {
+                  setEndTempInput(true);
+                  setEditingItemId(item.id);
+                }}
+              >
+                <View style={styles.dataItem}>
+                  <MaterialCommunityIcons
+                    name="thermometer-chevron-down"
+                    size={30}
+                    color={ThemeColors.text}
+                  />
+                  {item.endTemp ? (
+                    <Text style={styles.label}>{item.endTemp} °C</Text>
+                  ) : (
+                    <Text style={{ fontSize: 16, color: ThemeColors.tint }}>
+                      Lisää loppulämpötila
+                    </Text>
+                  )}
+                  {editingItemId === item.id && (
+                    <View
+                      style={{
+                        position: "relative",
+                        zIndex: 1001,
+                      }}
+                    >
+                      <TextInput
+                        mode="outlined"
+                        style={{ ...styles.input, width: 150 }}
+                        keyboardType="numeric"
+                        activeOutlineColor={ThemeColors.tint}
+                        onPressIn={(e) => e.stopPropagation()}
+                        ref={inputRef}
+                        value={inputValue}
+                        onChangeText={setInputValue}
+                        onSubmitEditing={submitEditing}
+                      />
+                    </View>
+                  )}
+                </View>
+              </Pressable>
               <View style={styles.dataItem}>
                 <MaterialCommunityIcons
                   name="calendar"
                   size={30}
                   color={ThemeColors.text}
                 />
-                <Text style={styles.label}>{item.Pvm}</Text>
+                <Text style={styles.label}>{item.date}</Text>
               </View>
               <TouchableOpacity
                 onPress={() => deleteHandler(item.id)}
