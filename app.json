@@ -2,7 +2,7 @@
   "expo": {
     "name": "Täppä",
     "slug": "k5_app",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "version": "1.2.0",
     "orientation": "portrait",
     "icon": "./assets/images/täppä_hd_thick.png",
