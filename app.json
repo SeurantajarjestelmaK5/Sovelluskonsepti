@@ -1,25 +1,33 @@
 {
   "expo": {
-    "name": "Omavalvonta",
+    "name": "Täppä",
     "slug": "k5_app",
     "newArchEnabled": true,
     "version": "1.2.0",
     "orientation": "portrait",
-    "icon": "./assets/images/k5dark.jpg",
+    "icon": "./assets/images/täppä_hd_thick.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/k5dark.jpg",
+      "image": "./assets/images/täppä_hd_thick.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000FF"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "statusBar": {
+        "style": "auto",
+        "backgroundColor": "transparent"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/burger-icon2.png",
+        "foregroundImage": "./assets/images/täppä_hd_thick.png",
         "backgroundColor": "#000000FF"
+      },
+      "statusBar": {
+        "style": "auto",
+        "backgroundColor": "transparent"
       },
       "permissions": [
         "android.permission.WRITE_EXTERNAL_STORAGE",

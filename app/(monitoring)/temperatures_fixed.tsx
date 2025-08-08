@@ -61,9 +61,11 @@ export default function TemperaturesFixedScreen() {
             )}
           />
         </View>
-        {selectedCategory === "Tiskikone" && <WashingMachineTemperatures />}
-        {selectedCategory === "Liha" && <MeatTemperatures />}
-        {selectedCategory === "Jäähdytys" && <CoolingTemperatures />}
+        {selectedCategory === "Tiskikone" ? (
+          <WashingMachineTemperatures />
+        ) : null}
+        {selectedCategory === "Liha" ? <MeatTemperatures /> : null}
+        {selectedCategory === "Jäähdytys" ? <CoolingTemperatures /> : null}
 
         <View style={{ position: "absolute", bottom: 10, left: 10 }}>
           <BackButton />

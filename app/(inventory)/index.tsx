@@ -4,6 +4,7 @@ import { Pressable, Text, View, Image } from "react-native";
 import { getInvNavStyle } from "../../styles/navigations/inventoryNavStyle";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import AppHeader from "@/components/misc/AppHeader";
 
 export default function InventoryHome() {
   const ThemeColors = useThemeColors();
@@ -11,6 +12,7 @@ export default function InventoryHome() {
 
   return (
     <View style={invNavStyle.container}>
+      <AppHeader />
       {/* <Image
         source={require("../../assets/images/k5dark.jpg")}
         style={invNavStyle.logo}

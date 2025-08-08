@@ -250,7 +250,7 @@ export default function Cleaning() {
       </View>
       <View style={styles.buttonContainer}>
         <BackButton />
-        {selectedSide === "Keittiö" && (
+        {selectedSide === "Keittiö" ? (
           <Button
             children="Pihvikone"
             mode="contained"
@@ -258,6 +258,8 @@ export default function Cleaning() {
             style={styles.kevinButton}
             labelStyle={styles.kevinButtonText}
           />
+        ) : (
+         null
         )}
       </View>
       <KevinModal

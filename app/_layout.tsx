@@ -6,9 +6,11 @@ import * as Updates from "expo-updates";
 import NetInfo from "@react-native-community/netinfo";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
+import { Colors } from "@/constants/Colors";
 import { getGeneralStyles } from "@/styles/navigations/generalStyles";
 import { useNavigationState } from "@react-navigation/native";
 import { ActivityIndicator, Snackbar } from "react-native-paper";
+import { StatusBar } from "expo-status-bar";
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -112,9 +114,16 @@ export default function TabsLayout() {
 
   return (
     <>
+      <StatusBar
+        style={
+          ThemeColors.background === Colors.light.background ? "dark" : "light"
+        }
+        translucent={true}
+      />
       <Tabs
         initialRouteName="(monitoring)"
         screenOptions={{
+          headerShown: false,
           headerRight: () => (
             <MaterialCommunityIcons
               name="cog"
@@ -134,7 +143,7 @@ export default function TabsLayout() {
           //     onPress={() => router.push("/(menu)")}
           //   />
           // ),
-          tabBarStyle: { height: 80, backgroundColor: ThemeColors.background },
+          tabBarStyle: { height: 100, backgroundColor: ThemeColors.background },
           tabBarLabelStyle: {
             fontSize: 23,
             fontWeight: "bold",

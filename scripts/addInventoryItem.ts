@@ -27,7 +27,6 @@ export async function addInventoryItem(
   try {
     const itemRef = doc(collection(db, "inventaario", selectedDate, location), item.Nimi);
     await setDoc(itemRef, item);
-    console.log(`Added item '${item.Nimi}' to ${location} for ${selectedDate}.`);
   } catch (error) {
     console.error("Error adding inventory item:", error);
     throw error; // Rethrow error to handle it where the function is called

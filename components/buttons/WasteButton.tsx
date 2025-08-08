@@ -49,7 +49,6 @@ export default function WasteButton({
 
   // Sync wasteAmount with the data prop
   useEffect(() => {
-    console.log(date)
     setDisplayedAmount(data.määrä);
   }, [data.määrä]);
 

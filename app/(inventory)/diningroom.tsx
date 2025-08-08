@@ -239,8 +239,6 @@ useEffect(() => {
       const newDocRef = doc(db, "inventaario", month, "sali", item.id);
       await setDoc(newDocRef, newItemData);
     });
-
-    // console.log(`Created new month entry for ${month} by copying data from ${previousMonth}`);
   };
 
   /** JA SE SITTEN LOPPUU TÄHÄN*/

@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { Button } from "react-native-paper";
+import AppHeader from "@/components/misc/AppHeader";
 
 export default function MonitorHome() {
   const ThemeColors = useThemeColors();
@@ -15,7 +16,8 @@ export default function MonitorHome() {
 
   return (
     <View style={monitoringNavStyle.container}>
-      <View style={monitoringNavStyle.buttonContainer}>
+      <AppHeader />
+      <View style={{...monitoringNavStyle.buttonContainer}}>
         <Link href="/samples" asChild>
           <Pressable style={monitoringNavStyle.button}>
             <Text style={monitoringNavStyle.buttonText}>Näytteenotto</Text>

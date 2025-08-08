@@ -8,6 +8,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getWashingTempStyles } from "@/styles/views/washingMachineTempStyle";
@@ -48,6 +49,7 @@ export default function WMTemps({
   const [currentDate, setCurrentDate] = useState(new Date());
   const [propDate, setPropDate] = useState("");
   const [fetchedData, setFetchedData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const finnishMonths = [
     "Tammikuu",
@@ -73,16 +75,23 @@ export default function WMTemps({
   };
 
   const fetchCategoryData = async (month: string, year: string) => {
+    setIsLoading(true);
     try {
       const data = await TemperatureFunctions.fetchCategoryData(
         "Tiskikone",
         year,
         month
       );
-
-      setFetchedData(data || []);
+      const sortedData = data.sort((a: any, b: any) => {
+        const dayA = parseInt(a.Pvm.split(".")[0]);
+        const dayB = parseInt(b.Pvm.split(".")[0]);
+        return dayA - dayB;
+      });
+      setFetchedData(sortedData || []);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -185,7 +194,11 @@ export default function WMTemps({
           hitslop={{ top: 30, bottom: 30, left: 30, right: 30 }}
         />
       </View>
-      {fetchedData.length > 0 ? (
+      {isLoading ? (
+        <View style={{ ...styles.dataList, minHeight: 370, minWidth: 600 }}>
+          <ActivityIndicator size="large" color={ThemeColors.tint} />
+        </View>
+      ) : fetchedData.length > 0 ? (
         <FlatList
           data={fetchedData}
           keyExtractor={(item) => item.id}

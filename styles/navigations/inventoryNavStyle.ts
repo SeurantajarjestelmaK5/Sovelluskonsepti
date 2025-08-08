@@ -15,7 +15,7 @@ export const getInvNavStyle = (ThemeColors: ThemeColors) =>
     },
     buttonContainer: {
       width: "70%",
-      height: windowHeight * 0.3,
+      height: windowHeight * 0.28,
       marginVertical: 30,
       justifyContent: "center",
     },

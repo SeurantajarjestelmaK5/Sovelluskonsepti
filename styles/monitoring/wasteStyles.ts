@@ -4,8 +4,6 @@ import waste from "@/app/(monitoring)/waste";
 
 const windowHeight = Dimensions.get("window").height;
 
-
-
 export const getWasteStyles = (ThemeColors: ThemeColors) =>
   StyleSheet.create({
     buttonContainer: {
@@ -28,6 +26,7 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "center",
       alignItems: "center",
       padding: 16,
+      paddingTop: 50,
       backgroundColor: ThemeColors.background,
     },
     content: {

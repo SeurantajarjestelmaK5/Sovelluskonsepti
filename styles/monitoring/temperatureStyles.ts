@@ -9,6 +9,7 @@ export const getTemperatureStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "flex-start",
       alignItems: "center",
       padding: 10,
+      paddingTop: 30,
       backgroundColor: ThemeColors.background,
     },
     header: {

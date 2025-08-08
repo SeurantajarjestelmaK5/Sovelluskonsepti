@@ -39,24 +39,24 @@ export default function FeedBackComponent() {
   const styles = useMemo(() => getFeedBackStyles(ThemeColors), [ThemeColors]);
 
   const sendFeedback = () => {
-        if (messageHeader === "") {
-          alert("Otsikko ei voi olla tyhjä.");
-          return;
-        } else if (message === "") {
-          alert("Viesti ei voi olla tyhjä.");
-          return;
-        } else {
-          const feedbackRef = doc(db, "palautteet", messageHeader);
-          const feedback = {
-            category: category,
-            message: message,
-          };
-          setDoc(feedbackRef, feedback);
-          setCategory("kehitysidea");
-          setMessage("");
-          setMessageHeader("");
-          alert("Kiitos palautteestasi!");
-        }
+    if (messageHeader === "") {
+      alert("Otsikko ei voi olla tyhjä.");
+      return;
+    } else if (message === "") {
+      alert("Viesti ei voi olla tyhjä.");
+      return;
+    } else {
+      const feedbackRef = doc(db, "palautteet", messageHeader);
+      const feedback = {
+        category: category,
+        message: message,
+      };
+      setDoc(feedbackRef, feedback);
+      setCategory("kehitysidea");
+      setMessage("");
+      setMessageHeader("");
+      alert("Kiitos palautteestasi!");
+    }
   };
 
   return (
@@ -64,12 +64,11 @@ export default function FeedBackComponent() {
       <View style={styles.textContent}>
         <Text style={styles.header}>Jätä palautetta</Text>
         <Text style={styles.text}>
-          {""}
           Löysitkö bugin? Onko invisnäkymä ärsyttävä? Haluatko muuten vaan
-          morjestaa kehittäjiä? Jätä vapaamuotoinen viesti alle. Valitse kategoria ja lisää otsikoksi
-          lyhyt kuvaus palautteen sisällöstä. Mikäli haluat raportoida virheistä
-          sovelluksesta niin kuvailethan löytämäsi bugin mahdollisimman
-          tarkasti.{""}
+          morjestaa kehittäjiä? Jätä vapaamuotoinen viesti alle. Valitse
+          kategoria ja lisää otsikoksi lyhyt kuvaus palautteen sisällöstä.
+          Mikäli haluat raportoida virheistä sovelluksesta niin kuvailethan
+          löytämäsi bugin mahdollisimman tarkasti.
         </Text>
       </View>
       <Picker

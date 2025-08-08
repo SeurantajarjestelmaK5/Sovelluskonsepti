@@ -15,8 +15,8 @@ export const getMonitoringNavStyle = (ThemeColors: ThemeColors) =>
       flexDirection: "row",
       width: "90%",
       height: windowHeight * 0.3,
-      marginVertical: 30,
       justifyContent: "center",
+      alignItems: "center",
     },
     button: {
       width: "45%",

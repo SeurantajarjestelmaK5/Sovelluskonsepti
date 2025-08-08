@@ -38,7 +38,6 @@ export const saveItem = async (
   month: string,
   data: any
 ) => {
-
   const docRef = doc(
     collection(db, "omavalvonta", "lämpötilat", category, year, month)
   );
@@ -51,8 +50,35 @@ export const deleteItem = async (
   category: string,
   year: string,
   month: string,
-  id: string,
+  id: string
 ) => {
-  const docRef = doc(db, "omavalvonta", "lämpötilat", category, year, month, id);
+  const docRef = doc(
+    db,
+    "omavalvonta",
+    "lämpötilat",
+    category,
+    year,
+    month,
+    id
+  );
   await deleteDoc(docRef);
-}
+};
+
+export const updateItem = async (
+  category: string,
+  year: string,
+  month: string,
+  id: string,
+  updateData: any
+) => {
+  const docRef = doc(
+    db,
+    "omavalvonta",
+    "lämpötilat",
+    category,
+    year,
+    month,
+    id
+  );
+  await updateDoc(docRef, updateData);
+};

@@ -6,6 +6,7 @@ import { useThemeColors } from "@/constants/ThemeColors";
 import { Colors } from "@/constants/Colors";
 import { Button } from "react-native-paper";
 import FeedBackComponent from "@/components/misc/FeedBackComponent";
+import BackButton from "@/components/buttons/BackButton";
 
 export default function SettingsScreen() {
   const [switchOn, setSwitchOn] = useState(false);
@@ -23,47 +24,58 @@ export default function SettingsScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "flex-start",
-        alignItems: "center",
-        padding: 20,
-        backgroundColor:
-          colorScheme === "light"
-            ? Colors.light.background
-            : Colors.dark.background,
-      }}
-      
-    >
       <View
         style={{
+          flex: 1,
           justifyContent: "space-between",
-          flexDirection: "row",
           alignItems: "center",
-          width: "80%",
+          padding: 20,
+          paddingTop: "10%",
+          backgroundColor:
+            colorScheme === "light"
+              ? Colors.light.background
+              : Colors.dark.background,
         }}
       >
-        <ThemedText>Tumma teema</ThemedText>
-        <Switch
-          trackColor={{ false: "#767577", true: "#81b0ff" }}
-          thumbColor={true ? ThemeColors.tint : "#f4f3f4"}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={switchHandler}
-          value={colorScheme === "dark" ? true : false}
-        />
+        <View
+          style={{
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center",
+            width: "80%",
+          }}
+        >
+          <ThemedText>Tumma teema</ThemedText>
+          <Switch
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={true ? ThemeColors.tint : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={switchHandler}
+            value={colorScheme === "dark" ? true : false}
+          />
+        </View>
+        <View
+          style={{
+            justifyContent: "space-between",
+            flexDirection: "row",
+            alignItems: "center",
+            width: "80%",
+          }}
+        >
+          <FeedBackComponent />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignContent: "flex-start",
+            width: "100%",
+            marginTop: 20,
+          }}
+        >
+          <BackButton />
+        </View>
       </View>
-      <View
-        style={{
-          justifyContent: "space-between",
-          flexDirection: "row",
-          alignItems: "center",
-          width: "80%",
-        }}
-      >
-        <FeedBackComponent />
-      </View>
-    </View>
     </TouchableWithoutFeedback>
   );
 }
