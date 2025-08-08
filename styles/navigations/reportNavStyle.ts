@@ -24,10 +24,11 @@ export const getReportNavStyle = (ThemeColors: ThemeColors) => StyleSheet.create
     paddingBottom: 15,
   },
   button: {
-    width: '45%',
-    height: '80%',
-    justifyContent: 'center',
+    width: '80%',
+    height: '10%',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
+    flexDirection: 'row',
     borderRadius: 10,  
     backgroundColor: ThemeColors.button,
     marginHorizontal: 15
@@ -44,11 +45,9 @@ export const getReportNavStyle = (ThemeColors: ThemeColors) => StyleSheet.create
   buttonText: {
     fontSize: 24,  
     color: ThemeColors.text,
-    marginBottom: 15
   },
   reportIcon: {
     color: ThemeColors.tabIconSelected,
     fontSize: 50,
-    marginTop: 25
   }
 });
