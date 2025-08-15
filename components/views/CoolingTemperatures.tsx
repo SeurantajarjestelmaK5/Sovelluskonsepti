@@ -7,6 +7,7 @@ import { Button, TextInput } from "react-native-paper";
 import CalendarComponent from "@/components/modals/CalendarComponent";
 import * as TemperatureFunctions from "@/components/functions/TemperatureFunctions";
 import CoolingDatalist from "@/components/views/components/CoolingDatalist";
+import { serverTimestamp } from "firebase/firestore";
 
 
 export default function CoolingTemperatures() {
@@ -20,6 +21,8 @@ export default function CoolingTemperatures() {
   const [startTemp, setStartTemp] = useState("");
   const [endTemp, setEndTemp] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [coolingTime, setCoolingTime] = useState("");
+  const [startTime, setStartTime] = useState("");
 
   useEffect(() => {
     const date = new Date();
@@ -40,6 +43,7 @@ export default function CoolingTemperatures() {
   };
 
   const saveButtonHandler = async () => {
+
     if (product === "" || startTemp === "") {
       Alert.alert("Lisää tuote ja alkulämpötila!");
       return;
@@ -49,6 +53,7 @@ export default function CoolingTemperatures() {
       startTemp: parseFloat(startTemp),
       endTemp: parseFloat(endTemp),
       date: `${currentDate}.${currentMonth}`,
+      startTime: serverTimestamp(),
     };
     try {
       await TemperatureFunctions.saveItem("Jäähdytys", currentYear, currentMonth, data);
@@ -96,7 +101,7 @@ export default function CoolingTemperatures() {
             onChangeText={setStartTemp}
           />
         </View>
-        <View style={styles.inputContainer}>
+        {/* <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             name="thermometer-chevron-down"
             color={ThemeColors.text}
@@ -111,7 +116,7 @@ export default function CoolingTemperatures() {
             value={endTemp}
             onChangeText={setEndTemp}
           />
-        </View>
+        </View> */}
         <View style={styles.inputContainer}>
           <MaterialCommunityIcons
             color={ThemeColors.text}

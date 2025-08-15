@@ -11,10 +11,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
-import { getWashingTempStyles } from "@/styles/views/washingMachineTempStyle";
+import { getCoolingTempStyles } from "@/styles/views/coolingTempStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button, TextInput } from "react-native-paper";
 import * as TemperatureFunctions from "@/components/functions/TemperatureFunctions";
+import { serverTimestamp } from "firebase/firestore";
 
 const finnishMonths = [
   "Tammikuu",
@@ -52,11 +53,47 @@ export default function WMTemps({
   const inputRef = useRef<any>(null);
   const ThemeColors = useThemeColors();
   const styles = useMemo(
-    () => getWashingTempStyles(ThemeColors),
+    () => getCoolingTempStyles(ThemeColors),
     [ThemeColors]
   );
   const [currentDate, setCurrentDate] = useState(new Date());
   const [propDate, setPropDate] = useState("");
+
+  // Function to calculate cooling time from timestamps
+  const calculateCoolingTime = (startTime: any, endTime: any) => {
+    if (!startTime || !endTime) return null;
+
+    try {
+      // Convert Firebase timestamps to Date objects
+      const start = startTime.toDate ? startTime.toDate() : new Date(startTime);
+      const end = endTime.toDate ? endTime.toDate() : new Date(endTime);
+
+      // Validate dates
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return null;
+      }
+
+      const diffMs = end.getTime() - start.getTime();
+
+      // Handle negative time differences (shouldn't happen but safety check)
+      if (diffMs < 0) return null;
+
+      const diffMinutes = Math.floor(diffMs / (1000 * 60));
+      const diffHours = Math.floor(diffMinutes / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      if (diffDays > 0) {
+        return `${diffDays}d ${diffHours % 24}h ${diffMinutes % 60}m`;
+      } else if (diffHours > 0) {
+        return `${diffHours}h ${diffMinutes % 60}m`;
+      } else {
+        return `${diffMinutes}m`;
+      }
+    } catch (error) {
+      console.error("Error calculating cooling time:", error);
+      return null;
+    }
+  };
 
   const finnishMonths = [
     "Tammikuu",
@@ -89,7 +126,19 @@ export default function WMTemps({
         year,
         month
       );
-      const sortedData = data.sort((a: any, b: any) => {
+
+      // Calculate cooling time for items that have both start and end times
+      const processedData = data.map((item: any) => {
+        if (item.startTime && item.endTime && item.endTemp) {
+          return {
+            ...item,
+            coolingTime: calculateCoolingTime(item.startTime, item.endTime),
+          };
+        }
+        return item;
+      });
+
+      const sortedData = processedData.sort((a: any, b: any) => {
         const dayA = parseInt(a.date.split(".")[0]);
         const dayB = parseInt(b.date.split(".")[0]);
         return dayA - dayB;
@@ -153,14 +202,22 @@ export default function WMTemps({
         year,
         month,
         editingItemId,
-        { endTemp: parseFloat(inputValue) }
+        {
+          endTemp: parseFloat(inputValue),
+          endTime: serverTimestamp(),
+        }
       );
 
-      // Update local state immediately
+      // Update local state immediately with calculated cooling time
       setFetchedData((prevData) =>
         prevData.map((item) =>
           item.id === editingItemId
-            ? { ...item, endTemp: parseFloat(inputValue) }
+            ? {
+                ...item,
+                endTemp: parseFloat(inputValue),
+                endTime: new Date(), // Temporary end time for immediate display
+                coolingTime: calculateCoolingTime(item.startTime, new Date()),
+              }
             : item
         )
       );
@@ -306,48 +363,98 @@ export default function WMTemps({
                 />
                 <Text style={styles.label}>{item.startTemp} °C</Text>
               </View>
-              <Pressable
-                onPress={() => {
-                  setEndTempInput(true);
-                  setEditingItemId(item.id);
-                }}
-              >
+              {item.endTemp ? (
                 <View style={styles.dataItem}>
                   <MaterialCommunityIcons
                     name="thermometer-chevron-down"
                     size={30}
                     color={ThemeColors.text}
                   />
-                  {item.endTemp ? (
-                    <Text style={styles.label}>{item.endTemp} °C</Text>
-                  ) : (
-                    <Text style={{ fontSize: 16, color: ThemeColors.tint }}>
-                      Lisää loppulämpötila
-                    </Text>
-                  )}
-                  {editingItemId === item.id && (
-                    <View
+                  <Text style={styles.label}>{item.endTemp} °C</Text>
+                </View>
+              ) : (
+                <Pressable
+                  onPress={() => {
+                    setEndTempInput(true);
+                    setEditingItemId(item.id);
+                  }}
+                >
+                  <View style={styles.dataItem}>
+                    <MaterialCommunityIcons
+                      name="thermometer-chevron-down"
+                      size={30}
+                      color={ThemeColors.text}
+                    />
+                    <Text
                       style={{
-                        position: "relative",
-                        zIndex: 1001,
-                        marginTop: 5,
+                        ...styles.label,
+                        fontSize: 16,
+                        color: ThemeColors.tint,
                       }}
                     >
-                      <TextInput
-                        mode="outlined"
-                        style={{ ...styles.input, width: 150 }}
-                        keyboardType="numeric"
-                        activeOutlineColor={ThemeColors.tint}
-                        onPressIn={(e) => e.stopPropagation()}
-                        ref={inputRef}
-                        value={inputValue}
-                        onChangeText={setInputValue}
-                        onSubmitEditing={submitEditing}
-                      />
-                    </View>
-                  )}
-                </View>
-              </Pressable>
+                      Lisää loppulämpötila
+                    </Text>
+                    {editingItemId === item.id && (
+                      <View
+                        style={{
+                          position: "relative",
+                          zIndex: 1001,
+                          marginTop: 5,
+                        }}
+                      >
+                        <TextInput
+                          mode="outlined"
+                          style={{ ...styles.input, width: 150 }}
+                          keyboardType="numeric"
+                          activeOutlineColor={ThemeColors.tint}
+                          onPressIn={(e) => e.stopPropagation()}
+                          ref={inputRef}
+                          value={inputValue}
+                          onChangeText={setInputValue}
+                          onSubmitEditing={submitEditing}
+                        />
+                      </View>
+                    )}
+                  </View>
+                </Pressable>
+              )}
+              <View style={styles.dataItem}>
+                <MaterialCommunityIcons
+                  name="clock-outline"
+                  size={30}
+                  color={ThemeColors.text}
+                />
+                {item.endTemp && item.startTime && item.endTime ? (
+                  (() => {
+                    const calculatedTime =
+                      item.coolingTime ||
+                      calculateCoolingTime(item.startTime, item.endTime);
+                    return calculatedTime ? (
+                      <Text style={styles.label}>{calculatedTime}</Text>
+                    ) : (
+                      <Text
+                        style={[
+                          styles.label,
+                          { color: ThemeColors.tint, fontSize: 14 },
+                        ]}
+                      >
+                        Virhe laskennassa
+                      </Text>
+                    );
+                  })()
+                ) : item.endTemp ? (
+                  <Text style={styles.label}>Lasketaan...</Text>
+                ) : (
+                  <Text
+                    style={[
+                      styles.label,
+                      { color: ThemeColors.tint, fontSize: 14 },
+                    ]}
+                  >
+                    Odottaa
+                  </Text>
+                )}
+              </View>
               <View style={styles.dataItem}>
                 <MaterialCommunityIcons
                   name="calendar"

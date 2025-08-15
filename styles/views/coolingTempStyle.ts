@@ -49,6 +49,55 @@ export const getCoolingTempStyles = (ThemeColors: ThemeColors) =>
       justifyContent: "center",
       alignItems: "center",
     },
+    dateFilterContainer: {
+      width: "60%",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 16,
+      marginTop: 20,
+      marginBottom: 10,
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: ThemeColors.navSelected,
+    },
+    dataList: {
+      width: "80%",
+      padding: 16,
+      backgroundColor: "ThemeColors.background",
+      maxHeight: 370,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: ThemeColors.navDefault,
+    },
+    dataListContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 16,
+      backgroundColor: ThemeColors.background,
+      width: "100%",
+    },
+    dataContainer: {
+      flexDirection: "column",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 16,
+      backgroundColor: ThemeColors.background,
+      width: "80%",
+    },
+    dataItem: {
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    dataItemContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+      marginBottom: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: ThemeColors.navDefault,
+    },
     saveButton: {
       backgroundColor: ThemeColors.tint,
       borderRadius: 10,
@@ -60,3 +109,5 @@ export const getCoolingTempStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
     },
   });
+
+  
