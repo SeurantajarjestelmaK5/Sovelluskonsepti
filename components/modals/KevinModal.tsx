@@ -5,6 +5,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   FlatList,
+  Pressable,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Button, TextInput } from "react-native-paper";
@@ -20,7 +21,7 @@ interface KevinModalProps {
   month: string;
 }
 
-const authorList = ["Teemu", "Tony", "Lari", "Risto", "Milja", "Milla", "Sepi", "Casper"];
+const authorList = ["Teemu", "Tony", "Lari", "Risto", "Milja", "Milla", "Sepi"];
 const finnishMonths = [
   "Tammikuu",
   "Helmikuu",
@@ -51,6 +52,7 @@ export default function KevinModal({
   const [monthIndex, setMonthIndex] = useState(month);
   const [filterMonth, setFilterMonth] = useState("");
   const [filterYear, setFilterYear] = useState("");
+  const [activeTab, setActiveTab] = useState("cleaning");
 
   const getParsedDate = (date: Date) => {
     const day = date.getDate();
@@ -63,7 +65,20 @@ export default function KevinModal({
   async function fetchTasks(year: string, month: string) {
     try {
       const tasks = await CleaningFunctions.fetchKevinTasks(year, month);
-      setTasks(tasks);
+      // Sort tasks by date in descending order (newest first)
+      const sortedTasks = tasks.sort((a, b) => {
+        // Parse dates in DD.MM.YYYY format
+        const [dayA, monthA, yearA] = a.date.split(".").map(Number);
+        const [dayB, monthB, yearB] = b.date.split(".").map(Number);
+
+        // Create Date objects for comparison
+        const dateA = new Date(yearA, monthA - 1, dayA);
+        const dateB = new Date(yearB, monthB - 1, dayB);
+
+        // Sort in descending order (newest first)
+        return dateB.getTime() - dateA.getTime();
+      });
+      setTasks(sortedTasks);
     } catch (error) {
       console.error("Error fetching Kevin tasks:", error);
     }
@@ -78,7 +93,6 @@ export default function KevinModal({
     return finnishMonths[parseInt(index) - 1];
   };
 
-
   useEffect(() => {
     if (month) {
       setFilterMonth(parseMonth(month));
@@ -89,17 +103,16 @@ export default function KevinModal({
     getParsedDate(currentDate);
   }, [month, year]);
 
-useEffect(() => {
+  useEffect(() => {
+    fetchTasks(year, month);
 
-  fetchTasks(year, month);
-
-  if (month) {
-    setFilterMonth(parseMonth(month));
-  }
-  if (year) {
-    setFilterYear(year);
-  }
-}, [year, month, taskAuthor]);
+    if (month) {
+      setFilterMonth(parseMonth(month));
+    }
+    if (year) {
+      setFilterYear(year);
+    }
+  }, [year, month, taskAuthor]);
 
   const chevronHandler = (direction: "left" | "right") => {
     let monthIndex = finnishMonths.indexOf(filterMonth);
@@ -123,24 +136,24 @@ useEffect(() => {
     fetchTasks(yearIndex.toString(), (monthIndex + 1).toString());
   };
 
- const saveButtonHandler = async () => {
-   if (!taskAuthor) {
-     alert("Valitse tekijä valikosta ennen tallentamista.");
-     return;
-   }
+  const saveButtonHandler = async () => {
+    if (!taskAuthor) {
+      alert("Valitse tekijä valikosta ennen tallentamista.");
+      return;
+    }
 
-   // Dynamically calculate the correct month and year from propDate
-   const [day, month, year] = propDate.split(".").map((value) => value.trim());
+    // Dynamically calculate the correct month and year from propDate
+    const [day, month, year] = propDate.split(".").map((value) => value.trim());
 
-   try {
-     await CleaningFunctions.saveKevinTask(year, month, taskAuthor, propDate);
-   } catch (error) {
-     console.error("Error saving Kevin task:", error);
-   }
+    try {
+      await CleaningFunctions.saveKevinTask(year, month, taskAuthor, propDate);
+    } catch (error) {
+      console.error("Error saving Kevin task:", error);
+    }
 
-   setTaskAuthor("");
-   fetchTasks(year, month); 
- };
+    setTaskAuthor("");
+    fetchTasks(year, month);
+  };
 
   return (
     <Modal
@@ -151,7 +164,73 @@ useEffect(() => {
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.header}>Pihvikoneen pesu</Text>
+          <View style={styles.tabContainer}>
+            <Pressable
+              style={
+                activeTab === "cleaning"
+                  ? {
+                      ...styles.tabButtonActive,
+                      borderTopLeftRadius: 10,
+                      borderTopRightRadius: 10,
+                      borderRightWidth: 1,
+                      borderTopWidth: 1,
+                      borderColor: "grey",
+                    }
+                  : {
+                      ...styles.tabButton,
+                      borderTopLeftRadius: 10,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "grey",
+                    }
+              }
+              onPress={() => setActiveTab("cleaning")}
+            >
+              <Text
+                style={{
+                  ...styles.tabHeader,
+                  color:
+                    activeTab === "cleaning"
+                      ? ThemeColors.tint
+                      : ThemeColors.text,
+                }}
+              >
+                Pihvikoneen pesu
+              </Text>
+            </Pressable>
+            <Pressable
+              style={
+                activeTab === "samples"
+                  ? {
+                      ...styles.tabButtonActive,
+                      borderTopRightRadius: 10,
+                      borderTopLeftRadius: 10,
+                      borderLeftWidth: 1,
+                      borderTopWidth: 1,
+                      borderColor: "grey",
+                    }
+                  : {
+                      ...styles.tabButton,
+                      borderTopRightRadius: 10,
+                      borderBottomWidth: 1,
+                      borderBottomColor: "grey",
+                    }
+              }
+              onPress={() => setActiveTab("samples")}
+            >
+              <Text
+                style={{
+                  ...styles.tabHeader,
+                  color:
+                    activeTab === "samples"
+                      ? ThemeColors.tint
+                      : ThemeColors.text,
+                }}
+              >
+                Pihvinäytteet
+              </Text>
+            </Pressable>
+          </View>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}> Tekijä </Text>
             <Picker

@@ -86,9 +86,17 @@ export default function waste() {
 
   const getCurrentDate = () => {
     const date = new Date();
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
+    const currentHour = date.getHours();
+
+    // If it's before 4 AM, use the previous day
+    let targetDate = new Date(date);
+    if (currentHour < 4) {
+      targetDate.setDate(date.getDate() - 1);
+    }
+
+    const day = targetDate.getDate();
+    const month = targetDate.getMonth() + 1;
+    const year = targetDate.getFullYear();
 
     // Ensure day and month are two digits
     const formattedDay = day < 10 ? `0${day}` : `${day}`;
@@ -350,7 +358,7 @@ export default function waste() {
                 }}
                 styles={styles}
                 ThemeColors={ThemeColors}
-                isLoading={data.id === "dummy"  || isLoading}
+                isLoading={data.id === "dummy" || isLoading}
               />
             ))}
 

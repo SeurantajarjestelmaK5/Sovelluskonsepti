@@ -1,7 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 import { ThemeColors } from "@/constants/ThemeColors";
 
-
 export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
   StyleSheet.create({
     closeButton: {
@@ -66,16 +65,37 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     },
     modalContainer: {
       width: "80%",
-      padding: 20,
       backgroundColor: ThemeColors.background,
       borderRadius: 10,
       alignItems: "center",
+      paddingBottom: 20,
     },
-    header: {
-      fontSize: 24,
-      fontWeight: "bold",
+    tabButton: {
+      padding: 20,
+      backgroundColor: ThemeColors.navDefault,
+      width: "50%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    tabButtonActive: {
+      padding: 20,
+      backgroundColor: ThemeColors.background,
+      width: "50%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    tabHeader: {
       color: ThemeColors.text,
-      marginBottom: 20,
+      fontSize: 20,
+    },
+    tabContainer: {
+      width: "100%",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 40,
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 10,
     },
     tasksContainer: {
       width: "60%",
