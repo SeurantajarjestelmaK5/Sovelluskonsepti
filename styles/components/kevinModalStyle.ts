@@ -45,7 +45,7 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     },
     label: {
       color: ThemeColors.text,
-      fontSize: 16,
+      fontSize: 18,
       marginBottom: 5,
     },
     overlay: {
@@ -121,5 +121,11 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     taskText: {
       color: ThemeColors.text,
       fontSize: 16,
+    },
+    sampleContainer: {
+      width: "100%",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "flex-start",
     },
   });

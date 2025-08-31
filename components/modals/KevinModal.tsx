@@ -231,88 +231,155 @@ export default function KevinModal({
             </Pressable>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}> Tekijä </Text>
-            <Picker
-              selectedValue={taskAuthor}
-              onValueChange={(itemValue) => setTaskAuthor(itemValue)}
-              style={styles.picker}
-              mode="dropdown"
-              dropdownIconColor={ThemeColors.tint}
-            >
-              {taskAuthor === "" && (
-                <Picker.Item label="Valitse tekijä" value="" />
-              )}
-              {authorList.map((author) => (
-                <Picker.Item
-                  key={author}
-                  label={author}
-                  value={author}
-                  style={styles.pickerItem}
-                />
-              ))}
-            </Picker>
-          </View>
-          <Button
-            children="Tallenna"
-            onPress={saveButtonHandler}
-            style={styles.closeButton}
-            labelStyle={styles.closeButtonText}
-          />
-          <Text style={{ ...styles.label, marginTop: 40 }}>
-            Tehdyt siivoukset:
-          </Text>
-          <View style={styles.tasksContainer}>
-            <View style={styles.dateFilterContainer}>
-              <MaterialCommunityIcons
-                name="chevron-left"
-                size={30}
-                color={ThemeColors.tint}
-                onPress={() => chevronHandler("left")}
-                hitSlop={30}
-              />
-              <Text style={styles.label}>
-                {filterMonth} {filterYear}
-              </Text>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={30}
-                color={ThemeColors.tint}
-                onPress={() => chevronHandler("right")}
-                hitSlop={30}
-              />
-            </View>
-            <View style={{ ...styles.flatlistContainer, height: 300 }}>
-              <FlatList
-                data={tasks}
-                contentContainerStyle={styles.flatlist}
-                showsVerticalScrollIndicator={false}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <View style={styles.task} key={item.id}>
-                    <Text style={[styles.taskText, { flex: 3 }]}>
-                      {item.author}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.taskText,
-                        { flex: 4, textAlign: "center" },
-                      ]}
-                    >
-                      {item.date}
-                    </Text>
-                    <MaterialCommunityIcons
-                      name="checkbox-marked"
-                      size={24}
-                      color={ThemeColors.text}
-                      style={{ flex: 2, textAlign: "right" }}
+          {activeTab === "cleaning" && (
+            <>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}> Tekijä </Text>
+                <Picker
+                  selectedValue={taskAuthor}
+                  onValueChange={(itemValue) => setTaskAuthor(itemValue)}
+                  style={styles.picker}
+                  mode="dropdown"
+                  dropdownIconColor={ThemeColors.tint}
+                >
+                  {taskAuthor === "" && (
+                    <Picker.Item label="Valitse tekijä" value="" />
+                  )}
+                  {authorList.map((author) => (
+                    <Picker.Item
+                      key={author}
+                      label={author}
+                      value={author}
+                      style={styles.pickerItem}
                     />
-                  </View>
-                )}
+                  ))}
+                </Picker>
+              </View>
+              <Button
+                children="Tallenna"
+                onPress={saveButtonHandler}
+                style={styles.closeButton}
+                labelStyle={styles.closeButtonText}
               />
+              <Text style={{ ...styles.label, marginTop: 40 }}>
+                Tehdyt siivoukset:
+              </Text>
+              <View style={styles.tasksContainer}>
+                <View style={styles.dateFilterContainer}>
+                  <MaterialCommunityIcons
+                    name="chevron-left"
+                    size={30}
+                    color={ThemeColors.tint}
+                    onPress={() => chevronHandler("left")}
+                    hitSlop={30}
+                  />
+                  <Text style={styles.label}>
+                    {filterMonth} {filterYear}
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={30}
+                    color={ThemeColors.tint}
+                    onPress={() => chevronHandler("right")}
+                    hitSlop={30}
+                  />
+                </View>
+                <View style={{ ...styles.flatlistContainer, height: 300 }}>
+                  <FlatList
+                    data={tasks}
+                    contentContainerStyle={styles.flatlist}
+                    showsVerticalScrollIndicator={false}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                      <View style={styles.task} key={item.id}>
+                        <Text style={[styles.taskText, { flex: 3 }]}>
+                          {item.author}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.taskText,
+                            { flex: 4, textAlign: "center" },
+                          ]}
+                        >
+                          {item.date}
+                        </Text>
+                        <MaterialCommunityIcons
+                          name="checkbox-marked"
+                          size={24}
+                          color={ThemeColors.text}
+                          style={{ flex: 2, textAlign: "right" }}
+                        />
+                      </View>
+                    )}
+                  />
+                </View>
+              </View>
+            </>
+          )}
+          {activeTab === "samples" && (
+            <View style={styles.sampleContainer}>
+              <Text style={styles.label}>Lisää näyte</Text>
+              <Button
+                children={
+                  <MaterialCommunityIcons name="plus" size={24} color="white" />
+                }
+                style={styles.closeButton}
+              />
+              <Text style={{ ...styles.label, marginTop: 40 }}>
+               Näytteet: 
+              </Text>
+              <View style={styles.tasksContainer}>
+                <View style={styles.dateFilterContainer}>
+                  <MaterialCommunityIcons
+                    name="chevron-left"
+                    size={30}
+                    color={ThemeColors.tint}
+                    onPress={() => chevronHandler("left")}
+                    hitSlop={30}
+                  />
+                  <Text style={styles.label}>
+                    {filterMonth} {filterYear}
+                  </Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={30}
+                    color={ThemeColors.tint}
+                    onPress={() => chevronHandler("right")}
+                    hitSlop={30}
+                  />
+                </View>
+                <View style={{ ...styles.flatlistContainer, height: 300 }}>
+                  <FlatList
+                    data={tasks}
+                    contentContainerStyle={styles.flatlist}
+                    showsVerticalScrollIndicator={false}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                      <View style={styles.task} key={item.id}>
+                        <Text style={[styles.taskText, { flex: 3 }]}>
+                          {item.author}
+                        </Text>
+                        <Text
+                          style={[
+                            styles.taskText,
+                            { flex: 4, textAlign: "center" },
+                          ]}
+                        >
+                          {item.date}
+                        </Text>
+                        <MaterialCommunityIcons
+                          name="checkbox-marked"
+                          size={24}
+                          color={ThemeColors.text}
+                          style={{ flex: 2, textAlign: "right" }}
+                        />
+                      </View>
+                    )}
+                  />
+                </View>
+              </View>
             </View>
-          </View>
-
+          )}
           <Button
             children="Sulje"
             onPress={onDismissModal}
