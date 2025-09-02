@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getKevinModalStyles } from "@/styles/components/kevinModalStyle";
 import * as CleaningFunctions from "@/components/functions/CleaningFunctions";
+import KevinSamples from "./components/KevinSamples";
 
 interface KevinModalProps {
   modalVisible: boolean;
@@ -317,68 +318,7 @@ export default function KevinModal({
             </>
           )}
           {activeTab === "samples" && (
-            <View style={styles.sampleContainer}>
-              <Text style={styles.label}>Lisää näyte</Text>
-              <Button
-                children={
-                  <MaterialCommunityIcons name="plus" size={24} color="white" />
-                }
-                style={styles.closeButton}
-              />
-              <Text style={{ ...styles.label, marginTop: 40 }}>
-               Näytteet: 
-              </Text>
-              <View style={styles.tasksContainer}>
-                <View style={styles.dateFilterContainer}>
-                  <MaterialCommunityIcons
-                    name="chevron-left"
-                    size={30}
-                    color={ThemeColors.tint}
-                    onPress={() => chevronHandler("left")}
-                    hitSlop={30}
-                  />
-                  <Text style={styles.label}>
-                    {filterMonth} {filterYear}
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="chevron-right"
-                    size={30}
-                    color={ThemeColors.tint}
-                    onPress={() => chevronHandler("right")}
-                    hitSlop={30}
-                  />
-                </View>
-                <View style={{ ...styles.flatlistContainer, height: 300 }}>
-                  <FlatList
-                    data={tasks}
-                    contentContainerStyle={styles.flatlist}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => (
-                      <View style={styles.task} key={item.id}>
-                        <Text style={[styles.taskText, { flex: 3 }]}>
-                          {item.author}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.taskText,
-                            { flex: 4, textAlign: "center" },
-                          ]}
-                        >
-                          {item.date}
-                        </Text>
-                        <MaterialCommunityIcons
-                          name="checkbox-marked"
-                          size={24}
-                          color={ThemeColors.text}
-                          style={{ flex: 2, textAlign: "right" }}
-                        />
-                      </View>
-                    )}
-                  />
-                </View>
-              </View>
-            </View>
+            <KevinSamples />
           )}
           <Button
             children="Sulje"

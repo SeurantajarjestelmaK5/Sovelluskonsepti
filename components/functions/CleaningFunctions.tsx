@@ -9,6 +9,7 @@ import {
   writeBatch,
   Firestore,
   updateDoc,
+  addDoc,
 } from "firebase/firestore";
 import * as Cleaning from "../../constants/CleaningTasks";
 import { QueryConstraint, where as firestoreWhere } from "firebase/firestore";
@@ -370,4 +371,26 @@ export const fetchKevinTasks = async (year: string, month: string) => {
   }
 };
 
+export const saveKevinSample = async (
+  year: number,
+  month: number,
+  date: number,
+) => {
+  const sampleRef = collection(
+    db, "omavalvonta", "siivous", "pihvinäytteet", 
+  )
+  await addDoc(sampleRef, {
+    year,
+    month,
+    date,
+  })
+}
 
+export const fetchKevinSamples = async () => {
+    const samplesRef = collection(
+        db, "omavalvonta", "siivous", "pihvinäytteet",
+    )
+    const samplesSnapshot = await getDocs(samplesRef)
+    const samples = samplesSnapshot.docs.map((doc) => doc.data())
+    return samples
+}
