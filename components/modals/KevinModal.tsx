@@ -318,7 +318,7 @@ export default function KevinModal({
             </>
           )}
           {activeTab === "samples" && (
-            <KevinSamples />
+            <KevinSamples isActive={activeTab === "samples"}/>
           )}
           <Button
             children="Sulje"

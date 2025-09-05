@@ -394,3 +394,12 @@ export const fetchKevinSamples = async () => {
     const samples = samplesSnapshot.docs.map((doc) => doc.data())
     return samples
 }
+
+export const deleteKevinSamples = async (samples: any[]) => {
+  const batch = writeBatch(db)
+  samples.forEach((sample) => {
+    const sampleRef = doc(db, "omavalvonta", "siivous", "pihvinäytteet", sample.id)
+    batch.delete(sampleRef)
+  })
+  await batch.commit()
+}
