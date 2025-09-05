@@ -31,7 +31,7 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     },
     flatlistContainer: {
       width: "100%",
-      maxHeight: 200,
+      maxHeight: 350,
     },
     input: {
       width: "80%",
@@ -69,6 +69,7 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
       borderRadius: 10,
       alignItems: "center",
       paddingBottom: 20,
+      
     },
     tabButton: {
       padding: 20,
@@ -99,7 +100,7 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
     },
     tasksContainer: {
       width: "60%",
-      maxHeight: 300,
+      maxHeight: 400,
       flexDirection: "column",
       alignContent: "center",
       justifyContent: "space-between",

@@ -59,7 +59,6 @@ export const checkAndPopulateDefaults = async (
   if (!weekSnapshot.exists()) {
     // Create a placeholder document if it doesn't exist
     await setDoc(weekRef, { initialized: true });
-
   } else {
     // If week document exists, assume data is already populated
     return true;
@@ -132,7 +131,6 @@ export const checkAndPopulateDefaults = async (
   await batch.commit();
   return false; // Indicates that defaults were populated
 };
-
 
 export const fetchTasksBySideAndWeek = async (
   side: string,
@@ -253,8 +251,6 @@ export const toggleTaskCompletionInFirestore = async (
         completed,
         date: completed ? new Date().toLocaleString() : "",
       });
-
-
     } else if (side === "sali") {
       // Dining room tasks: no `day`, tasks are under "all"
       const taskDocRef = doc(
@@ -273,7 +269,6 @@ export const toggleTaskCompletionInFirestore = async (
         completed,
         date: completed ? new Date().toLocaleString() : "",
       });
-
     } else {
       console.error(`Invalid side: "${side}".`);
       throw new Error("Side must be either 'keittiö' or 'sali'.");
@@ -290,7 +285,7 @@ export const saveKevinTask = async (
   year: string,
   month: string,
   author: string,
-  fullDate: string,
+  fullDate: string
 ) => {
   try {
     const taskRef = doc(
@@ -300,7 +295,7 @@ export const saveKevinTask = async (
       "keittiö",
       year,
       month,
-      "pihvikone"+fullDate
+      "pihvikone" + fullDate
     );
 
     await setDoc(taskRef, {
@@ -314,7 +309,7 @@ export const saveKevinTask = async (
     console.error("Error saving task:", error);
     throw error;
   }
-}
+};
 
 export const fetchKevinTasks = async (year: string, month: string) => {
   try {
@@ -326,7 +321,6 @@ export const fetchKevinTasks = async (year: string, month: string) => {
       year,
       month
     );
-
 
     const q = query(
       tasksRef,
@@ -374,32 +368,38 @@ export const fetchKevinTasks = async (year: string, month: string) => {
 export const saveKevinSample = async (
   year: number,
   month: number,
-  date: number,
+  date: number
 ) => {
-  const sampleRef = collection(
-    db, "omavalvonta", "siivous", "pihvinäytteet", 
-  )
-  await addDoc(sampleRef, {
+  const sampleRef = collection(db, "omavalvonta", "siivous", "pihvinäytteet");
+  const docRef = await addDoc(sampleRef, {
     year,
     month,
     date,
-  })
-}
+  });
+  return docRef.id; // Return the generated ID
+};
 
 export const fetchKevinSamples = async () => {
-    const samplesRef = collection(
-        db, "omavalvonta", "siivous", "pihvinäytteet",
-    )
-    const samplesSnapshot = await getDocs(samplesRef)
-    const samples = samplesSnapshot.docs.map((doc) => doc.data())
-    return samples
-}
+  const samplesRef = collection(db, "omavalvonta", "siivous", "pihvinäytteet");
+  const samplesSnapshot = await getDocs(samplesRef);
+  const samples = samplesSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+  return samples;
+};
 
 export const deleteKevinSamples = async (samples: any[]) => {
-  const batch = writeBatch(db)
+  const batch = writeBatch(db);
   samples.forEach((sample) => {
-    const sampleRef = doc(db, "omavalvonta", "siivous", "pihvinäytteet", sample.id)
-    batch.delete(sampleRef)
-  })
-  await batch.commit()
-}
+    const sampleRef = doc(
+      db,
+      "omavalvonta",
+      "siivous",
+      "pihvinäytteet",
+      sample.id
+    );
+    batch.delete(sampleRef);
+  });
+  await batch.commit();
+};
