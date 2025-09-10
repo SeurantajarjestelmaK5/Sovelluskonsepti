@@ -194,6 +194,19 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
+          name="(giftcards)/index"
+          options={{
+            title: "Lahjakortit",
+            tabBarIcon: ({ color }) => (
+              <MaterialCommunityIcons
+                name="wallet-giftcard"
+                color={color}
+                size={30}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="(settings)/index"
           options={{
             title: "Asetukset",
