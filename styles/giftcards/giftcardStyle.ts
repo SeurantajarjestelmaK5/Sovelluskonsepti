@@ -90,4 +90,81 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
       textAlign: "center",
       opacity: 0.7,
     },
+    // Modal styles
+    modalContainer: {
+      flex: 1,
+      backgroundColor: ThemeColors.background,
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: 20,
+      paddingTop: 60,
+      borderBottomWidth: 1,
+      borderBottomColor: ThemeColors.navDefault,
+    },
+    modalTitle: {
+      fontSize: 24,
+      fontWeight: "bold",
+      color: ThemeColors.text,
+      flex: 1,
+    },
+    closeButton: {
+      padding: 8,
+      borderRadius: 20,
+      backgroundColor: ThemeColors.navDefault,
+    },
+    modalContent: {
+      flex: 1,
+      padding: 20,
+    },
+    formContainer: {
+      flex: 1,
+    },
+    formLabel: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: ThemeColors.text,
+      marginBottom: 20,
+    },
+    textInput: {
+      borderWidth: 1,
+      borderColor: ThemeColors.navDefault,
+      borderRadius: 10,
+      padding: 15,
+      fontSize: 16,
+      color: ThemeColors.text,
+      backgroundColor: ThemeColors.background,
+      marginBottom: 15,
+    },
+    helpText: {
+      fontSize: 14,
+      color: ThemeColors.text,
+      opacity: 0.7,
+      fontStyle: "italic",
+      marginTop: 10,
+    },
+    modalFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      padding: 20,
+      borderTopWidth: 1,
+      borderTopColor: ThemeColors.navDefault,
+    },
+    modalButton: {
+      flex: 1,
+      marginHorizontal: 10,
+      borderRadius: 10,
+    },
+    cancelButton: {
+      borderColor: ThemeColors.text,
+    },
+    submitButton: {
+      backgroundColor: ThemeColors.tint,
+    },
+    buttonLabel: {
+      fontSize: 16,
+      fontWeight: "600",
+    },
   });

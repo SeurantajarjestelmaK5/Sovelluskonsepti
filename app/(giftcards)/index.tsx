@@ -9,12 +9,15 @@ import AppHeader from "@/components/misc/AppHeader";
 import { GiftcardType } from "@/components/functions/GiftcardFunctions";
 import Giftcard from "../../components/misc/Giftcard";
 import { Timestamp } from "firebase/firestore";
+import AddGiftcardModal from "@/components/modals/AddGiftcardModal";
 
 export default function GiftcardsHome() {
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getGiftcardStyles(ThemeColors), [ThemeColors]);
   const [searchQuery, setSearchQuery] = useState("");
   const [giftcards, setGiftcards] = useState<GiftcardType[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState<"new" | "existing">("new");
 
   const searchHandler = (query: string) => {
     if (query.trim() === "") {
@@ -27,6 +30,20 @@ export default function GiftcardsHome() {
       );
       setGiftcards(filteredGiftcards);
     }
+  };
+
+  const openNewGiftcardModal = () => {
+    setModalType("new");
+    setModalVisible(true);
+  };
+
+  const openExistingGiftcardModal = () => {
+    setModalType("existing");
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   useEffect(() => {
@@ -67,7 +84,7 @@ export default function GiftcardsHome() {
       <View style={styles.addButtonContainer}>
         <Button
           mode="contained"
-          onPress={() => {}}
+          onPress={openNewGiftcardModal}
           icon="plus"
           children="Lisää uusi lahjakortti"
           style={[styles.addButton, { backgroundColor: "green" }]}
@@ -76,7 +93,7 @@ export default function GiftcardsHome() {
 
         <Button
           mode="contained"
-          onPress={() => {}}
+          onPress={openExistingGiftcardModal}
           icon="plus"
           children="Lisää olemassa oleva lahjakortti"
           style={[styles.addButton, { backgroundColor: ThemeColors.tint }]}
@@ -114,6 +131,11 @@ export default function GiftcardsHome() {
           style={{ width: "95%", marginTop: 20, marginHorizontal: "auto" }}
         />
       )}
+      <AddGiftcardModal
+        visible={modalVisible}
+        onClose={closeModal}
+        modalType={modalType}
+      />
     </View>
   );
 }
