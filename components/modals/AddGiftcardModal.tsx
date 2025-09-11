@@ -1,5 +1,5 @@
 import { useThemeColors } from "@/constants/ThemeColors";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Modal, View, Text, Pressable, TextInput } from "react-native";
 import { GiftcardType } from "@/components/functions/GiftcardFunctions";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
@@ -9,33 +9,33 @@ import { Button } from "react-native-paper";
 interface AddGiftcardModalProps {
   visible: boolean;
   onClose: () => void;
-  modalType: "new" | "existing";
   giftcard?: GiftcardType;
 }
 
 export default function AddGiftcardModal({
   visible,
   onClose,
-  modalType,
   giftcard,
 }: AddGiftcardModalProps) {
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getGiftcardStyles(ThemeColors), [ThemeColors]);
+  const [activeTab, setActiveTab] = useState<"new" | "existing">("new");
 
   useEffect(() => {
     // Reset form when modal opens
     if (visible) {
+      setActiveTab("new");
       // Add any form reset logic here if needed
     }
   }, [visible]);
 
   const handleSubmit = () => {
     // TODO: Implement form submission logic
-    console.log(`Submitting ${modalType} giftcard`);
+    console.log(`Submitting ${activeTab} giftcard`);
     onClose();
   };
 
-  const isNewGiftcard = modalType === "new";
+  const isNewGiftcard = activeTab === "new";
 
   return (
     <Modal
@@ -46,11 +46,7 @@ export default function AddGiftcardModal({
       <View style={styles.modalContainer}>
         {/* Header */}
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>
-            {isNewGiftcard
-              ? "Lisää uusi lahjakortti"
-              : "Lisää olemassa oleva lahjakortti"}
-          </Text>
+          <Text style={styles.modalTitle}>Lisää lahjakortti</Text>
           <Pressable onPress={onClose} style={styles.closeButton}>
             <MaterialCommunityIcons
               name="close"
@@ -62,6 +58,49 @@ export default function AddGiftcardModal({
 
         {/* Content */}
         <View style={styles.modalContent}>
+          {/* Tab Navigation */}
+          <View style={styles.tabContainer}>
+            <Pressable
+              style={[
+                styles.tab,
+                activeTab === "new" ? styles.activeTab : styles.inactiveTab,
+              ]}
+              onPress={() => setActiveTab("new")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "new"
+                    ? styles.activeTabText
+                    : styles.inactiveTabText,
+                ]}
+              >
+                Uusi lahjakortti
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[
+                styles.tab,
+                activeTab === "existing"
+                  ? styles.activeTab
+                  : styles.inactiveTab,
+              ]}
+              onPress={() => setActiveTab("existing")}
+            >
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "existing"
+                    ? styles.activeTabText
+                    : styles.inactiveTabText,
+                ]}
+              >
+                Olemassa oleva
+              </Text>
+            </Pressable>
+          </View>
+
+          {/* Form Content */}
           {isNewGiftcard ? (
             // New giftcard form
             <View style={styles.formContainer}>
@@ -85,16 +124,19 @@ export default function AddGiftcardModal({
             // Existing giftcard form
             <View style={styles.formContainer}>
               <Text style={styles.formLabel}>
-                Hae olemassa oleva lahjakortti
+                Lisää aiemmin myyty lahjakortti
               </Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Lahjakortin ID"
                 placeholderTextColor={ThemeColors.text + "80"}
               />
-              <Text style={styles.helpText}>
-                Syötä olemassa olevan lahjakortin ID
-              </Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Arvo (€)"
+                placeholderTextColor={ThemeColors.text + "80"}
+                keyboardType="numeric"
+              />
             </View>
           )}
         </View>
@@ -115,7 +157,7 @@ export default function AddGiftcardModal({
             style={[styles.modalButton, styles.submitButton]}
             labelStyle={styles.buttonLabel}
           >
-            {isNewGiftcard ? "Luo lahjakortti" : "Hae lahjakortti"}
+            {isNewGiftcard ? "Luo lahjakortti" : "Lisää lahjakortti"}
           </Button>
         </View>
       </View>

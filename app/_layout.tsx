@@ -9,7 +9,13 @@ import { useThemeColors } from "@/constants/ThemeColors";
 import { Colors } from "@/constants/Colors";
 import { getGeneralStyles } from "@/styles/navigations/generalStyles";
 import { useNavigationState } from "@react-navigation/native";
-import { ActivityIndicator, Snackbar } from "react-native-paper";
+import {
+  ActivityIndicator,
+  MD3DarkTheme,
+  MD3LightTheme,
+  PaperProvider,
+  Snackbar,
+} from "react-native-paper";
 import { StatusBar } from "expo-status-bar";
 
 export default function TabsLayout() {
@@ -20,6 +26,63 @@ export default function TabsLayout() {
   const [isInSettings, setIsInSettings] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  // Choose the correct base theme based on your color scheme
+  const isDarkMode = ThemeColors.background === Colors.dark.background;
+  const baseTheme = isDarkMode ? MD3DarkTheme : MD3LightTheme;
+
+  const paperTheme = {
+    ...baseTheme,
+    colors: {
+      ...baseTheme.colors,
+      // Primary colors
+      primary: ThemeColors.tint,
+      onPrimary: isDarkMode ? ThemeColors.text : ThemeColors.background,
+
+      // Background colors
+      background: ThemeColors.background,
+      onBackground: ThemeColors.text,
+
+      // Surface colors - CRITICAL for TextInput
+      surface: ThemeColors.background,
+      onSurface: ThemeColors.text,
+      surfaceVariant: ThemeColors.navDefault,
+      onSurfaceVariant: ThemeColors.text,
+
+      // Container colors
+      surfaceContainer: ThemeColors.navDefault,
+      surfaceContainerHigh: ThemeColors.navSelected,
+      surfaceContainerHighest: ThemeColors.navSelected,
+      onSurfaceContainer: ThemeColors.text,
+
+      // Outline colors
+      outline: ThemeColors.tabIconDefault,
+      outlineVariant: ThemeColors.navDefault,
+
+      // Error colors (keeping Paper's defaults)
+      error: baseTheme.colors.error,
+      onError: baseTheme.colors.onError,
+      errorContainer: baseTheme.colors.errorContainer,
+      onErrorContainer: baseTheme.colors.onErrorContainer,
+
+      // Success colors (using your tint for success)
+      tertiary: ThemeColors.tint,
+      onTertiary: isDarkMode ? ThemeColors.text : ThemeColors.background,
+
+      // Secondary colors
+      secondary: ThemeColors.tabIconSelected,
+      onSecondary: isDarkMode ? ThemeColors.text : ThemeColors.background,
+
+      // Inverse colors
+      inverseSurface: ThemeColors.text,
+      onInverseSurface: ThemeColors.background,
+      inversePrimary: ThemeColors.tint,
+
+      // Shadow
+      shadow: ThemeColors.text,
+      scrim: ThemeColors.text,
+    },
+  };
 
   const handleCogPress = () => {
     checkForUpdates();
@@ -114,129 +177,136 @@ export default function TabsLayout() {
 
   return (
     <>
-      <StatusBar
-        style={
-          ThemeColors.background === Colors.light.background ? "dark" : "light"
-        }
-        translucent={true}
-      />
-      <Tabs
-        initialRouteName="(monitoring)"
-        screenOptions={{
-          headerShown: false,
-          headerRight: () => (
-            <MaterialCommunityIcons
-              name="cog"
-              size={40}
-              style={{ marginRight: 20 }}
-              color={ThemeColors.tint}
-              onPress={() => handleCogPress()}
-            />
-          ),
-          // TÄÄ ON DRAWER-VALIKOLLE MENU JOS HALUU LISÄTÄ
-          // headerLeft: () => (
-          //   <MaterialCommunityIcons
-          //     name="menu"
-          //     size={40}
-          //     style={{ marginLeft: 20 }}
-          //     color={ThemeColors.tint}
-          //     onPress={() => router.push("/(menu)")}
-          //   />
-          // ),
-          tabBarStyle: { height: 100, backgroundColor: ThemeColors.background },
-          tabBarLabelStyle: {
-            fontSize: 23,
-            fontWeight: "bold",
-            textShadowRadius: 0,
-          },
-          tabBarActiveTintColor: ThemeColors.tabIconSelected,
-          tabBarInactiveTintColor: ThemeColors.tabIconDefault,
-          tabBarActiveBackgroundColor: ThemeColors.navSelected,
-          tabBarInactiveBackgroundColor: ThemeColors.navDefault,
-          tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
-          headerStyle: { backgroundColor: ThemeColors.background },
-          headerTintColor: ThemeColors.tint,
-        }}
-      >
-        <Tabs.Screen
-          name="(inventory)"
-          options={{
-            title: "Inventaario",
-            tabBarIcon: ({ color }) => (
+      <PaperProvider theme={paperTheme}>
+        <StatusBar
+          style={
+            ThemeColors.background === Colors.light.background
+              ? "dark"
+              : "light"
+          }
+          translucent={true}
+        />
+        <Tabs
+          initialRouteName="(monitoring)"
+          screenOptions={{
+            headerShown: false,
+            headerRight: () => (
               <MaterialCommunityIcons
-                name="clipboard-list"
-                color={color}
-                size={35}
+                name="cog"
+                size={40}
+                style={{ marginRight: 20 }}
+                color={ThemeColors.tint}
+                onPress={() => handleCogPress()}
               />
             ),
+            // TÄÄ ON DRAWER-VALIKOLLE MENU JOS HALUU LISÄTÄ
+            // headerLeft: () => (
+            //   <MaterialCommunityIcons
+            //     name="menu"
+            //     size={40}
+            //     style={{ marginLeft: 20 }}
+            //     color={ThemeColors.tint}
+            //     onPress={() => router.push("/(menu)")}
+            //   />
+            // ),
+            tabBarStyle: {
+              height: 100,
+              backgroundColor: ThemeColors.background,
+            },
+            tabBarLabelStyle: {
+              fontSize: 23,
+              fontWeight: "bold",
+              textShadowRadius: 0,
+            },
+            tabBarActiveTintColor: ThemeColors.tabIconSelected,
+            tabBarInactiveTintColor: ThemeColors.tabIconDefault,
+            tabBarActiveBackgroundColor: ThemeColors.navSelected,
+            tabBarInactiveBackgroundColor: ThemeColors.navDefault,
+            tabBarIconStyle: { marginBottom: 10, color: ThemeColors.icon },
+            headerStyle: { backgroundColor: ThemeColors.background },
+            headerTintColor: ThemeColors.tint,
           }}
-        />
-        <Tabs.Screen
-          name="(monitoring)"
-          options={{
-            title: "Omavalvonta",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons name="home" color={color} size={35} />
-            ),
+        >
+          <Tabs.Screen
+            name="(inventory)"
+            options={{
+              title: "Inventaario",
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons
+                  name="clipboard-list"
+                  color={color}
+                  size={35}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(monitoring)"
+            options={{
+              title: "Omavalvonta",
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons name="home" color={color} size={35} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(reports)"
+            options={{
+              title: "Raportit",
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons
+                  name="chart-bar"
+                  color={color}
+                  size={35}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(giftcards)/index"
+            options={{
+              title: "Lahjakortit",
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons
+                  name="wallet-giftcard"
+                  color={color}
+                  size={30}
+                />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="(settings)/index"
+            options={{
+              title: "Asetukset",
+              href: null,
+              tabBarIcon: ({ color }) => (
+                <MaterialCommunityIcons
+                  name="chart-bar"
+                  color={color}
+                  size={35}
+                />
+              ),
+            }}
+          />
+        </Tabs>
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          action={{
+            label: "OK",
+            onPress: () => {
+              setSnackbarVisible(false);
+            },
           }}
-        />
-        <Tabs.Screen
-          name="(reports)"
-          options={{
-            title: "Raportit",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name="chart-bar"
-                color={color}
-                size={35}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="(giftcards)/index"
-          options={{
-            title: "Lahjakortit",
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name="wallet-giftcard"
-                color={color}
-                size={30}
-              />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="(settings)/index"
-          options={{
-            title: "Asetukset",
-            href: null,
-            tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons
-                name="chart-bar"
-                color={color}
-                size={35}
-              />
-            ),
-          }}
-        />
-      </Tabs>
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => setSnackbarVisible(false)}
-        action={{
-          label: "OK",
-          onPress: () => {
-            setSnackbarVisible(false);
-          },
-        }}
-        style={styles.snackbar}
-        elevation={1}
-      >
-        <Text style={styles.snackbarText}>
-          Sovellusta päivitetään, odota hetki...
-        </Text>
-      </Snackbar>
+          style={styles.snackbar}
+          elevation={1}
+        >
+          <Text style={styles.snackbarText}>
+            Sovellusta päivitetään, odota hetki...
+          </Text>
+        </Snackbar>
+      </PaperProvider>
     </>
   );
 }

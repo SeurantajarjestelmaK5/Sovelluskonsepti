@@ -94,6 +94,7 @@ export default function WashingMachineTemperatures() {
             activeOutlineColor={ThemeColors.tint}
             value={washTemp}
             onChangeText={(text) => setWashTemp(text)}
+            textColor="black"
           />
         </View>
         <View style={styles.icon}>
@@ -110,6 +111,7 @@ export default function WashingMachineTemperatures() {
             activeOutlineColor={ThemeColors.tint}
             value={rinseTemp}
             onChangeText={(text) => setRinseTemp(text)}
+            textColor="black"
           />
         </View>
         <View style={styles.icon}>
@@ -165,7 +167,7 @@ export default function WashingMachineTemperatures() {
         children="Tallenna"
         mode="contained"
         style={styles.saveButton}
-        labelStyle={{ fontSize: 17 }}
+        labelStyle={{ fontSize: 17, color: ThemeColors.text }}
         onPress={saveButtonHandler}
       />
 

@@ -13,17 +13,16 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     },
     addButtonContainer: {
       flexDirection: "row",
-      justifyContent: "space-evenly",
+      justifyContent: "center",
       width: "90%",
       marginBottom: 20,
     },
     addButton: {
-      width: "45%",
+      width: "60%",
       justifyContent: "center",
       alignItems: "center",
       borderRadius: 10,
       padding: 5,
-      marginHorizontal: 15,
     },
     buttonContainer: {
       flexDirection: "row",
@@ -113,7 +112,7 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     closeButton: {
       padding: 8,
       borderRadius: 20,
-      backgroundColor: ThemeColors.navDefault,
+      backgroundColor: ThemeColors.tint,
     },
     modalContent: {
       flex: 1,
@@ -166,5 +165,44 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     buttonLabel: {
       fontSize: 16,
       fontWeight: "600",
+    },
+    smallModalContainer: {
+      flex: 0.4,
+      backgroundColor: ThemeColors.background,
+      padding: 20,
+      borderRadius: 10,
+    },
+    // Tab styles
+    tabContainer: {
+      flexDirection: "row",
+      marginBottom: 20,
+      backgroundColor: ThemeColors.navDefault,
+      borderRadius: 10,
+      padding: 4,
+    },
+    tab: {
+      flex: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      alignItems: "center",
+    },
+    activeTab: {
+      backgroundColor: ThemeColors.tint,
+    },
+    inactiveTab: {
+      backgroundColor: "transparent",
+    },
+    tabText: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: ThemeColors.text,
+    },
+    activeTabText: {
+      color: "white",
+    },
+    inactiveTabText: {
+      color: ThemeColors.text,
+      opacity: 0.7,
     },
   });

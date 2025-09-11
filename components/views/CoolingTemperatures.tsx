@@ -83,6 +83,7 @@ export default function CoolingTemperatures() {
             activeOutlineColor={ThemeColors.tint}
             value={product}
             onChangeText={setProduct}
+            textColor="black"
           />
         </View>
         <View style={styles.inputContainer}>
@@ -99,6 +100,7 @@ export default function CoolingTemperatures() {
             activeOutlineColor={ThemeColors.tint}
             value={startTemp}
             onChangeText={setStartTemp}
+            textColor="black"
           />
         </View>
         {/* <View style={styles.inputContainer}>
@@ -166,18 +168,18 @@ export default function CoolingTemperatures() {
         )}
       </View>
       <Button
-          children="Tallenna"
-          mode="contained"
-          style={styles.saveButton}
-          labelStyle={{ fontSize: 17 }}
-          onPress={saveButtonHandler}
-        />
-        <CoolingDatalist
-          month={currentMonth}
-          year={currentYear}
-          day={currentDate}
-          refreshKey={refreshKey}
-        />
+        children="Tallenna"
+        mode="contained"
+        style={styles.saveButton}
+        labelStyle={{ fontSize: 17 }}
+        onPress={saveButtonHandler}
+      />
+      <CoolingDatalist
+        month={currentMonth}
+        year={currentYear}
+        day={currentDate}
+        refreshKey={refreshKey}
+      />
     </View>
   );
 }

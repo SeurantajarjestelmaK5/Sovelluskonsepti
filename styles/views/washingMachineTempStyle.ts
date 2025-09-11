@@ -43,7 +43,7 @@ export const getWashingTempStyles = (ThemeColors: ThemeColors) =>
     dataList: {
       width: "80%",
       padding: 16,
-      backgroundColor: 'ThemeColors.background',
+      backgroundColor: ThemeColors.background,
       maxHeight: 370,
       borderRadius: 10,
       borderWidth: 1,
@@ -96,9 +96,9 @@ export const getWashingTempStyles = (ThemeColors: ThemeColors) =>
     },
     input: {
       width: 150,
-      backgroundColor: ThemeColors.editableField,
       borderRadius: 5,
       marginTop: 10,
+      backgroundColor: ThemeColors.editableField,
     },
     label: {
       color: ThemeColors.text,
@@ -107,6 +107,7 @@ export const getWashingTempStyles = (ThemeColors: ThemeColors) =>
     },
     saveButton: {
       backgroundColor: ThemeColors.tint,
+
       borderRadius: 10,
       marginTop: 20,
       marginBottom: 30,

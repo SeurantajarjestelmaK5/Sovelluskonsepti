@@ -1,4 +1,4 @@
-import {StyleSheet} from "react-native";
+import { StyleSheet } from "react-native";
 import { ThemeColors } from "@/constants/ThemeColors";
 
 export const getCoolingTempStyles = (ThemeColors: ThemeColors) =>
@@ -109,5 +109,3 @@ export const getCoolingTempStyles = (ThemeColors: ThemeColors) =>
       alignItems: "center",
     },
   });
-
-  

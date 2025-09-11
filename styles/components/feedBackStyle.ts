@@ -23,15 +23,15 @@ export const getFeedBackStyles = (ThemeColors: ThemeColors) =>
       marginTop: 50,
     },
     dropdownButton: {
-        width: "80%",
-        height: 70,
-        backgroundColor: "white",
-        borderRadius: 20,
-        marginBottom: 20,
+      width: "80%",
+      height: 70,
+      backgroundColor: "white",
+      borderRadius: 20,
+      marginBottom: 20,
     },
     dropdownItem: {
-        color: "black",
-        fontSize: 20,
+      color: "black",
+      fontSize: 20,
     },
     header: {
       fontSize: 30,
@@ -55,9 +55,9 @@ export const getFeedBackStyles = (ThemeColors: ThemeColors) =>
       marginBottom: 20,
     },
     textInput: {
-        width: "80%",
-        backgroundColor: "white",
-        borderRadius: 20,
-        marginBottom: 20,
-    }
+      width: "80%",
+      backgroundColor: "white",
+      borderRadius: 20,
+      marginBottom: 20,
+    },
   });

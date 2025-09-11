@@ -17,7 +17,6 @@ export default function GiftcardsHome() {
   const [searchQuery, setSearchQuery] = useState("");
   const [giftcards, setGiftcards] = useState<GiftcardType[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [modalType, setModalType] = useState<"new" | "existing">("new");
 
   const searchHandler = (query: string) => {
     if (query.trim() === "") {
@@ -32,13 +31,7 @@ export default function GiftcardsHome() {
     }
   };
 
-  const openNewGiftcardModal = () => {
-    setModalType("new");
-    setModalVisible(true);
-  };
-
-  const openExistingGiftcardModal = () => {
-    setModalType("existing");
+  const openGiftcardModal = () => {
     setModalVisible(true);
   };
 
@@ -84,20 +77,11 @@ export default function GiftcardsHome() {
       <View style={styles.addButtonContainer}>
         <Button
           mode="contained"
-          onPress={openNewGiftcardModal}
+          onPress={openGiftcardModal}
           icon="plus"
-          children="Lisää uusi lahjakortti"
-          style={[styles.addButton, { backgroundColor: "green" }]}
-          labelStyle={{ fontSize: 18 }}
-        />
-
-        <Button
-          mode="contained"
-          onPress={openExistingGiftcardModal}
-          icon="plus"
-          children="Lisää olemassa oleva lahjakortti"
+          children="Lisää lahjakortti"
           style={[styles.addButton, { backgroundColor: ThemeColors.tint }]}
-          labelStyle={{ fontSize: 18 }}
+          labelStyle={{ fontSize: 18, }}
         />
       </View>
       <Searchbar
@@ -112,7 +96,7 @@ export default function GiftcardsHome() {
           searchHandler("");
         }}
         clearIcon="close"
-        style={{ width: "90%" }}
+        style={{ width: "90%", backgroundColor: ThemeColors.navDefault }}
       />
       {giftcards.length === 0 ? (
         <View style={styles.noResultsContainer}>
@@ -131,11 +115,7 @@ export default function GiftcardsHome() {
           style={{ width: "95%", marginTop: 20, marginHorizontal: "auto" }}
         />
       )}
-      <AddGiftcardModal
-        visible={modalVisible}
-        onClose={closeModal}
-        modalType={modalType}
-      />
+      <AddGiftcardModal visible={modalVisible} onClose={closeModal} />
     </View>
   );
 }

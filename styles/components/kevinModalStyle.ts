@@ -69,7 +69,6 @@ export const getKevinModalStyles = (ThemeColors: ThemeColors) =>
       borderRadius: 10,
       alignItems: "center",
       paddingBottom: 20,
-      
     },
     tabButton: {
       padding: 20,
