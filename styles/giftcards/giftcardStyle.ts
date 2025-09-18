@@ -18,11 +18,11 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
       marginBottom: 20,
     },
     addButton: {
-      width: "60%",
       justifyContent: "center",
       alignItems: "center",
       borderRadius: 10,
       padding: 5,
+      backgroundColor: ThemeColors.tint,
     },
     buttonContainer: {
       flexDirection: "row",

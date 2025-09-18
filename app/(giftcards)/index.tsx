@@ -80,8 +80,9 @@ export default function GiftcardsHome() {
           onPress={openGiftcardModal}
           icon="plus"
           children="Lisää lahjakortti"
-          style={[styles.addButton, { backgroundColor: ThemeColors.tint }]}
-          labelStyle={{ fontSize: 18, }}
+          contentStyle={styles.addButton}
+          style={{ borderRadius: 10, width: "40%" }}
+          labelStyle={{ fontSize: 18 }}
         />
       </View>
       <Searchbar

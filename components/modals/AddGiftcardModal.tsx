@@ -1,7 +1,7 @@
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useMemo, useEffect, useState } from "react";
 import { Modal, View, Text, Pressable, TextInput } from "react-native";
-import { GiftcardType } from "@/components/functions/GiftcardFunctions";
+import { findNextGiftcardId, GiftcardType } from "@/components/functions/GiftcardFunctions";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
@@ -20,14 +20,35 @@ export default function AddGiftcardModal({
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getGiftcardStyles(ThemeColors), [ThemeColors]);
   const [activeTab, setActiveTab] = useState<"new" | "existing">("new");
+  const [newGiftcardId, setNewGiftcardId] = useState("");
+  const [newGiftcardValue, setNewGiftcardValue] = useState<number | "">("");
+  const [newGiftcardCreated, setNewGiftcardCreated] = useState("");
+  const [newGiftcardValid, setNewGiftcardValid] = useState("");
 
   useEffect(() => {
-    // Reset form when modal opens
     if (visible) {
       setActiveTab("new");
-      // Add any form reset logic here if needed
+      setGiftcardDates();
+      findGiftcardId();
     }
+    console.log(findGiftcardId());
   }, [visible]);
+
+  const findGiftcardId = async () => {
+    const id = await findNextGiftcardId();
+    setNewGiftcardId(id);
+  };
+  
+  const setGiftcardDates = () => {
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    const createdDate = new Date(currentYear, currentMonth, currentDay);
+    const validDate = new Date(currentYear + 1, currentMonth, currentDay);
+    setNewGiftcardCreated(createdDate.toLocaleDateString());
+    setNewGiftcardValid(validDate.toLocaleDateString());
+  };
 
   const handleSubmit = () => {
     // TODO: Implement form submission logic
@@ -109,12 +130,31 @@ export default function AddGiftcardModal({
                 style={styles.textInput}
                 placeholder="Lahjakortin ID"
                 placeholderTextColor={ThemeColors.text + "80"}
+                value={newGiftcardId}
               />
               <TextInput
                 style={styles.textInput}
                 placeholder="Arvo (€)"
                 placeholderTextColor={ThemeColors.text + "80"}
                 keyboardType="numeric"
+                value={newGiftcardValue.toString()}
+              />
+              <Text style={styles.formLabel}>Lahjakortti luotu</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Luotu"
+                placeholderTextColor={ThemeColors.text + "80"}
+                keyboardType="numeric"
+                value={newGiftcardCreated}
+                onChangeText={setNewGiftcardCreated}
+              />
+              <Text style={styles.formLabel}>Lahjakortti voimassa</Text>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Voimassa"
+                placeholderTextColor={ThemeColors.text + "80"}
+                keyboardType="numeric"
+                value={newGiftcardValid}
               />
               <Text style={styles.helpText}>
                 Uusi lahjakortti luodaan järjestelmään
