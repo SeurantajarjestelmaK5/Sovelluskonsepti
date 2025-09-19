@@ -1,10 +1,15 @@
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useMemo, useEffect, useState } from "react";
 import { Modal, View, Text, Pressable, TextInput } from "react-native";
-import { findNextGiftcardId, GiftcardType } from "@/components/functions/GiftcardFunctions";
+import {
+  AddGiftcard,
+  findNextGiftcardId,
+  GiftcardType,
+} from "@/components/functions/GiftcardFunctions";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button } from "react-native-paper";
+import { Timestamp } from "firebase/firestore";
 
 interface AddGiftcardModalProps {
   visible: boolean;
@@ -22,8 +27,10 @@ export default function AddGiftcardModal({
   const [activeTab, setActiveTab] = useState<"new" | "existing">("new");
   const [newGiftcardId, setNewGiftcardId] = useState("");
   const [newGiftcardValue, setNewGiftcardValue] = useState<number | "">("");
-  const [newGiftcardCreated, setNewGiftcardCreated] = useState("");
-  const [newGiftcardValid, setNewGiftcardValid] = useState("");
+  const [newGiftcardCreated, setNewGiftcardCreated] = useState<Date | null>(
+    null
+  );
+  const [newGiftcardValid, setNewGiftcardValid] = useState<Date | null>(null);
 
   useEffect(() => {
     if (visible) {
@@ -31,14 +38,13 @@ export default function AddGiftcardModal({
       setGiftcardDates();
       findGiftcardId();
     }
-    console.log(findGiftcardId());
   }, [visible]);
 
   const findGiftcardId = async () => {
     const id = await findNextGiftcardId();
     setNewGiftcardId(id);
   };
-  
+
   const setGiftcardDates = () => {
     const currentDate = new Date();
     const currentDay = currentDate.getDate();
@@ -46,14 +52,41 @@ export default function AddGiftcardModal({
     const currentYear = currentDate.getFullYear();
     const createdDate = new Date(currentYear, currentMonth, currentDay);
     const validDate = new Date(currentYear + 1, currentMonth, currentDay);
-    setNewGiftcardCreated(createdDate.toLocaleDateString());
-    setNewGiftcardValid(validDate.toLocaleDateString());
+    setNewGiftcardCreated(createdDate);
+    setNewGiftcardValid(validDate);
   };
 
-  const handleSubmit = () => {
-    // TODO: Implement form submission logic
-    console.log(`Submitting ${activeTab} giftcard`);
-    onClose();
+  const handleSubmit = async () => {
+    if (isNewGiftcard) {
+      if (
+        newGiftcardId === "" ||
+        newGiftcardValue === "" ||
+        newGiftcardCreated === null ||
+        newGiftcardValid === null
+      ) {
+        return;
+      }
+      try {
+        await AddGiftcard(
+          {
+            id: newGiftcardId,
+            value: Number(newGiftcardValue),
+            start_date: Timestamp.fromDate(newGiftcardCreated),
+            end_date: Timestamp.fromDate(newGiftcardValid),
+            expired: false,
+            used: false,
+          },
+        );
+
+        setNewGiftcardId("");
+        setNewGiftcardValue("");
+        setNewGiftcardCreated(null);
+        setNewGiftcardValid(null);
+        onClose();
+      } catch (error) {
+        console.error("Failed to add giftcard:", error);
+      }
+    }
   };
 
   const isNewGiftcard = activeTab === "new";
@@ -125,36 +158,81 @@ export default function AddGiftcardModal({
           {isNewGiftcard ? (
             // New giftcard form
             <View style={styles.formContainer}>
-              <Text style={styles.formLabel}>Lahjakortin tiedot</Text>
+              <Text style={styles.formLabel}>Lahjakortin numero</Text>
               <TextInput
                 style={styles.textInput}
                 placeholder="Lahjakortin ID"
                 placeholderTextColor={ThemeColors.text + "80"}
                 value={newGiftcardId}
               />
+              <Text style={styles.formLabel}>Lahjakortin arvo (€)</Text>
               <TextInput
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  {
+                    borderColor:
+                      newGiftcardValue === "" || newGiftcardValue === null
+                        ? "red"
+                        : ThemeColors.navDefault,
+                  },
+                ]}
                 placeholder="Arvo (€)"
                 placeholderTextColor={ThemeColors.text + "80"}
                 keyboardType="numeric"
                 value={newGiftcardValue.toString()}
+                onChangeText={(text) =>
+                  setNewGiftcardValue(text === "" ? "" : Number(text))
+                }
               />
               <Text style={styles.formLabel}>Lahjakortti luotu</Text>
               <TextInput
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  {
+                    borderColor:
+                      newGiftcardCreated === null
+                        ? "red"
+                        : ThemeColors.navDefault,
+                  },
+                ]}
                 placeholder="Luotu"
                 placeholderTextColor={ThemeColors.text + "80"}
                 keyboardType="numeric"
-                value={newGiftcardCreated}
-                onChangeText={setNewGiftcardCreated}
+                value={
+                  newGiftcardCreated
+                    ? newGiftcardCreated.toLocaleDateString()
+                    : ""
+                }
+                onChangeText={(text) => {
+                  const date = new Date(text);
+                  if (!isNaN(date.getTime())) {
+                    setNewGiftcardCreated(date);
+                  }
+                }}
               />
               <Text style={styles.formLabel}>Lahjakortti voimassa</Text>
               <TextInput
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  {
+                    borderColor:
+                      newGiftcardValid === null
+                        ? "red"
+                        : ThemeColors.navDefault,
+                  },
+                ]}
                 placeholder="Voimassa"
                 placeholderTextColor={ThemeColors.text + "80"}
                 keyboardType="numeric"
-                value={newGiftcardValid}
+                value={
+                  newGiftcardValid ? newGiftcardValid.toLocaleDateString() : ""
+                }
+                onChangeText={(text) => {
+                  const date = new Date(text);
+                  if (!isNaN(date.getTime())) {
+                    setNewGiftcardValid(date);
+                  }
+                }}
               />
               <Text style={styles.helpText}>
                 Uusi lahjakortti luodaan järjestelmään

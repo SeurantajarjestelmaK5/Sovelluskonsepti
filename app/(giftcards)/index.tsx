@@ -6,7 +6,7 @@ import { useThemeColors } from "@/constants/ThemeColors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useMemo } from "react";
 import AppHeader from "@/components/misc/AppHeader";
-import { GiftcardType } from "@/components/functions/GiftcardFunctions";
+import { getGiftcards, GiftcardType } from "@/components/functions/GiftcardFunctions";
 import Giftcard from "../../components/misc/Giftcard";
 import { Timestamp } from "firebase/firestore";
 import AddGiftcardModal from "@/components/modals/AddGiftcardModal";
@@ -21,10 +21,10 @@ export default function GiftcardsHome() {
   const searchHandler = (query: string) => {
     if (query.trim() === "") {
       // If search is empty, show all giftcards
-      setGiftcards(testGiftcards);
+      setGiftcards(giftcards);
     } else {
       // Filter by ID (case-insensitive)
-      const filteredGiftcards = testGiftcards.filter((giftcard) =>
+      const filteredGiftcards = giftcards.filter((giftcard) =>
         giftcard.id.toLowerCase().includes(query.toLowerCase())
       );
       setGiftcards(filteredGiftcards);
@@ -40,36 +40,13 @@ export default function GiftcardsHome() {
   };
 
   useEffect(() => {
-    // Initialize with all giftcards
-    setGiftcards(testGiftcards);
-  }, []);
-
-  const testGiftcards = [
-    {
-      id: "mursu-22564",
-      value: 100,
-      start_date: Timestamp.fromDate(new Date("2025-01-01")),
-      end_date: Timestamp.fromDate(new Date("2026-01-01")),
-      expired: false,
-      used: false,
-    },
-    {
-      id: "2004",
-      value: 25,
-      start_date: Timestamp.fromDate(new Date("2025-01-01")),
-      end_date: Timestamp.fromDate(new Date("2026-01-01")),
-      expired: false,
-      used: false,
-    },
-    {
-      id: "5543",
-      value: 50,
-      start_date: Timestamp.fromDate(new Date("2025-01-01")),
-      end_date: Timestamp.fromDate(new Date("2026-01-01")),
-      expired: false,
-      used: false,
-    },
-  ];
+    fetchGiftcards();
+  }, [modalVisible]);
+  
+  const fetchGiftcards = async () => {
+    const giftcardsData = await getGiftcards();
+    setGiftcards(giftcardsData);
+  };
 
   return (
     <View style={styles.container}>

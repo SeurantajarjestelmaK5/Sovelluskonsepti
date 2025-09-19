@@ -42,3 +42,20 @@ export const findNextGiftcardId = async (): Promise<string> => {
   // Return the next ID as a string
   return (highestId + 1).toString();
 };
+
+export const AddGiftcard = async (giftcard: GiftcardType) => {
+  const giftcardDocRef = doc(db, "lahjakortit", giftcard.id);
+  await setDoc(giftcardDocRef, giftcard);
+};
+
+export const getGiftcards = async (): Promise<GiftcardType[]> => {
+  const ref = collection(db, "lahjakortit");
+  const snapshot = await getDocs(ref);
+  return snapshot.docs.map(
+    (doc) =>
+      ({
+        id: doc.id,
+        ...doc.data(),
+      } as GiftcardType)
+  );
+};
