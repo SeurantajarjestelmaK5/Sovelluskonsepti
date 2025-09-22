@@ -121,20 +121,7 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     formContainer: {
       flex: 1,
     },
-    formLabel: {
-      fontSize: 18,
-      fontWeight: "600",
-      color: ThemeColors.text,
-      marginBottom: 20,
-    },
     textInput: {
-      borderWidth: 1,
-      borderColor: ThemeColors.navDefault,
-      borderRadius: 10,
-      padding: 15,
-      fontSize: 16,
-      color: ThemeColors.text,
-      backgroundColor: ThemeColors.background,
       marginBottom: 15,
     },
     helpText: {
@@ -155,9 +142,6 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
       flex: 1,
       marginHorizontal: 10,
       borderRadius: 10,
-    },
-    cancelButton: {
-      borderColor: ThemeColors.text,
     },
     submitButton: {
       backgroundColor: ThemeColors.tint,
@@ -204,5 +188,20 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     inactiveTabText: {
       color: ThemeColors.text,
       opacity: 0.7,
+    },
+    // Dialog styles
+    dialogText: {
+      fontSize: 18,
+      color: ThemeColors.text,
+    },
+    valueHighlight: {
+      color: "green",
+      fontWeight: "bold",
+      fontSize: 20,
+    },
+    actionButton: {
+      borderRadius: 20,
+      width: "20%",
+      color: "white",
     },
   });

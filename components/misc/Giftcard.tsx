@@ -1,22 +1,32 @@
-import { GiftcardType } from "@/components/functions/GiftcardFunctions";
+import { GiftcardType, useGiftcard } from "@/components/functions/GiftcardFunctions";
 import { useMemo, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Portal, Modal, Dialog, Button, Paragraph } from "react-native-paper";
+import { Portal, Modal, Dialog, Button, Surface } from "react-native-paper";
 
-export default function Giftcard({ giftcard }: { giftcard: GiftcardType }) {
+export default function Giftcard({ giftcard, onUse }: { giftcard: GiftcardType, onUse: () => void }) {
   const ThemeColors = useThemeColors();
   const styles = useMemo(() => getGiftcardStyles(ThemeColors), [ThemeColors]);
   const [useGiftcardModal, setUseGiftcardModal] = useState(false);
   return (
     <>
-      <View style={styles.giftcard}>
-        {/* <MaterialCommunityIcons
-      name="pencil"
-      style={{color: "white", position: "absolute", left: 10, top: 10, fontSize: 25}}
-    /> */}
+      <Surface style={styles.giftcard} elevation={2}>
+        <View style={styles.buttonContainer}>
+          <Pressable
+            style={styles.deleteButton}
+            onPress={() => setUseGiftcardModal(true)}
+          >
+            <MaterialCommunityIcons
+              name="check-bold"
+              style={styles.deleteIcon}
+            />
+          </Pressable>
+          <Pressable style={styles.spendButton}>
+            <MaterialCommunityIcons name="minus" style={styles.spendIcon} />
+          </Pressable>
+        </View>
         <View style={[styles.cardAttribute, { minWidth: "22%" }]}>
           <MaterialCommunityIcons
             name="wallet-giftcard"
@@ -49,21 +59,7 @@ export default function Giftcard({ giftcard }: { giftcard: GiftcardType }) {
             {giftcard.end_date.toDate().toLocaleDateString()}
           </Text>
         </View>
-        <View style={styles.buttonContainer}>
-          <Pressable style={styles.spendButton}>
-            <MaterialCommunityIcons name="minus" style={styles.spendIcon} />
-          </Pressable>
-          <Pressable
-            style={styles.deleteButton}
-            onPress={() => setUseGiftcardModal(true)}
-          >
-            <MaterialCommunityIcons
-              name="check-bold"
-              style={styles.deleteIcon}
-            />
-          </Pressable>
-        </View>
-      </View>
+      </Surface>
 
       {/* Use Paper's Dialog for better UX */}
       <Portal>
@@ -73,23 +69,31 @@ export default function Giftcard({ giftcard }: { giftcard: GiftcardType }) {
         >
           <Dialog.Title>Käytä lahjakortti</Dialog.Title>
           <Dialog.Content>
-            <Text>
-              Haluatko varmasti käyttää lahjakortin "{giftcard.id}" arvolla{" "}
-              {giftcard.value}€?
+            <Text style={styles.dialogText}>
+              Haluatko varmasti käyttää lahjakortin{" "}
+              <Text style={styles.valueHighlight}>{giftcard.id}</Text> arvolla{" "}
+              <Text style={styles.valueHighlight}>{giftcard.value}€</Text>?
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setUseGiftcardModal(false)}>Peruuta</Button>
+            <Button
+              onPress={() => setUseGiftcardModal(false)}
+              style={styles.actionButton}
+              labelStyle={{ fontSize: 16, color: ThemeColors.text }}
+              children="Peruuta"
+            />
             <Button
               mode="contained"
               onPress={() => {
-                // TODO: Implement giftcard usage logic
-                console.log(`Using giftcard: ${giftcard.id}`);
+                useGiftcard(giftcard.id);
                 setUseGiftcardModal(false);
+                onUse();
               }}
-            >
-              Käytä
-            </Button>
+              style={styles.actionButton}
+              contentStyle={{ backgroundColor: "green" }}
+              labelStyle={{ fontSize: 16 }}
+              children="Käytä"
+            />
           </Dialog.Actions>
         </Dialog>
       </Portal>

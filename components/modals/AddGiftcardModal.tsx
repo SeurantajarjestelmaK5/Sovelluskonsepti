@@ -1,14 +1,14 @@
 import { useThemeColors } from "@/constants/ThemeColors";
 import { useMemo, useEffect, useState } from "react";
-import { Modal, View, Text, Pressable, TextInput } from "react-native";
+import { Modal, View, Text, Pressable } from "react-native";
 import {
-  AddGiftcard,
+  addGiftcard,
   findNextGiftcardId,
   GiftcardType,
 } from "@/components/functions/GiftcardFunctions";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button } from "react-native-paper";
+import { Button, TextInput } from "react-native-paper";
 import { Timestamp } from "firebase/firestore";
 
 interface AddGiftcardModalProps {
@@ -26,7 +26,7 @@ export default function AddGiftcardModal({
   const styles = useMemo(() => getGiftcardStyles(ThemeColors), [ThemeColors]);
   const [activeTab, setActiveTab] = useState<"new" | "existing">("new");
   const [newGiftcardId, setNewGiftcardId] = useState("");
-  const [newGiftcardValue, setNewGiftcardValue] = useState<number | "">("");
+  const [newGiftcardValue, setNewGiftcardValue] = useState<string>("");
   const [newGiftcardCreated, setNewGiftcardCreated] = useState<Date | null>(
     null
   );
@@ -37,6 +37,7 @@ export default function AddGiftcardModal({
       setActiveTab("new");
       setGiftcardDates();
       findGiftcardId();
+      setNewGiftcardValue("");
     }
   }, [visible]);
 
@@ -56,6 +57,12 @@ export default function AddGiftcardModal({
     setNewGiftcardValid(validDate);
   };
 
+  const validateNumericInput = (text: string) => {
+    // Allow empty string, numbers, and one decimal point
+    const numericRegex = /^[0-9]*\.?[0-9]*$/;
+    return numericRegex.test(text);
+  };
+
   const handleSubmit = async () => {
     if (isNewGiftcard) {
       if (
@@ -67,16 +74,14 @@ export default function AddGiftcardModal({
         return;
       }
       try {
-        await AddGiftcard(
-          {
-            id: newGiftcardId,
-            value: Number(newGiftcardValue),
-            start_date: Timestamp.fromDate(newGiftcardCreated),
-            end_date: Timestamp.fromDate(newGiftcardValid),
-            expired: false,
-            used: false,
-          },
-        );
+        await addGiftcard({
+          id: newGiftcardId,
+          value: Number(newGiftcardValue),
+          start_date: Timestamp.fromDate(newGiftcardCreated),
+          end_date: Timestamp.fromDate(newGiftcardValid),
+          expired: false,
+          used: false,
+        });
 
         setNewGiftcardId("");
         setNewGiftcardValue("");
@@ -158,51 +163,47 @@ export default function AddGiftcardModal({
           {isNewGiftcard ? (
             // New giftcard form
             <View style={styles.formContainer}>
-              <Text style={styles.formLabel}>Lahjakortin numero</Text>
               <TextInput
-                style={styles.textInput}
+                mode="outlined"
+                label="Lahjakortin numero"
                 placeholder="Lahjakortin ID"
-                placeholderTextColor={ThemeColors.text + "80"}
                 value={newGiftcardId}
+                error={newGiftcardId === "" || newGiftcardId === null}
+                style={styles.textInput}
+                outlineColor={ThemeColors.navDefault}
+                activeOutlineColor={ThemeColors.tint}
+                onChangeText={(text) => setNewGiftcardId(text)}
               />
-              <Text style={styles.formLabel}>Lahjakortin arvo (€)</Text>
               <TextInput
-                style={[
-                  styles.textInput,
-                  {
-                    borderColor:
-                      newGiftcardValue === "" || newGiftcardValue === null
-                        ? "red"
-                        : ThemeColors.navDefault,
-                  },
-                ]}
+                mode="outlined"
+                label="Lahjakortin arvo (€)"
                 placeholder="Arvo (€)"
-                placeholderTextColor={ThemeColors.text + "80"}
+                value={newGiftcardValue}
+                error={newGiftcardValue === "" || newGiftcardValue === null}
+                style={styles.textInput}
+                outlineColor={ThemeColors.navDefault}
+                activeOutlineColor={ThemeColors.tint}
                 keyboardType="numeric"
-                value={newGiftcardValue.toString()}
-                onChangeText={(text) =>
-                  setNewGiftcardValue(text === "" ? "" : Number(text))
-                }
+                onChangeText={(text) => {
+                  if (validateNumericInput(text)) {
+                    setNewGiftcardValue(text);
+                  }
+                }}
               />
-              <Text style={styles.formLabel}>Lahjakortti luotu</Text>
               <TextInput
-                style={[
-                  styles.textInput,
-                  {
-                    borderColor:
-                      newGiftcardCreated === null
-                        ? "red"
-                        : ThemeColors.navDefault,
-                  },
-                ]}
+                mode="outlined"
+                label="Lahjakortti luotu"
                 placeholder="Luotu"
-                placeholderTextColor={ThemeColors.text + "80"}
-                keyboardType="numeric"
                 value={
                   newGiftcardCreated
                     ? newGiftcardCreated.toLocaleDateString()
                     : ""
                 }
+                error={newGiftcardCreated === null}
+                style={styles.textInput}
+                outlineColor={ThemeColors.navDefault}
+                activeOutlineColor={ThemeColors.tint}
+                keyboardType="numeric"
                 onChangeText={(text) => {
                   const date = new Date(text);
                   if (!isNaN(date.getTime())) {
@@ -210,23 +211,18 @@ export default function AddGiftcardModal({
                   }
                 }}
               />
-              <Text style={styles.formLabel}>Lahjakortti voimassa</Text>
               <TextInput
-                style={[
-                  styles.textInput,
-                  {
-                    borderColor:
-                      newGiftcardValid === null
-                        ? "red"
-                        : ThemeColors.navDefault,
-                  },
-                ]}
+                mode="outlined"
+                label="Lahjakortti voimassa"
                 placeholder="Voimassa"
-                placeholderTextColor={ThemeColors.text + "80"}
-                keyboardType="numeric"
                 value={
                   newGiftcardValid ? newGiftcardValid.toLocaleDateString() : ""
                 }
+                error={newGiftcardValid === null}
+                style={styles.textInput}
+                outlineColor={ThemeColors.navDefault}
+                activeOutlineColor={ThemeColors.tint}
+                keyboardType="numeric"
                 onChangeText={(text) => {
                   const date = new Date(text);
                   if (!isNaN(date.getTime())) {
@@ -241,19 +237,23 @@ export default function AddGiftcardModal({
           ) : (
             // Existing giftcard form
             <View style={styles.formContainer}>
-              <Text style={styles.formLabel}>
-                Lisää aiemmin myyty lahjakortti
-              </Text>
               <TextInput
-                style={styles.textInput}
+                mode="outlined"
+                label="Lisää aiemmin myyty lahjakortti"
                 placeholder="Lahjakortin ID"
-                placeholderTextColor={ThemeColors.text + "80"}
+                style={styles.textInput}
+                outlineColor={ThemeColors.navDefault}
+                activeOutlineColor={ThemeColors.tint}
+                onChangeText={(text) => setNewGiftcardId(text)}
               />
               <TextInput
-                style={styles.textInput}
+                mode="outlined"
+                label="Arvo (€)"
                 placeholder="Arvo (€)"
-                placeholderTextColor={ThemeColors.text + "80"}
-                keyboardType="numeric"
+                style={styles.textInput}
+                outlineColor={ThemeColors.navDefault}
+                activeOutlineColor={ThemeColors.tint}
+                keyboardType="decimal-pad"
               />
             </View>
           )}
@@ -264,7 +264,7 @@ export default function AddGiftcardModal({
           <Button
             mode="outlined"
             onPress={onClose}
-            style={[styles.modalButton, styles.cancelButton]}
+            style={[styles.modalButton, { borderColor: "transparent" }]}
             labelStyle={styles.buttonLabel}
           >
             Peruuta
