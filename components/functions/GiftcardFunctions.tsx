@@ -88,3 +88,17 @@ export const useGiftcard = async (id: string): Promise<void> => {
     throw error;
   }
 };
+
+export const spendGiftcard = async (id: string, amount: string): Promise<void> => {
+  const giftcardDocRef = doc(db, "lahjakortit", id);
+  const snapshot = await getDoc(giftcardDocRef);
+  if (snapshot.exists()) {
+    await updateDoc(giftcardDocRef, { value: snapshot.data().value - Number(amount) });
+  }
+};
+
+export const checkExistingGiftcard = async (id: string): Promise<boolean> => {
+  const giftcardDocRef = doc(db, "lahjakortit", id);
+  const snapshot = await getDoc(giftcardDocRef);
+  return snapshot.exists();
+};

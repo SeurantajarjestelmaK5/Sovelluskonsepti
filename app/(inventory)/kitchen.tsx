@@ -236,11 +236,16 @@ export default function Diningroom() {
     // Copy previous month's data to new month
     prevMonthSnapshot.forEach(async (item) => {
       const itemData = item.data();
+      const calculatedYhteishinta = itemData.Hinta * itemData.Määrä;
+      const calculatedAlv0 = +(
+        calculatedYhteishinta /
+        (1 + itemData.Alv / 100)
+      ).toFixed(2);
       const newItemData = {
         ...itemData,
         Määrä: itemData.Määrä,
-        Yhteishinta: 0,
-        Alv0: 0 / (1 + itemData.Alv / 100),
+        Yhteishinta: calculatedYhteishinta,
+        Alv0: calculatedAlv0,
         Hinta: itemData.Hinta,
       };
       const newDocRef = doc(db, "inventaario", month, "keittiö", item.id);
@@ -252,10 +257,55 @@ export default function Diningroom() {
 
   /** INVENTAARION FUNKTIOT ALKAA */
 
+  const fixExistingYhteishinta = async (date: string) => {
+    try {
+      const inventoryRef = collection(db, "inventaario", date, "keittiö");
+      const querySnapshot = await getDocs(inventoryRef);
+
+      const updatePromises: Promise<void>[] = [];
+
+      querySnapshot.forEach((docSnapshot) => {
+        const data = docSnapshot.data() as InventoryItem;
+        // Fix items where Yhteishinta is 0 but Hinta and Määrä are valid
+        if (data.Yhteishinta === 0 && data.Hinta > 0 && data.Määrä > 0) {
+          const correctYhteishinta = data.Hinta * data.Määrä;
+          const correctAlv0 = +(
+            correctYhteishinta /
+            (1 + data.Alv / 100)
+          ).toFixed(2);
+
+          const docRef = doc(
+            db,
+            "inventaario",
+            date,
+            "keittiö",
+            docSnapshot.id
+          );
+          updatePromises.push(
+            updateDoc(docRef, {
+              Yhteishinta: correctYhteishinta,
+              Alv0: correctAlv0,
+            })
+          );
+        }
+      });
+
+      if (updatePromises.length > 0) {
+        await Promise.all(updatePromises);
+        console.log(
+          `Fixed ${updatePromises.length} items with incorrect Yhteishinta`
+        );
+      }
+    } catch (error) {
+      console.error("Error fixing existing Yhteishinta values:", error);
+    }
+  };
+
   const fetchInventory = async (date: string) => {
     try {
       setIsLoading(true);
       await checkOrCreateMonth(date);
+      await fixExistingYhteishinta(date); // Fix existing data
 
       const inventoryRef = collection(db, "inventaario", date, "keittiö");
       const querySnapshot = await getDocs(inventoryRef);

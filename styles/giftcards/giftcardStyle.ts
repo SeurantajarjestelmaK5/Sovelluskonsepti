@@ -27,17 +27,19 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     buttonContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
+      maxWidth: "15%",
       minWidth: "15%",
     },
     giftcard: {
       width: "100%",
       flexDirection: "row",
-      justifyContent: "space-evenly",
+      justifyContent: "space-between",
       alignItems: "center",
       minHeight: 80,
       backgroundColor: ThemeColors.navDefault,
       borderRadius: 10,
       marginBottom: 10,
+      paddingHorizontal: 10,
     },
     cardAttribute: {
       flexDirection: "column",
@@ -124,6 +126,18 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     textInput: {
       marginBottom: 15,
     },
+    amountInput: {
+      width: "80%",
+      textAlign: "center",
+      marginHorizontal: 10,
+    },
+    amountInputContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "15%",
+      marginVertical: 10,
+    },
     helpText: {
       fontSize: 14,
       color: ThemeColors.text,
@@ -155,6 +169,12 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
       backgroundColor: ThemeColors.background,
       padding: 20,
       borderRadius: 10,
+    },
+    spendAmountInput: {
+      marginVertical: 15,
+      width: "30%",
+      alignSelf: "center",
+      textAlign: "center",
     },
     // Tab styles
     tabContainer: {
@@ -203,5 +223,9 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
       borderRadius: 20,
       width: "20%",
       color: "white",
+    },
+    helperText: {
+      fontSize: 16,
+      color: "red",
     },
   });

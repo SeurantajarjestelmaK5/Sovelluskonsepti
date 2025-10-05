@@ -50,7 +50,7 @@ export default function GiftcardsHome() {
   }, []);
 
   useEffect(() => {
-    if (!modalVisible && allGiftcards.length > 0) {
+    if (!modalVisible) {
       fetchGiftcards();
     }
   }, [modalVisible]);
@@ -108,13 +108,19 @@ export default function GiftcardsHome() {
       ) : (
         <FlatList
           data={giftcards}
-          renderItem={({ item }) => <Giftcard giftcard={item} onUse={fetchGiftcards} />}
+          renderItem={({ item }) => (
+            <Giftcard giftcard={item} onUse={fetchGiftcards} />
+          )}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
           style={{ width: "95%", marginTop: 20, marginHorizontal: "auto" }}
         />
       )}
-      <AddGiftcardModal visible={modalVisible} onClose={closeModal} />
+      <AddGiftcardModal
+        visible={modalVisible}
+        onClose={closeModal}
+        onGiftcardAdded={fetchGiftcards}
+      />
     </View>
   );
 }

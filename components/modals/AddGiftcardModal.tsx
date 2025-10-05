@@ -5,21 +5,24 @@ import {
   addGiftcard,
   findNextGiftcardId,
   GiftcardType,
+  checkExistingGiftcard,
 } from "@/components/functions/GiftcardFunctions";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button, TextInput } from "react-native-paper";
+import { Button, IconButton, TextInput } from "react-native-paper";
 import { Timestamp } from "firebase/firestore";
 
 interface AddGiftcardModalProps {
   visible: boolean;
   onClose: () => void;
+  onGiftcardAdded?: () => void;
   giftcard?: GiftcardType;
 }
 
 export default function AddGiftcardModal({
   visible,
   onClose,
+  onGiftcardAdded,
   giftcard,
 }: AddGiftcardModalProps) {
   const ThemeColors = useThemeColors();
@@ -31,6 +34,7 @@ export default function AddGiftcardModal({
     null
   );
   const [newGiftcardValid, setNewGiftcardValid] = useState<Date | null>(null);
+  const [amountOfGiftcards, setAmountOfGiftcards] = useState<number>(1);
 
   useEffect(() => {
     if (visible) {
@@ -63,6 +67,14 @@ export default function AddGiftcardModal({
     return numericRegex.test(text);
   };
 
+  const isIdNumeric = () => {
+    return (
+      newGiftcardId !== "" &&
+      !isNaN(Number(newGiftcardId)) &&
+      Number.isInteger(Number(newGiftcardId))
+    );
+  };
+
   const handleSubmit = async () => {
     if (isNewGiftcard) {
       if (
@@ -73,20 +85,79 @@ export default function AddGiftcardModal({
       ) {
         return;
       }
-      try {
-        await addGiftcard({
-          id: newGiftcardId,
-          value: Number(newGiftcardValue),
-          start_date: Timestamp.fromDate(newGiftcardCreated),
-          end_date: Timestamp.fromDate(newGiftcardValid),
-          expired: false,
-          used: false,
-        });
 
+      try {
+        // Only allow multiple giftcards if ID is numeric
+        const effectiveAmount = isIdNumeric() ? amountOfGiftcards : 1;
+
+        // Check if any of the giftcard IDs already exist
+        const existingIds: string[] = [];
+
+        if (isIdNumeric()) {
+          // For numeric IDs, check sequential IDs
+          const baseId = parseInt(newGiftcardId);
+          for (let i = 0; i < effectiveAmount; i++) {
+            const checkId = (baseId + i).toString();
+            const exists = await checkExistingGiftcard(checkId);
+            if (exists) {
+              existingIds.push(checkId);
+            }
+          }
+        } else {
+          // For non-numeric IDs, just check the single ID
+          const exists = await checkExistingGiftcard(newGiftcardId);
+          if (exists) {
+            existingIds.push(newGiftcardId);
+          }
+        }
+
+        // If any IDs exist, show error and return
+        if (existingIds.length > 0) {
+          console.error(
+            `Giftcard IDs already exist: ${existingIds.join(", ")}`
+          );
+          // You could show an alert here instead of just logging
+          return;
+        }
+
+        // Create giftcards based on amount and ID type
+        if (isIdNumeric() && effectiveAmount > 1) {
+          // Create multiple giftcards with sequential IDs
+          const baseId = parseInt(newGiftcardId);
+          for (let i = 0; i < effectiveAmount; i++) {
+            await addGiftcard({
+              id: (baseId + i).toString(),
+              value: Number(newGiftcardValue),
+              start_date: Timestamp.fromDate(newGiftcardCreated),
+              end_date: Timestamp.fromDate(newGiftcardValid),
+              expired: false,
+              used: false,
+            });
+          }
+        } else {
+          // Create single giftcard with exact ID
+          await addGiftcard({
+            id: newGiftcardId,
+            value: Number(newGiftcardValue),
+            start_date: Timestamp.fromDate(newGiftcardCreated),
+            end_date: Timestamp.fromDate(newGiftcardValid),
+            expired: false,
+            used: false,
+          });
+        }
+
+        // Reset form and close modal
         setNewGiftcardId("");
         setNewGiftcardValue("");
         setNewGiftcardCreated(null);
         setNewGiftcardValid(null);
+        setAmountOfGiftcards(1);
+
+        // Notify parent component that giftcards were added
+        if (onGiftcardAdded) {
+          onGiftcardAdded();
+        }
+
         onClose();
       } catch (error) {
         console.error("Failed to add giftcard:", error);
@@ -230,8 +301,48 @@ export default function AddGiftcardModal({
                   }
                 }}
               />
+              <View style={styles.amountInputContainer}>
+                <IconButton
+                  icon="minus"
+                  size={26}
+                  disabled={!isIdNumeric()}
+                  onPress={() =>
+                    setAmountOfGiftcards(Math.max(1, amountOfGiftcards - 1))
+                  }
+                />
+                <TextInput
+                  mode="outlined"
+                  label="Määrä"
+                  placeholder="Määrä"
+                  keyboardType="numeric"
+                  value={amountOfGiftcards.toString()}
+                  style={[
+                    styles.amountInput,
+                    !isIdNumeric() && { opacity: 0.5 },
+                  ]}
+                  outlineColor={ThemeColors.navDefault}
+                  activeOutlineColor={ThemeColors.tint}
+                  editable={isIdNumeric()}
+                  onChangeText={(text) => {
+                    if (isIdNumeric()) {
+                      const num = parseInt(text);
+                      if (!isNaN(num) && num > 0) {
+                        setAmountOfGiftcards(num);
+                      }
+                    }
+                  }}
+                />
+                <IconButton
+                  icon="plus"
+                  size={26}
+                  disabled={!isIdNumeric()}
+                  onPress={() => setAmountOfGiftcards(amountOfGiftcards + 1)}
+                />
+              </View>
               <Text style={styles.helpText}>
                 Uusi lahjakortti luodaan järjestelmään
+                {!isIdNumeric() &&
+                  " (Määrä-kenttä käytettävissä vain numeerisilla ID:illä)"}
               </Text>
             </View>
           ) : (
@@ -265,7 +376,7 @@ export default function AddGiftcardModal({
             mode="outlined"
             onPress={onClose}
             style={[styles.modalButton, { borderColor: "transparent" }]}
-            labelStyle={styles.buttonLabel}
+            labelStyle={[styles.buttonLabel, { color: ThemeColors.text }]}
           >
             Peruuta
           </Button>
@@ -275,7 +386,7 @@ export default function AddGiftcardModal({
             style={[styles.modalButton, styles.submitButton]}
             labelStyle={styles.buttonLabel}
           >
-            {isNewGiftcard ? "Luo lahjakortti" : "Lisää lahjakortti"}
+            {amountOfGiftcards > 1 ? "Lisää lahjakortit" : "Lisää lahjakortti"}
           </Button>
         </View>
       </View>
