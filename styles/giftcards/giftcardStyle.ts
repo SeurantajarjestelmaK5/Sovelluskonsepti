@@ -54,7 +54,7 @@ export const getGiftcardStyles = (ThemeColors: ThemeColors) =>
     attributeIcon: {
       fontSize: 28,
       marginBottom: 5,
-      color: ThemeColors.tint,
+      color: ThemeColors.text,
     },
     deleteButton: {
       padding: 5,

@@ -263,7 +263,7 @@ export default function TabsLayout() {
             }}
           />
           <Tabs.Screen
-            name="(giftcards)/index"
+            name="(giftcards)"
             options={{
               title: "Lahjakortit",
               tabBarIcon: ({ color }) => (
