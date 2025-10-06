@@ -65,6 +65,12 @@ export default function WasteButton({
     }
   }, [wasteModal]);
 
+  const validateNumericInput = (text: string) => {
+    // Allow empty string, numbers, and one decimal point
+    const numericRegex = /^[0-9]*\.?[0-9]*$/;
+    return numericRegex.test(text);
+  };
+
   const submitEditing = async () => {
     setWasteModal(false);
     if (modalType === "plus") {
@@ -139,11 +145,17 @@ export default function WasteButton({
                   ref={inputRef}
                   mode="outlined"
                   style={styles.wasteInput}
+                  textColor="black"
                   placeholder="Määrä"
                   keyboardType="numeric"
                   activeOutlineColor={ThemeColors.tint}
-                  onChangeText={(text) => setWasteAmount(Number(text))}
+                  onChangeText={(text) => {
+                    if (validateNumericInput(text)) {
+                      setWasteAmount(Number(text));
+                    }
+                  }}
                   onSubmitEditing={submitEditing}
+                  value={wasteAmount.toString()}
                 />
               </View>
             </TouchableWithoutFeedback>

@@ -99,6 +99,7 @@ export const getWasteStyles = (ThemeColors: ThemeColors) =>
       width: "100%",
       marginBottom: 15,
       backgroundColor: "white",
+      color: "black",
     },
     wasteTotal: {
       justifyContent: "space-between",
