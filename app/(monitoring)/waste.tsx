@@ -46,6 +46,7 @@ export default function waste() {
   const [showInKilograms, setShowInKilograms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   const [calendarDate, setCalendarDate] = useState<string>("");
   const [date, setDate] = useState<string>("");
@@ -112,6 +113,26 @@ export default function waste() {
 
   useEffect(() => {
     getCurrentDate();
+  }, []);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setIsKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setIsKeyboardVisible(false);
+      }
+    );
+
+    return () => {
+      keyboardDidHideListener?.remove();
+      keyboardDidShowListener?.remove();
+    };
   }, []);
 
   const navigationHandler = (iconPressed: string) => {
@@ -455,7 +476,7 @@ export default function waste() {
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
 
-      {!isSmallScreen && (
+      {!isSmallScreen && !isKeyboardVisible && (
         <View style={styles.totalsContainer}>
           <Text style={styles.totalsTitle}>Kuukausi yhteensä:</Text>
           <View style={styles.totalsRow}>
@@ -484,9 +505,11 @@ export default function waste() {
         </View>
       )}
 
-      <View style={styles.buttonContainer}>
-        <BackButton />
-      </View>
+      {!isKeyboardVisible && (
+        <View style={styles.buttonContainer}>
+          <BackButton />
+        </View>
+      )}
     </View>
   );
 }
