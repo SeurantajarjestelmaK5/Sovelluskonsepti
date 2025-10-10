@@ -71,27 +71,51 @@ export default function WasteButton({
     return numericRegex.test(text);
   };
 
-  const submitEditing = async () => {
-    setWasteModal(false);
-    if (modalType === "plus") {
-      await WasteFunctions.AddWaste(
-        wasteName,
-        date.month,
-        date.year,
-        date.day,
-        wasteAmount
-      );
-    } else {
-      await WasteFunctions.RemoveWaste(
-        wasteName,
-        date.month,
-        date.year,
-        date.day,
-        wasteAmount
-      );
-    }
+  const removHandler = async () => {
+    await WasteFunctions.RemoveWaste(
+      wasteName,
+      date.month,
+      date.year,
+      date.day,
+      wasteAmount
+    );
     addWaste();
+    setWasteAmount(0);
   };
+  const addHandler = async () => {
+    await WasteFunctions.AddWaste(
+      wasteName,
+      date.month,
+      date.year,
+      date.day,
+      wasteAmount
+    );
+    addWaste();
+    setWasteAmount(0);
+  };
+
+  // const submitEditing = async () => {
+  //   setWasteModal(false);
+  //   if (modalType === "plus") {
+  //     await WasteFunctions.AddWaste(
+  //       wasteName,
+  //       date.month,
+  //       date.year,
+  //       date.day,
+  //       wasteAmount
+  //     );
+  //   } else {
+  //     await WasteFunctions.RemoveWaste(
+  //       wasteName,
+  //       date.month,
+  //       date.year,
+  //       date.day,
+  //       wasteAmount
+  //     );
+  //   }
+  //   addWaste();
+  //   setWasteAmount(0);
+  // };
 
   return (
     <View key={data.id} style={styles.wasteContainer}>
@@ -105,34 +129,44 @@ export default function WasteButton({
           </Text>
         )}
       </View>
-      <TouchableRipple hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
+      <TouchableRipple hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }} >
         <MaterialCommunityIcons
           name="minus"
           size={37}
           color={ThemeColors.tint}
           onPress={() => {
-            setModalType("minus");
-            showModal(wasteName);
+            removHandler();
           }}
         />
       </TouchableRipple>
+      <TextInput
+        ref={inputRef}
+        mode="outlined"
+        style={styles.wasteInput}
+        textColor="black"
+        placeholder="Määrä"
+        keyboardType="numeric"
+        activeOutlineColor={ThemeColors.tint}
+        onChangeText={(text) => {
+          if (validateNumericInput(text)) {
+            setWasteAmount(Number(text));
+          }
+        }}
+        onSubmitEditing={addHandler}
+        value={wasteAmount.toString()}
+      />
       <TouchableRipple hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
         <MaterialCommunityIcons
           name="plus"
           size={37}
           color={ThemeColors.tint}
           onPress={() => {
-            setModalType("plus");
-            showModal(wasteName);
+            addHandler();
           }}
         />
       </TouchableRipple>
 
-      <Modal
-        visible={wasteModal}
-        animationType="slide"
-        transparent={true}
-      >
+      {/* <Modal visible={wasteModal} animationType="slide" transparent={true}>
         <TouchableWithoutFeedback onPress={() => setWasteModal(false)}>
           <View style={styles.wasteModalContainer}>
             <TouchableWithoutFeedback>
@@ -161,7 +195,7 @@ export default function WasteButton({
             </TouchableWithoutFeedback>
           </View>
         </TouchableWithoutFeedback>
-      </Modal>
+      </Modal> */}
     </View>
   );
 }

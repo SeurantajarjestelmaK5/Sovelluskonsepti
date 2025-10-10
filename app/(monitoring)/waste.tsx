@@ -258,62 +258,60 @@ export default function waste() {
   }, [month, year, date]);
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // Adjust this offset based on headers
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <Text style={styles.header}>Jätteet</Text>
-          <View style={styles.navigationContainer}>
-            <Pressable hitSlop={30} onPress={() => navigationHandler("left")}>
-              <MaterialCommunityIcons
-                name="chevron-left"
-                size={35}
-                color={ThemeColors.tint}
+    <View style={styles.container}>
+      <Text style={styles.header}>Jätteet</Text>
+      <View style={styles.navigationContainer}>
+        <Pressable hitSlop={30} onPress={() => navigationHandler("left")}>
+          <MaterialCommunityIcons
+            name="chevron-left"
+            size={35}
+            color={ThemeColors.tint}
+          />
+        </Pressable>
+        <Pressable
+          style={styles.calendar}
+          onPress={() => setCalendarModal(!calendarModal)}
+        >
+          <Text style={styles.text}>{calendarDate}</Text>
+          <MaterialCommunityIcons
+            name="calendar"
+            size={35}
+            color={ThemeColors.tint}
+          />
+        </Pressable>
+        <Pressable hitSlop={30} onPress={() => navigationHandler("right")}>
+          <MaterialCommunityIcons
+            name="chevron-right"
+            size={35}
+            color={ThemeColors.tint}
+          />
+        </Pressable>
+      </View>
+      {calendarModal && (
+        <Modal
+          visible={calendarModal}
+          animationType="slide"
+          transparent={true}
+          onDismiss={() => setCalendarModal(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
+            <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}>
+              <CalendarComponent
+                onDayPress={handleDatePress}
+                dataDates={dateList}
+                selectedDate={selectedDate}
               />
-            </Pressable>
-            <Pressable
-              style={styles.calendar}
-              onPress={() => setCalendarModal(!calendarModal)}
-            >
-              <Text style={styles.text}>{calendarDate}</Text>
-              <MaterialCommunityIcons
-                name="calendar"
-                size={35}
-                color={ThemeColors.tint}
-              />
-            </Pressable>
-            <Pressable hitSlop={30} onPress={() => navigationHandler("right")}>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={35}
-                color={ThemeColors.tint}
-              />
-            </Pressable>
-          </View>
-          {calendarModal && (
-            <Modal
-              visible={calendarModal}
-              animationType="slide"
-              transparent={true}
-              onDismiss={() => setCalendarModal(false)}
-            >
-              <TouchableWithoutFeedback onPress={() => setCalendarModal(false)}>
-                <View
-                  style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-                >
-                  <CalendarComponent
-                    onDayPress={handleDatePress}
-                    dataDates={dateList}
-                    selectedDate={selectedDate}
-                  />
-                </View>
-              </TouchableWithoutFeedback>
-            </Modal>
-          )}
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      )}
 
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View style={styles.content}>
             {(bioData.length > 0
               ? bioData
@@ -454,37 +452,41 @@ export default function waste() {
               />
             ))}
           </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
 
-          {!isSmallScreen && (
-            <View>
-              <Text style={{ ...styles.text }}>Kuukausi yhteensä:</Text>
-              {Object.entries(monthTotals).map(([wasteType, total]) => (
-                <Text key={wasteType} style={{ ...styles.text }}>
-                  {wasteType}:{" "}
-                  {showInKilograms
-                    ? ((total as number) / 1000).toFixed(2)
-                    : (total as number)}{" "}
-                  {showInKilograms ? "kg" : "g"}
-                </Text>
-              ))}
-              <Button
-                children={`Näytä ${showInKilograms ? "grammoina" : "kiloina"}`}
-                icon={() => (
-                  <MaterialCommunityIcons name="scale-balance" size={20} />
-                )}
-                contentStyle={{ flexDirection: "row-reverse" }}
-                mode="contained"
-                buttonColor={ThemeColors.tint}
-                onPress={() => setShowInKilograms((prev) => !prev)}
-              />
-            </View>
-          )}
-
-          <View style={styles.buttonContainer}>
-            <BackButton />
+      {!isSmallScreen && (
+        <View style={styles.totalsContainer}>
+          <Text style={styles.totalsTitle}>Kuukausi yhteensä:</Text>
+          <View style={styles.totalsRow}>
+            {Object.entries(monthTotals).map(([wasteType, total]) => (
+              <Text key={wasteType} style={styles.totalsText}>
+                {wasteType}:{" "}
+                {showInKilograms
+                  ? ((total as number) / 1000).toFixed(2)
+                  : (total as number)}{" "}
+                {showInKilograms ? "kg" : "g"}
+              </Text>
+            ))}
+          </View>
+          <View style={styles.totalsButtonContainer}>
+            <Button
+              children={`Näytä ${showInKilograms ? "grammoina" : "kiloina"}`}
+              icon={() => (
+                <MaterialCommunityIcons name="scale-balance" size={20} />
+              )}
+              contentStyle={{ flexDirection: "row-reverse" }}
+              mode="contained"
+              buttonColor={ThemeColors.tint}
+              onPress={() => setShowInKilograms((prev) => !prev)}
+            />
           </View>
         </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      )}
+
+      <View style={styles.buttonContainer}>
+        <BackButton />
+      </View>
+    </View>
   );
 }
