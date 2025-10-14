@@ -132,6 +132,7 @@ export default function AddGiftcardModal({
               end_date: Timestamp.fromDate(newGiftcardValid),
               expired: false,
               used: false,
+              removed: false,
             });
           }
         } else {
@@ -143,6 +144,7 @@ export default function AddGiftcardModal({
             end_date: Timestamp.fromDate(newGiftcardValid),
             expired: false,
             used: false,
+            removed: false,
           });
         }
 

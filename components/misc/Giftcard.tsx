@@ -2,8 +2,9 @@ import {
   GiftcardType,
   useGiftcard,
   spendGiftcard,
+  setExpiredGiftcard,
 } from "@/components/functions/GiftcardFunctions";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { View, Text, Pressable } from "react-native";
 import { useThemeColors } from "@/constants/ThemeColors";
 import { getGiftcardStyles } from "@/styles/giftcards/giftcardStyle";
@@ -31,12 +32,28 @@ export default function Giftcard({
   const [spendAmountModal, setSpendAmountModal] = useState(false);
   const [spendAmount, setSpendAmount] = useState("");
   const [helperText, setHelperText] = useState("");
+  const [expired, setExpired] = useState(false);
 
   const validateNumericInput = (text: string) => {
     // Allow empty string, numbers, and one decimal point
     const numericRegex = /^[0-9]*\.?[0-9]*$/;
     return numericRegex.test(text);
   };
+
+  const checkExpiration = () => {
+    const currentDate = new Date();
+    const giftcardDate = giftcard.end_date.toDate();
+    if (currentDate > giftcardDate) {
+      setExpiredGiftcard(giftcard.id);
+      setExpired(true);
+    }
+    return;
+  };
+
+  useEffect(() => {
+    checkExpiration();
+  }, []);
+
   const closeSpendAmountModal = () => {
     setSpendAmountModal(false);
     setHelperText("");
@@ -61,16 +78,25 @@ export default function Giftcard({
       <Surface style={styles.giftcard} elevation={1}>
         <View style={styles.buttonContainer}>
           <Pressable
-            style={styles.deleteButton}
+            style={[
+              styles.deleteButton,
+              {
+                backgroundColor: expired ? "red" : "green",
+                borderColor: expired ? "red" : "green",
+              },
+            ]}
             onPress={() => setUseGiftcardModal(true)}
           >
             <MaterialCommunityIcons
-              name="check-bold"
+              name={expired ? "calendar-remove" : "check-bold"}
               style={styles.deleteIcon}
             />
           </Pressable>
           <Pressable
-            style={styles.spendButton}
+            style={[
+              styles.spendButton,
+              { display: expired ? "none" : "flex" },
+            ]}
             onPress={() => setSpendAmountModal(true)}
           >
             <MaterialCommunityIcons name="minus" style={styles.spendIcon} />
@@ -118,13 +144,27 @@ export default function Giftcard({
           visible={useGiftcardModal}
           onDismiss={() => setUseGiftcardModal(false)}
         >
-          <Dialog.Title>Käytä lahjakortti</Dialog.Title>
+          <Dialog.Title>
+            {expired
+              ? "Lahjakortti on erääntynyt"
+              : "Käytä lahjakortti"}
+          </Dialog.Title>
           <Dialog.Content>
-            <Text style={styles.dialogText}>
-              Haluatko varmasti käyttää lahjakortin{" "}
-              <Text style={styles.valueHighlight}>{giftcard.id}</Text> arvolla{" "}
-              <Text style={styles.valueHighlight}>{giftcard.value}€</Text>?
-            </Text>
+            {expired ? (
+              <Text style={styles.dialogText}>
+                Haluatko poistaa lahjakortin{" "}
+                <Text style={[styles.valueHighlight, { color: "red" }]}>
+                  {giftcard.id}
+                </Text>
+                ?
+              </Text>
+            ) : (
+              <Text style={styles.dialogText}>
+                Haluatko varmasti käyttää lahjakortin{" "}
+                <Text style={styles.valueHighlight}>{giftcard.id}</Text> arvolla{" "}
+                <Text style={styles.valueHighlight}>{giftcard.value}€</Text>?
+              </Text>
+            )}
           </Dialog.Content>
           <Dialog.Actions>
             <Button
@@ -137,7 +177,7 @@ export default function Giftcard({
               mode="contained"
               onPress={async () => {
                 try {
-                  await useGiftcard(giftcard.id);
+                  await useGiftcard(giftcard.id, expired);
                   setUseGiftcardModal(false);
                   onUse();
                 } catch (error) {
@@ -146,9 +186,11 @@ export default function Giftcard({
                 }
               }}
               style={styles.actionButton}
-              contentStyle={{ backgroundColor: "green" }}
+              contentStyle={{
+                backgroundColor: expired ? "red" : "green",
+              }}
               labelStyle={{ fontSize: 16 }}
-              children="Käytä"
+              children={expired ? "Poista" : "Käytä"}
             />
           </Dialog.Actions>
         </Dialog>

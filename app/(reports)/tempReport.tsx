@@ -19,10 +19,6 @@ export default function sampleReport() {
       <View style={styles.buttonContainer}>
         <BackButton />
       </View>
-
-      <View>
-        <Text>asdasdasdasdasdasdasdasdasdasdads</Text>
-      </View>
     </View>
   );
 }

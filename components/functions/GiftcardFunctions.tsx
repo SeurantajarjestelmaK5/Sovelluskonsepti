@@ -21,6 +21,7 @@ export interface GiftcardType {
   value: number;
   expired: boolean;
   used: boolean;
+  removed: boolean;
 }
 export const findNextGiftcardId = async (): Promise<string> => {
   const giftcardsRef = collection(db, "lahjakortit");
@@ -65,7 +66,7 @@ export const getUnusedGiftcards = async (): Promise<GiftcardType[]> => {
   const ref = collection(db, "lahjakortit");
   const snapshot = await getDocs(ref);
   const unusedGiftcards = snapshot.docs.filter(
-    (doc) => doc.data().used === false
+    (doc) => doc.data().used === false && doc.data().removed === false
   );
   return unusedGiftcards.map(
     (doc) =>
@@ -76,13 +77,18 @@ export const getUnusedGiftcards = async (): Promise<GiftcardType[]> => {
   );
 };
 
-export const useGiftcard = async (id: string): Promise<void> => {
+export const useGiftcard = async (id: string, expired: boolean): Promise<void> => {
   try {
   const ref = doc(db, "lahjakortit", id);
   const snapshot = await getDoc(ref);
     if (snapshot.exists()) {
-      await updateDoc(ref, { used: true });
+      if (expired) {
+        await updateDoc(ref, { removed: true });
+      } else {
+        await updateDoc(ref, { used: true });
+      }
     }
+    return;
   } catch (error) {
     console.error("Error using giftcard:", error);
     throw error;
@@ -101,4 +107,9 @@ export const checkExistingGiftcard = async (id: string): Promise<boolean> => {
   const giftcardDocRef = doc(db, "lahjakortit", id);
   const snapshot = await getDoc(giftcardDocRef);
   return snapshot.exists();
+};
+
+export const setExpiredGiftcard = async (id: string): Promise<void> => {
+  const giftcardDocRef = doc(db, "lahjakortit", id);
+  await updateDoc(giftcardDocRef, { expired: true });
 };
